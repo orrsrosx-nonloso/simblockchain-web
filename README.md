@@ -1,250 +1,201 @@
-<!--
- * @Author: your name
- * @Date: 2021-01-07 09:49:49
- * @LastEditTime: 2021-08-05 14:55:38
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \vue3-element-admin\README.md
--->
-
-项目使用了最新的**vue3 全家桶**+**element-plus**+**mockjs**+**axios**+**eChart5**.项目继成了**mockServe**,可脱离后端自主开发测试
-对**axios**深度封装,采用动态路由,路由配置更简单,**mockServe**独立开发测试时可在 nodework 直观查看接口数据  
-基于 node 实现自动化开发
+## 介绍
+本项目为构建区块链仿真工具创建
+## 软件架构
+[vite 2.0.1](https://cn.vitejs.dev/guide/)  
+[vue 3.0.5](https://vue3js.cn/docs/zh/)  
+[element-plus 1.0.2-beta.32](https://element-plus.gitee.io/#/zh-CN)  
+vue-route 4.0.4  
+vue-i18n 9.0.0  
+axios 0.21.1  
+vuex 4.0.0-beta.2  
 
 ## 环境依赖
+node v12.18.3  
 
-**node 14+**, **vueCli 4+**
+## 安装教程
 
-## 部署步骤
+#### 1. git clone ssh
+#### 2. cd vite-vue-elementplus-admin  
+#### 3. npm install  
+#### 4. npm run dev:dev  
 
-**npm i**
-**npm run serve**
+## 使用说明
 
-## 目录结构描述
+#### 1. 访问路径必须为localhost:3000才可以登录
+#### 2. 用户名：（admin）（user）密码：（111111）
 
+## 参与贡献
+
+JustTwo
+
+## 项目结构
 ```
-│  .browserslistrc			浏览器兼容配置
-│  .eslintrc.js				eslint配置文件
-│  .gitignore				git配置文件
-│  babel.config.js			babel配置文件
-│  jsconfig.json 			js配置文件
-│  LICENSE 					开源认证
-│  package-lock.json
-│  package.json
-│  README.md				项目说明
-│  vue.config.js 			vue配置文件
-│
-├─.vscode					vscode配置文件
-│      settings.json
-│
-├─node_modules
-├─public
-│      favicon.ico
-│      index.html
-│
-└─src
-    │  App.vue
-    │  main.js
-    │  config.js
-    │
-    ├─api					api管理模块
-    │  │  index.js			api管理入口文件
-    │  │  mock-server.js	mock服务配置文件
-    │  │
-    │  └─modules			api分模块管理
-    │          system.js	模块api文件
-    │
-    ├─assets				静态文件
-    │      logo.png
-    │
-    ├─components			公共组件目录
-    │  │  Common.vue
-    │  │  FunctionPage.vue
-    │  │
-    │  ├─dashboard
-    │  │      LiveChart.vue
-    │  │      Shortcuts.vue
-    │  │
-    │  └─layout
-    │      │  NavigateBar.vue
-    │      │  SideBar.vue
-    │      │
-    │      └─components
-    │              Breadcrumb.vue
-    │              Hamburger.vue
-    │              Logo.vue
-    │              Personal.vue
-    │              SlideMenu.vue
-    │
-    ├─directives			自定义指令目录
-    │  │  index.js			自定义指令入口文件
-    │  │
-    │  └─modules 			自定义指令模块目录
-    │          permission.js
-    │          resize.js
-    │
-    ├─plugins				插件目录
-    │      axios.js
-    │      element.js
-    │      mock.js
-    │      permission.js
-    │
-    ├─router 				router目录
-    │      globalRoutes.js
-    │      index.js
-    │      mainRoutes.js
-    │
-    ├─store 				vuex目录
-    │  │  getters.js
-    │  │  index.js
-    │  │
-    │  └─modules			vuex模块目录
-    │          app.js
-    │
-    ├─styles 				样式目录
-    │      common.scss
-    │      variables.scss.js
-    │
-    ├─utils					公共方法
-    │      index.js
-    │      validate.js
-    │
-    └─views
-        │  404.vue
-        │  AppMain.vue
-        │  Home.vue
-        │  IFrame.vue
-        │  Login.vue
-        │
-        └─layoutpages
-            │  common.js
-            │
-            ├─leisure
-            │      Game.vue
-            │
-            └─system
-                │  Menus.vue
-                │  Roles.vue
-                │  Users.vue
-                │
-                └─components
-                        MenuEdit.vue
-                        RoleEdit.vue
-                        UsersEdit.vue
-                        UsersEditRoute.vue
+├── public           #静态资源
+├── src              #前端项目源码目录
+│   ├───—api         #接口文件目录
+│   ├───—assets      #静态资源资源目录
+│   ├───—common      #公用文件目录
+│   ├───—components  #公共组件目录
+│   ├───—language    #国际化语言目录
+│   ├───—layout      #项目模式配置组件目录
+│   ├───—router      #路由目录
+│   ├───—store       #状态管理目录
+│   ├───—utils       #常用方法目录
+│   ├───—views       #视图文件目录
+│   ├───—App.vue     #项目入口文件
+│   └────main.js     #项目的核心配置文件
+├── vite.config.js   #vite配置文件
+├── .env.development #开发环境下配置文件
+├── .env.production  #正式环境下配置文件
+├── index.html       #首页入口文件
+├── package.json     #项目依赖列表文件
+├── LICENSE          #开源凭证
+└── README.md        #项目的说明文档
 ```
 
-## 使用文档
-
-### 自定义指令
-
-**v-permission="[array]"**
-自定义权限指令,参数为一个数组,数组元素为按钮所对应的 key 值
-
-```js
-<el-button
-    v-permission="['add']"
-    size="mini"
-    type="primary"
-    @click="handleEdit(menus.add.name)"
-    >{{ menus.add.name }}
-</el-button>
+## V1.0.0 版本功能
+### 0. 三种不同模式 PC横向导航 PC垂直导航 手机导航  
+    在.env中自行配置：VITE_LAYOUT_TYPE
+### 1. 国际化 
+    /src/language/en.js 和 /src/language/zh_cn.js 填写对应的语言  
+    引用 import { useI18n } from "vue-i18n";  
+    使用 const { t } = useI18n();   
+    视图中 {{t('regist')}}  
+    可在登录页查看具体用法
+### 2. 动态路由和路由鉴权（菜单管理和权限管理未完善）
+    结合vuex,cookie,localstorage使用  
+### 3. 二次封装element_table组件: /src/components/table.vue
+#### 引用表格组件
+```vue
+<table-box
+      :tableData="state.tableData"
+      :tableColumn="tableColumn"
+      :selection="true"
+      :selectedData="selectedData"
+      :routeRoles="route.meta.roles"
+      @actionClick="actionClick"
+    >
+      <!-- 自定义列 -->
+  <template
+    v-slot:status="{row}"
+  >
+    <i
+      class="el-icon-circle-check"
+      v-if="row.status"
+    ></i>
+    <i
+      class="el-icon-circle-close"
+      v-else
+    ></i>
+  </template>
+</table-box>
 ```
-
-**v-resize="myChart"**
-监听 echart 容器的自定义指令,参数为 echart 实例
-
-```js
-<div
-    v-resize="myChart"
-    style="height:400px;margin-top:20px"
-    ref="liveChart"
-></div>
+#### 表格数据
+```javascript
+tableData: [
+    {
+      id: 3,
+      date: "2016-05-02",
+      name: "王小虎",
+      address: "上海市普陀区金沙江路1518弄",
+      status: false,
+    },
+  ],
 ```
-
-### 动态路由
-
-动态路由的配置可查看 [src\plugins\permission.js](src\plugins\permission.js)  
-主要原理就是根据后端接口返回的树形菜单数据,动态生成路由表并挂载.具体需求字段可在[src\plugins\permission.js](src\plugins\permission.js)中的**fnAddDynamicMenuRoutes**方法中进行配置修改
-
-```js
-let route = {
-    path: menuList[i].url.replace(/\//g, "-") + `-${menuList[i].id}`,
-    component: null,
-    name: menuList[i].url.replace(/\//g, "-") + `-${menuList[i].id}`
-    // meta: {
-    // }
-};
-// url以http[s]://开头, 通过iframe展示
-if (menuList[i].iframe == 1) {
-    route["path"] = `i-${menuList[i].id}`;
-    route["name"] = `i-${menuList[i].id}`;
-    route["props"] = { url: menuList[i].url };
-    route["component"] = () => import("@/views/IFrame.vue");
-} else {
-    const l = "views/layoutpages/" + menuList[i].url;
-    route["component"] = () => import("@/" + l + ".vue");
+#### 需要展示的表格字段和表格操作
+```javascript
+const tableColumn = [
+  {
+    type: "index",
+    label: "序号",
+  },
+  {
+    prop: "status", // 字段关键字
+    label: "状态",  // 字段描述
+    width: "150",   // 列宽
+    slot: true,    // 是否需要插槽自定义
+  },
+  {
+    type: "action", // 识别操作类型的关键字段
+    label: "操作", // 字段描述
+    width: "150",   // 列宽
+    actionBtn: [
+      // 操作列表
+      // 如果要做权限，这里的funName需要和路由菜单中meta的auth一致
+      {
+        funName: "detail", // 自定义操作方法名
+        title: "详情",     // 自定义操作标题
+        color: "orange",   // 操作按钮颜色，如需其他颜色可在组件中自行添加
+      },
+      {
+        funName: "edit",
+        color: "orange",
+        title: "编辑",
+      },
+      {
+        funName: "del",
+        color: "red",
+        title: "删除",
+      },
+    ],
+  },
+];
+```
+#### 表格行操作
+```javascript
+function actionClick(e) {
+  console.log(e.funName); // 表格行操作方法名
+  console.log(e.data);    // 表格行数据
 }
-routes.push(route);
 ```
 
-根据需求可以添加更多路由配置或定制化字段,如路由别名等
-
-### 接口配置
-
-项目中对 axios 做了封装配置中添加**Global**字段用来控制是否显示全屏 load,默认为 true,如需修改添加 axios 配置可在[src\plugins\axios.js](src\plugins\axios.js)中进行
-
-#### 添加接口
-
-本项目对 mock 做了深度集成,在使用其他项目时,mock 接口和项目接口往往都是分开维护很不方便.所以就放在了一起.只用在一处添加即可.接口目录为[src\api\modules](src\api\modules)**不要修改此目录名称**.在该目录下添加对应的接口文件.
-
-```js
-module.exports = {
-    login: {
-        //接口名称  必须
-        url: "/login", //接口地址  必须
-        type: "post", //请求类型  必须
-        mock: true, //mock细粒度控制开关,非必须,不填则为false
-        response: opt => {
-            //启用mock时的返回数据  opt为请求数据头
-            const {
-                body: { userName, pwd }
-            } = opt;
-            let data = {
-                code: "00",
-                message: "登录成功!",
-                token: new Date().getTime(),
-                uname: userName
-            };
-            if (userName == "Administrator") {
-                if (pwd != "123456") {
-                    data = {
-                        code: "01",
-                        message: "密码错误"
-                    };
-                }
-            }
-            return data;
-        }
-    }
-};
+### 4. 封装检索条件组件:  /src/components/retrival.vue
+#### 引用检索组件
+```vue
+<retrieval
+      :retrievalList="retrievalList"
+      :retrievalActionBtn="retrievalActionBtn"
+      @retrievalAction="retrievalAction"
+    >
+     <!-- 插槽式添加自定义检索 -->
+  <template
+    v-slot:custom="{form, props, slotChange}"
+  >
+    <el-input v-model="form[props]" placeholder="自定义检索" @change="slotChange"></el-input>
+  </template>
+</retrieval>
 ```
-
-必须使用**module.exports**导出
-
-#### 接口的使用
-
-项目中已将封装后 axios 实例挂载到自定义字段 window.VE_API 上.调用方式为:
-
-```js
-VE_API [ fileName ][ portName ] (params,[config])   //有全局loading
-VE_API [ fileName ][ portName ] (params,{Global:false)   //没有全局loading
+#### retrievalList 检索列表
+```javascript
+const retrievalList = [
+  {
+    props: "input",  // 关键字
+    label: "输入框", // 标题
+    type: "input",  // 检索类型 目前支持 input select DatePicker，需要更多其它类型可在retrieval组件中添加或者slot插槽模式自定义
+    default: "111", // 默认值
+    options: [{     // 检索类型为select时添加的下拉列表
+        label: "全部",
+        value: "",
+      },
+      {
+        label: "值1",
+        value: "1",
+      },
+      {
+        label: "值2",
+        value: "2",
+      }],    
+  },
+];
 ```
-
-### 菜单配置
-
-项目中的菜单时根据后端返回的树形结构数据动态生成,具体可查看[src\components\layout\components\SlideMenu.vue](src\components\layout\components\SlideMenu.vue)
-
-## 声明
-
-个人开发维护! 欢迎交流学习!
+#### retrievalActionBtn 右侧按钮列表
+```javascript
+const retrievalActionBtn = ["add", "retrieval"]; // add新增 retrieval查询 reset重置 download导出 需要更多按钮可在retrieval组件中自行配置添加
+```
+#### retrievalAction 右侧按钮点击方法
+```javascript
+function retrievalAction(e) {
+  console.log(e.type) // 点击的按钮类型
+  console.log(e.form) // 检索数据列表
+}
+```
