@@ -1,22 +1,17 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-01-18 09:41:14
+ * @LastEditTime: 2021-01-18 16:14:36
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \vue3-element-admin\src\views\404.vue
+-->
 <template>
-  <div class="not-found">
-    <img src="../assets/404.gif" alt="" />
-  </div>
+    <common></common>
 </template>
-<script>
-export default {
-  name: 'Home',
-  components: {}
-}
+
+<script setup>
+import Common from "@/components/Common";
 </script>
-<style scoped>
-.not-found {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-.not-found img {
-  width: 100%;
-  height: 100%;
-}
-</style>
+
+<style lang="scss" scoped></style>
