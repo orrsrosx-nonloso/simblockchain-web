@@ -1,8 +1,5 @@
 <template>
   <div class="coverAll">
-    <div class="localTime" :style="isPhone? 'font-size: 50px;' : 'font-size: 150px'">
-      <span>{{state.localTime}}</span>
-    </div>
     <div class="content">
       <div>
         <div class="box">
@@ -12,7 +9,7 @@
               label-width="60px"
               :model="state.formLabelAlign"
             >
-              <el-form-item :label="t('username')">
+              <!-- <el-form-item :label="t('username')">
                 <el-input v-model="state.formLabelAlign.username"></el-input>
               </el-form-item>
               <el-form-item :label="t('password')">
@@ -27,18 +24,19 @@
                     ></i>
                   </template>
                 </el-input>
-              </el-form-item>
+              </el-form-item> -->
+              <h1 style="padding-bottom:40px">欢迎来到Simblockchain</h1>
             </el-form>
             <el-button
               type="primary"
               class="login"
               :loading="state.loginLoading"
               @click="login"
-            >{{t('login')}}</el-button>
-            <div
+            >{{t('simblock')}}</el-button>
+            <!-- <div
               class="regist"
               @click="regist"
-            >{{t('regist')}}</div>
+            >{{t('regist')}}</div> -->
           </div>
         </div>
       </div>
@@ -88,7 +86,11 @@ function changeType() {
   state.passwordType = state.passwordType == "password" ? "text" : "password";
 }
 function login() {
-  const params = JSON.parse(JSON.stringify(state.formLabelAlign));
+  const params = {
+    "username": "admin",
+    "password": "111111"
+}
+  // JSON.parse(JSON.stringify(state.formLabelAlign));
   state.loginLoading = true
   getLogin(params).then((res) => {
     if (res.status === 1) {
@@ -112,10 +114,10 @@ function login() {
   console.log(params);
 }
 
-function regist() {
-  const params = JSON.parse(JSON.stringify(state.formLabelAlign));
-  console.log(params);
-}
+// function regist() {
+//   const params = JSON.parse(JSON.stringify(state.formLabelAlign));
+//   console.log(params);
+// }
 </script>
 
 <style scoped lang="scss">
@@ -150,7 +152,7 @@ function regist() {
       background-color: rgba(255, 255, 255, 0.6);
       padding: 40px;
       .login {
-        width: 100%;
+        width: 70%;
       }
       .regist {
         text-align: right;
