@@ -1,5 +1,5 @@
 {
-  "name": "vite-vue-elementplus-admin",
+  "name": "simblockchain",
   "version": "0.0.1",
   "scripts": {
     "dev:dev": "vite --mode development",
