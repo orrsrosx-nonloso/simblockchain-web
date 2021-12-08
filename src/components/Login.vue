@@ -33,6 +33,12 @@
               :loading="state.loginLoading"
               @click="login"
             >{{t('simblock')}}</el-button>
+            <!-- <el-button
+              type="primary"
+              class="login"
+              :loading="state.loginLoading"
+              @click="userGet"
+            >{{t('username')}}</el-button> -->
             <!-- <div
               class="regist"
               @click="regist"
@@ -50,7 +56,7 @@ import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { getDate } from "../utils/utils";
 import { useRouter } from "vue-router";
-import { getLogin } from "../api/apis";
+import { getLogin, getUserData } from "../api/apis";
 
 defineProps({
   msg: String,
@@ -85,11 +91,17 @@ const { t } = useI18n();
 function changeType() {
   state.passwordType = state.passwordType == "password" ? "text" : "password";
 }
+function userGet(){
+  getUserData(null).then((res) =>{
+    console.log("获取数据:");
+    console.log(res);
+  }); 
+}
 function login() {
   const params = {
     "username": "admin",
     "password": "111111"
-}
+    }
   // JSON.parse(JSON.stringify(state.formLabelAlign));
   state.loginLoading = true
   getLogin(params).then((res) => {

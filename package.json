@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "mappa-mundi": "^0.0.5",
     "element-plus": "^1.2.0-beta.4",
     "node-sass": "npm:dart-sass@^1.25.0",
     "vue": "^3.2.4",

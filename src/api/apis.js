@@ -6,6 +6,11 @@ export const getLogin = function (data) {
     return http('get', '/http/login', data)
 }
 
+// 获取用户数据
+export const getUserData = function (data) {
+    return http('get', 'http://localhost:8081/book/findAll', data)
+}
+
 // 获取路由菜单
 export const getRoutesApi = function (data) {
     return http('get', '/http/getTable', {
