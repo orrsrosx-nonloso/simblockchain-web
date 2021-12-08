@@ -15,7 +15,7 @@ node v12.18.3
 ## 安装教程
 
 #### 1. git clone ssh
-#### 2. cd vite-vue-elementplus-admin  
+#### 2. cd simblockchain-web  
 #### 3. npm install  
 #### 4. npm run dev:dev  
 
