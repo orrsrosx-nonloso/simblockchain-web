@@ -1,11 +1,11 @@
 <template>
+      <!-- 二级菜单start -->
   <el-submenu :index="parentRoute + menu.path">
     <template #title>
       <i :class="props.menu.meta.icon ? props.menu.meta.icon: 'el-icon-menu'"></i>
       <span>{{menu.title}}</span>
     </template>
     <el-menu-item-group>
-      <!-- 二级菜单start -->
       <template
         :index="parentRoute + menuTwo.path"
         v-for="(menuTwo, indexTwo) in props.menu.children"

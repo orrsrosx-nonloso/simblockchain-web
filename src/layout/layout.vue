@@ -1,4 +1,5 @@
 <template>
+ <!-- 整体布局 -->
   <div class="main">
     <!-- 顶部导航 -->
     <topNav v-if="state.navType == 'horizontal' && !isPhone"></topNav>

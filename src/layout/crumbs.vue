@@ -9,6 +9,7 @@
 </template>
 
 <script setup>
+//左侧菜单点击后获取的地址
 import { reactive, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";

@@ -1,4 +1,5 @@
 <template>
+
   <ul
     class="parent"
     v-if="data.routeArr.length"
@@ -43,7 +44,7 @@
                 v-for="role in roles"
                 :key="role.value"
                 :label="role.value"
-              >{{role.label}}</el-checkbox>
+              >{{role.label}}sdada</el-checkbox>
             </el-checkbox-group>
           </div>
         </div>

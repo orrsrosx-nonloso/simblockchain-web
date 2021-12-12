@@ -1,4 +1,5 @@
 <template>
+<!-- 一级菜单 -->
   <el-menu
     :default-active="state.activeIndex"
     v-bind="$attrs"

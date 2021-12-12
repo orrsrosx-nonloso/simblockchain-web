@@ -1,7 +1,8 @@
 <template>
+<!-- 手机端 -->
   <div>
     <div class="phoneTop">
-      <div class="logo">LOGO</div>
+      <div class="logo">SimBlockchain</div>
       <div class="openClose">
         <i
           class="el-icon-s-fold"

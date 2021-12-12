@@ -8,8 +8,7 @@ import store from './store'
 import locale from 'element-plus/lib/locale/lang/zh-cn'
 import 'dayjs/locale/zh-cn'
 import i18n from './language/i18n'
-
-
+import echarts from 'echarts'
 
 const app = createApp(App);
 app.use(router);

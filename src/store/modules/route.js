@@ -50,7 +50,7 @@ const route = {
         asyncGetRoutes({ commit }, auth) {
             return new Promise((resolve) => {
                 getRoutesApi({ page: 1, limit: 100, auth: auth }).then(res => {
-                    const { data } = res
+                    const  data  = res
                     commit("getRoutes", data)
                     commit("addRoute", data)
                     resolve(data)

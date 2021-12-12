@@ -9,22 +9,7 @@
               label-width="60px"
               :model="state.formLabelAlign"
             >
-              <!-- <el-form-item :label="t('username')">
-                <el-input v-model="state.formLabelAlign.username"></el-input>
-              </el-form-item>
-              <el-form-item :label="t('password')">
-                <el-input
-                  v-model="state.formLabelAlign.password"
-                  :type="state.passwordType"
-                >
-                  <template #suffix>
-                    <i
-                      class="el-input__icon el-icon-view"
-                      @click="changeType"
-                    ></i>
-                  </template>
-                </el-input>
-              </el-form-item> -->
+             
               <h1 style="padding-bottom:40px">欢迎来到Simblockchain</h1>
             </el-form>
             <el-button
@@ -33,16 +18,6 @@
               :loading="state.loginLoading"
               @click="login"
             >{{t('simblock')}}</el-button>
-            <!-- <el-button
-              type="primary"
-              class="login"
-              :loading="state.loginLoading"
-              @click="userGet"
-            >{{t('username')}}</el-button> -->
-            <!-- <div
-              class="regist"
-              @click="regist"
-            >{{t('regist')}}</div> -->
           </div>
         </div>
       </div>

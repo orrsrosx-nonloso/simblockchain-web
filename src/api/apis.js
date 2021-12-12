@@ -11,9 +11,14 @@ export const getUserData = function (data) {
     return http('get', 'http://localhost:8081/book/findAll', data)
 }
 
+// 获取用户数据
+export const getMapData = function (data) {
+    return JSON.stringify
+}
+
 // 获取路由菜单
 export const getRoutesApi = function (data) {
-    return http('get', '/http/getTable', {
+    return http('get', 'http://localhost:8081/route/findAll', {
         tablename: 'routes',
         ...data
     })
