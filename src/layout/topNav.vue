@@ -1,7 +1,7 @@
 <template>
   <!-- 顶部菜单 -->
   <div class="navBox">
-    <div class="logo">SimBlockchain</div>
+    <div class="logo">SBC</div>
     <div class="nav">
       <navMenu mode="horizontal"></navMenu>
     </div>

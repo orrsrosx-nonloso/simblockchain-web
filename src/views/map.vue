@@ -17,17 +17,7 @@
 import world from '../assets/mapRow/world.json'
 import china from '../assets/mapRow/china.json'
 import nameMap from '../utils/nameMap.js'
-// import anhui from '../assets/mapRow/province/anhui.json'
-// import aomen from '../assets/mapRow/province/aomen.json'
-// import fujian from '../assets/mapRow/province/fujian.json'
-// import gansu from '../assets/mapRow/province/gansu.json'
-// import guangdong from '../assets/mapRow/province/guangdong.json'
-// import sichuan from '../assets/mapRow/province/sichuan.json'
-// import guangxi from '../assets/mapRow/province/guangxi.json'
-// import beijing from '../assets/mapRow/province/beijing.json'
-// import tianjin from '../assets/mapRow/province/tianjin.json'
-// import shanghai from '../assets/mapRow/province/shanghai.json'
-// import chongqing from '../assets/mapRow/province/chongqing.json'
+
 
 import echarts from "echarts"
 export default {

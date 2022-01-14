@@ -57,7 +57,6 @@
 import retrieval from "../components/retrieval.vue";
 import tableBox from "../components/table.vue";
 import pagination from "../components/pagination.vue";
-import tree from "../components/tree/tree.vue";
 import { reactive, getCurrentInstance, onMounted, nextTick, toRef, ref } from "vue";
 import { useRoute } from "vue-router";
 import { getRoutesApi, getRolesApi } from "../api/apis";

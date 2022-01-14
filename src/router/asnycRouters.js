@@ -3,6 +3,8 @@ import table from '../views/table.vue'
 import tree from '../views/tree.vue'
 import auth from '../views/auth.vue'
 import map from '../views/map.vue'
+import singleSim from '../views/singleSim.vue'
+import wholeSim from '../views/wholeSim.vue'
 
 const asnycRouters = [
     {
@@ -24,6 +26,17 @@ const asnycRouters = [
         path: 'map',
         name: 'map',
         component: map
+    }
+    ,
+    {
+        path: 'singleSim',
+        name: 'singleSim',
+        component: singleSim
+    },
+    {
+        path: 'wholeSim',
+        name: 'wholeSim',
+        component: wholeSim
     }
 ]
 

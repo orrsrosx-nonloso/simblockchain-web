@@ -2,7 +2,7 @@
 <!-- 手机端 -->
   <div>
     <div class="phoneTop">
-      <div class="logo">SimBlockchain</div>
+      <div class="logo">SBC</div>
       <div class="openClose">
         <i
           class="el-icon-s-fold"

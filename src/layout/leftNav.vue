@@ -1,76 +1,24 @@
 <template>
   <!-- 侧边菜单 -->
   <div :class="state.isCollapse ? 'leftNav collapse' : 'leftNav notCollapse'">
-    <div class="logo">SimBlockchain</div>
+    <div class="logo">SBC</div>
     <div class="nav">
       <navMenu
         mode="vertical"
         :isCollapse="state.isCollapse"
       ></navMenu>
-      <el-menu :default-openeds="['1', '3']">
-        <el-sub-menu index="1">
-          <template #title>
-            <el-icon><message /></el-icon>Navigator One
-          </template>
-          <el-menu-item-group>
-            <el-menu-item index="1-1">Option 1</el-menu-item>
-            <el-menu-item index="1-2">Option 2</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group>
-            <el-menu-item index="1-3">Option 3</el-menu-item>
-          </el-menu-item-group>
-          <el-sub-menu index="1-4">
-            <template #title>Option4</template>
-            <el-menu-item index="1-4-1">Option 4-1</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-        <el-sub-menu index="2">
-          <template #title>
-            <el-icon><icon-menu /></el-icon>Navigator Two
-          </template>
-          <el-menu-item-group>
-            <template #title>Group 1</template>
-            <el-menu-item index="2-1">Option 1</el-menu-item>
-            <el-menu-item index="2-2">Option 2</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="Group 2">
-            <el-menu-item index="2-3">Option 3</el-menu-item>
-          </el-menu-item-group>
-          <el-sub-menu index="2-4">
-            <template #title>Option 4</template>
-            <el-menu-item index="2-4-1">Option 4-1</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-        <el-sub-menu index="3">
-          <template #title>
-            <el-icon><setting /></el-icon>Navigator Three
-          </template>
-          <el-menu-item-group>
-            <template #title>Group 1</template>
-            <el-menu-item index="3-1">Option 1</el-menu-item>
-            <el-menu-item index="3-2">Option 2</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="Group 2">
-            <el-menu-item index="3-3">Option 3</el-menu-item>
-          </el-menu-item-group>
-          <el-sub-menu index="3-4">
-            <template #title>Option 4</template>
-            <el-menu-item index="3-4-1">Option 4-1</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-      </el-menu>
     </div>
     <div class="toolbar">
       <i
         v-if="!state.isCollapse"
         class="el-icon-s-fold"
         @click="setCollapse(true)"
-      ></i>
+      ><i class="iconfont">&#xe676;</i></i>
       <i
         v-if="state.isCollapse"
         class="el-icon-s-unfold"
         @click="setCollapse(false)"
-      ></i>
+      ><i class="iconfont">&#xe678;</i></i>
     </div>
     <!-- 用户信息，面包屑 -->
     <div :class="state.isCollapse ? 'topUser leftCollapse' : 'topUser leftNotCollapse'">
@@ -89,6 +37,8 @@ import navMenu from "./navMenu.vue";
 import user from "./user.vue";
 import crumbs from "./crumbs.vue";
 import { reactive } from "vue";
+import {modelSim, setsingle ,setsingle0} from "./menu.js";
+//modelSim 为0时为navmenu界面，1为singleSim配置界面
 
 const state = reactive({
   isCollapse: false,
@@ -158,7 +108,7 @@ function setCollapse(bol) {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   }
@@ -181,4 +131,18 @@ function setCollapse(bol) {
     }
   }
 }
+@font-face {
+  font-family: 'iconfont';  /* Project id 3114720 */
+  src: url('//at.alicdn.com/t/font_3114720_22gemfyklqph.woff2?t=1641177754695') format('woff2'),
+       url('//at.alicdn.com/t/font_3114720_22gemfyklqph.woff?t=1641177754695') format('woff'),
+       url('//at.alicdn.com/t/font_3114720_22gemfyklqph.ttf?t=1641177754695') format('truetype');
+}
+.iconfont{
+    font-family:"iconfont" !important;
+    font-size:16px;font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 </style>

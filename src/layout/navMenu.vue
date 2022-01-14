@@ -1,6 +1,6 @@
 <template>
 <!-- 一级菜单 -->
-  <el-menu
+  <el-menu v-if="state.thisModelSim === '0'"
     :default-active="state.activeIndex"
     v-bind="$attrs"
     @select="handleSelect"
@@ -18,17 +18,56 @@
         :index="'/layout/' + menu.path"
         v-else
       >
-        <i :class="menu.meta.icon ? menu.meta.icon: 'el-icon-menu'"></i>
-        <template #title>{{menu.title}}</template>
+        <i :class="menu.meta.icon ? menu.meta.icon: 'el-icon-menu'" ></i>
+        <template #title>
+          <div v-if="menu.path === 'singleSim'" 
+          @click="setSingle1()"
+          >{{menu.title}}</div>
+          <div v-else-if="menu.path === 'wholeSim'" 
+          @click="setSingle2()"
+          >{{menu.title}}</div>
+          <div v-else >{{menu.title}}</div>
+        </template>
+        
       </el-menu-item>
     </template>
   </el-menu>
+
+  <el-menu class="menu" :default-openeds="['1', '3']" v-if="state.thisModelSim === '1'">
+    <div class="back"><i class="iconfont" @click="setSingle0()">&#xe679;返回</i></div>
+      <el-submenu index="1">
+        <el-button size="small">节点生成</el-button><el-button size="small">区块生成</el-button>
+        <el-menu-item>
+          <el-menu-item index="1-1">选项1</el-menu-item>
+        </el-menu-item>
+      </el-submenu>
+      <el-submenu index="2">
+        <el-menu-item>
+          <el-menu-item index="2-2">选项2</el-menu-item>
+        </el-menu-item>
+      </el-submenu>
+      <el-submenu index="3">
+        <el-menu-item>
+          <el-menu-item index="3-1">选项3</el-menu-item>
+        </el-menu-item>
+      </el-submenu>
+    </el-menu>
+
+    <el-menu class="menu" :default-openeds="['1', '3']" v-if="state.thisModelSim === '2'">
+    <div class="back"><i class="iconfont" @click="setSingle0()">&#xe679;返回</i></div>
+      <el-submenu index="1">
+        <el-menu-item>
+          <el-menu-item index="1-1">配置项目</el-menu-item>
+        </el-menu-item>
+      </el-submenu>
+    </el-menu>
 </template>
 
 <script setup>
 import submenu from "./submenu.vue";
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import {modelSim, setsingle ,setsingle0,setsingle2} from "./menu.js";
 
 const router = useRouter();
 const route = useRoute();
@@ -37,11 +76,21 @@ const props = defineProps({
   isCollapse: Boolean,
 });
 
+const emit = defineEmits(['changeCollapse'])
+
+function setCollapse(bol) {
+  props.isCollapse = bol;
+  emit('changeCollapse', {
+    isCollapse: props.isCollapse
+  })
+}
+
 const routes = router.getRoutes();
 
 const state = reactive({
   activeIndex: route.path,
   menu: [],
+  thisModelSim: '0'
 });
 
 onMounted(() => {
@@ -53,6 +102,22 @@ function handleSelect(route) {
   router.push(route)
 }
 
+function setSingle1(){
+    setsingle();
+    state.thisModelSim = modelSim;
+    console.log("what is "+modelSim);
+}
+function setSingle0(){
+    setsingle0();
+    state.thisModelSim = modelSim;
+    console.log("what is "+modelSim);
+}
+
+function setSingle2(){
+    setsingle2();
+    state.thisModelSim = modelSim;
+    console.log("what is "+modelSim);
+}
 function getMenu(routes) {
   let menu = [];
   routes.map((layout) => {
@@ -67,5 +132,35 @@ function getMenu(routes) {
 <style lang='scss' scoped>
 .el-menu {
   border: none;
+}
+.backBtn{
+  position:absolute;
+  height: 20px;
+  left: 0px;
+}
+
+
+@font-face {
+  font-family: 'iconfont';  /* Project id 3114720 */
+  src: url('//at.alicdn.com/t/font_3114720_5ql72fsa49o.woff2?t=1641209428578') format('woff2'),
+       url('//at.alicdn.com/t/font_3114720_5ql72fsa49o.woff?t=1641209428578') format('woff'),
+       url('//at.alicdn.com/t/font_3114720_5ql72fsa49o.ttf?t=1641209428578') format('truetype');
+}
+.iconfont{
+    font-family:"iconfont" !important;
+    font-size:16px;font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+.back{
+  width: 30%;
+  left: 0;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  i {
+      font-size: 15px;
+      cursor: pointer;
+    }
 }
 </style>
