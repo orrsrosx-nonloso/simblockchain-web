@@ -16,14 +16,11 @@
       </template>
       <el-menu-item
         :index="'/layout/' + menu.path"
-        v-else
+        v-else 
       >
         <i :class="menu.meta.icon ? menu.meta.icon: 'el-icon-menu'" ></i>
         <template #title>
-          <div v-if="menu.path === 'singleSim'" 
-          @click="setSingle1()"
-          >{{menu.title}}</div>
-          <div v-else-if="menu.path === 'wholeSim'" 
+          <div v-if="menu.path === 'wholeSim'" 
           @click="setSingle2()"
           >{{menu.title}}</div>
           <div v-else >{{menu.title}}</div>
@@ -32,27 +29,6 @@
       </el-menu-item>
     </template>
   </el-menu>
-
-  <el-menu class="menu" :default-openeds="['1', '3']" v-if="state.thisModelSim === '1'">
-    <div class="back"><i class="iconfont" @click="setSingle0()">&#xe679;返回</i></div>
-      <el-submenu index="1">
-        <el-button size="small">节点生成</el-button><el-button size="small">区块生成</el-button>
-        <el-menu-item>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-        </el-menu-item>
-      </el-submenu>
-      <el-submenu index="2">
-        <el-menu-item>
-          <el-menu-item index="2-2">选项2</el-menu-item>
-        </el-menu-item>
-      </el-submenu>
-      <el-submenu index="3">
-        <el-menu-item>
-          <el-menu-item index="3-1">选项3</el-menu-item>
-        </el-menu-item>
-      </el-submenu>
-    </el-menu>
-
     <el-menu class="menu" :default-openeds="['1', '3']" v-if="state.thisModelSim === '2'">
     <div class="back"><i class="iconfont" @click="setSingle0()">&#xe679;返回</i></div>
       <el-submenu index="1">

@@ -31,7 +31,7 @@ import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { getDate } from "../utils/utils";
 import { useRouter } from "vue-router";
-import { getLogin, getUserData } from "../api/apis";
+import { getLoginMes ,getUserData} from "../api/apis";
 
 defineProps({
   msg: String,
@@ -66,20 +66,25 @@ const { t } = useI18n();
 function changeType() {
   state.passwordType = state.passwordType == "password" ? "text" : "password";
 }
-function userGet(){
-  getUserData(null).then((res) =>{
-    console.log("获取数据:");
-    console.log(res);
-  }); 
-}
+// function getLoginMesss(){
+//   const params = {
+//     "username": "admin",
+//     "password": "111111"
+//     }
+//   getLoginMes(params).then((res) =>{
+//     console.log("获取数据:");
+//     console.log(res);
+//   }); 
+// }
 function login() {
   const params = {
     "username": "admin",
     "password": "111111"
     }
+
   // JSON.parse(JSON.stringify(state.formLabelAlign));
   state.loginLoading = true
-  getLogin(params).then((res) => {
+  getLoginMes(params).then((res) => {
     if (res.status === 1) {
       store.commit('getUser', {token: res.data._id, ...res.data})
       console.log('store', store)
