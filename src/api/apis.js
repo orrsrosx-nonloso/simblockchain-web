@@ -40,6 +40,29 @@ export const getRoutesApi = function (data) {
 export const createNewNode = function (data) {
     return http('get', 'http://localhost:8081/singleNode/createNode', data)
 }
+//清楚仿真数据缓存
+export const clearCache = function (data) {
+    return http('get', 'http://localhost:8081/singleNode/clearCache', data)
+}
+//查找节点
+export const findNodeByAddressId = function (data) {
+    return http('post', 'http://localhost:8081/singleNode/findByAddressID', data)
+}
+
+//查找区块
+export const findBlockByBlockId = function (data) {
+    return http('post', 'http://localhost:8081/singleBlock/findByBlockId', data)
+}
+
+//清楚仿真数据缓存
+export const deleteNode = function (data) {
+    return http('post', 'http://localhost:8081/singleNode/deleteNode', data)
+}
+
+// 新键区块
+export const createNewBlock = function (data) {
+    return http('get', 'http://localhost:8081/singleBlock/createBlock', data)
+}
 
 // 获取权限菜单
 export const getRolesApi = function (data) {

@@ -11,6 +11,7 @@ import 'dayjs/locale/zh-cn'
 import i18n from './language/i18n'
 import echarts from 'echarts'
 import {SuperFlow} from 'vue3-super-flow'
+import CScrollbar from 'c-scrollbar';
 import 'vue3-super-flow/dist/style.css'
 
 const app = createApp(App);
@@ -19,5 +20,6 @@ app.use(ElementPlus, {locale});
 app.use(i18n);
 app.use(store);
 app.use(SuperFlow);
+app.use(CScrollbar);
 app.mount('#app');
 

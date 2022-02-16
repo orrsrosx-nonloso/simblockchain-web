@@ -1,35 +1,71 @@
 <template>
   <el-scrollbar height="100%">
     <el-row :gutter="3">
-      <el-col :span="4"
+      <el-col :span="3"
         ><div class="grid-content">
           <div class="base_title">节点操作</div>
           <div class="drag-box">
-            <div class="list-complete-item1">
-              <div class="list-complete-item-handle2">节点生成</div>
-            </div>
+            <el-button class="opButton" type="primary" size="small">交易模拟 </el-button>
+          </div>
+          <div class="drag-box">
+            <el-button class="opButton" type="primary" size="small">区块传输 </el-button>
+          </div>
+          <div class="drag-box">
+            <el-button class="opButton" type="primary" size="small">钱包结构 </el-button>
+          </div>
+          <div class="drag-box">
+            <el-button class="opButton" type="primary" size="small">网络延迟 </el-button>
           </div>
           <div class="base_title">区块操作</div>
           <div class="drag-box">
-            <Draggable
-              :list="block2"
-              item-key="id"
-              :animation="100"
-              :sort="false"
-              :group="{ name: 'article2', pull: 'clone' }"
-              @end="end1"
-              class="dragArea1"
+            <el-button
+              class="opButton"
+              type="primary"
+              size="small"
+              @click="consensusVisible = true"
+              >共识选择
+            </el-button>
+            <el-dialog
+              v-model="consensusVisible"
+              title="选择需要的共识协议"
+              width="30%"
+              :before-close="consensusHandleClose"
             >
-              <template #item="{ element }">
-                <div class="list-complete-item1">
-                  <div class="list-complete-item-handle2">{{ element.name }}</div>
-                </div>
+              <div>
+                <el-radio v-model="consensusChoose" label="1" size="large">POW</el-radio>
+                <el-radio v-model="consensusChoose" label="2" size="large">POS</el-radio>
+              </div>
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="consensusVisible = false">关闭</el-button>
+                  <el-button type="primary" @click="consensusVisible = false"
+                    >保存</el-button
+                  >
+                </span>
               </template>
-            </Draggable>
+            </el-dialog>
+          </div>
+          <div class="drag-box">
+            <el-button class="opButton" type="primary" size="small" @click="blockTranSim"
+              >区块传输模拟
+            </el-button>
+          </div>
+          <div class="drag-box">
+            <el-button class="opButton" type="primary" size="small">区块传输 </el-button>
+          </div>
+          <div class="drag-box">
+            <el-button class="opButton" type="primary" size="small"
+              >新区块获取难度
+            </el-button>
+          </div>
+          <div class="drag-box">
+            <el-button class="opButton" type="primary" size="small"
+              >区块链分叉
+            </el-button>
           </div>
         </div></el-col
       >
-      <el-col :span="14"
+      <el-col :span="15"
         ><div class="grid-content">
           <div class="drag-box">
             <el-card class="box-card" :body-style="{ padding: '5px', height: '538px' }">
@@ -37,6 +73,14 @@
                 <div class="card-header">
                   <span>节点与区块</span>
                   <div>
+                    <el-tooltip
+                      class="box-item"
+                      effect="dark"
+                      content="仿真开始前进行清除"
+                      placement="top-start"
+                    >
+                      <el-button @click="clearCache" style="left: 0">清空缓存</el-button>
+                    </el-tooltip>
                     <span
                       class="node-item"
                       v-for="item in nodeItemList"
@@ -57,6 +101,7 @@
               <div class="flow-container" ref="flowContainer">
                 <super-flow
                   ref="superFlow"
+                  :node-list="nodeList"
                   :link-list="linkList"
                   :graph-menu="graphMenu"
                   :node-menu="nodeMenu"
@@ -116,19 +161,24 @@
         ><div class="grid-content bg-purple-light">
           <el-card class="box-card" :body-style="{ padding: '5px', height: '236px' }">
             <template #header>
-              <div class="card-header">
+              <div class="card-header" style="font-weight: bold">
                 <span>SUMMARY</span>
               </div>
             </template>
-            <div v-for="o in 4" :key="o" class="text item">{{ "List item " + o }}</div>
+            <div v-for="o in summaryMes" class="text item">{{ o.tabName + o.data }}</div>
           </el-card>
           <el-card class="box-card" :body-style="{ padding: '5px', height: '237px' }">
             <template #header>
-              <div class="card-header">
+              <div class="card-header" style="font-weight: bold">
                 <span>EVENT</span>
               </div>
             </template>
-            <div v-for="o in 4" :key="o" class="text item">{{ "List item " + o }}</div>
+            <c-scrollbar maxHeight="237px" maxWidth="280px" trigger="hover">
+              <div v-for="e in eventMes" class="text item">
+                {{ e.eventName }}
+                {{ e.data }}
+              </div>
+            </c-scrollbar>
           </el-card>
         </div>
         <el-drawer
@@ -139,47 +189,81 @@
           direction="ltr"
           custom-class="demo-drawer"
           size="40%"
+          width="350px"
         >
           <div class="demo-drawer__content">
-            <el-form :model="form">
+            <el-form :model="wqeqweqew">
               <el-descriptions :column="1" border>
                 <el-descriptions-item
-                  label="Address"
-                  label-align="center"
+                  label="Hash"
+                  label-align="left"
                   align="center"
                   label-class-name="my-label"
                   class-name="my-content"
-                  >18cBEMRxXHqzWWCxZNtU91F5sbUNKhL5PX</el-descriptions-item
+                  >{{
+                    drwaerDateBlock.hash[0]
+                  }}
+
+                  {{
+                    drwaerDateBlock.hash[1]
+                  }}
+                  </el-descriptions-item
                 >
                 <el-descriptions-item
-                  label="Transactions"
+                  label="Confirmations"
                   label-align="center"
                   align="center"
-                  >30,838</el-descriptions-item
+                  >{{drwaerDateBlock.confirmations}}</el-descriptions-item
                 >
                 <el-descriptions-item
-                  label="Total Received"
+                  label="Timestamp"
                   label-align="center"
                   align="center"
                 >
-                  289155.43415856 BTC</el-descriptions-item
+                  {{drwaerDateBlock.timestamp}}</el-descriptions-item
                 >
-                <el-descriptions-item
-                  label="Total Sent"
-                  label-align="center"
-                  align="center"
-                >
-                  289086.00621223 BTC
+                <el-descriptions-item label="Height" label-align="center" align="center">
+                  {{drwaerDateBlock.height}}
                 </el-descriptions-item>
+                <el-descriptions-item label="Miner" label-align="center" align="center"
+                  >{{drwaerDateBlock.miner}}</el-descriptions-item
+                >
                 <el-descriptions-item
-                  label="Final Balance"
+                  label="Number of Transactions"
                   label-align="center"
                   align="center"
-                  >69.42794633 BTC</el-descriptions-item
+                  >{{drwaerDateBlock.numOfTransac}}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Difficulty"
+                  label-align="center"
+                  align="center"
+                  >{{drwaerDateBlock.difficulty}}</el-descriptions-item
+                >
+                <el-descriptions-item label="Nonce" label-align="center" align="center"
+                  >{{drwaerDateBlock.nonce}}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Transaction Volume"
+                  label-align="center"
+                  align="center"
+                  >{{drwaerDateBlock.transactionVolume}}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Block Reward"
+                  label-align="center"
+                  align="center"
+                  >{{drwaerDateBlock.reward}}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Fee Reward"
+                  label-align="center"
+                  align="center"
+                  >{{drwaerDateBlock.feeReward}}</el-descriptions-item
                 >
               </el-descriptions>
               <el-button type="text" @click="innerDrawer = true"
-                >节点内所有交易详情</el-button
+                >区块内所有交易详情</el-button
               >
               <el-drawer
                 v-model="innerDrawer"
@@ -202,26 +286,62 @@
         <el-drawer
           ref="drawerRef"
           v-model="dialog2"
-          title="I have a nested form inside!"
+          title="节点详情"
           :before-close="handleClose"
           direction="rtl"
           custom-class="demo-drawer"
           size="40%"
         >
           <div class="demo-drawer__content">
-            <el-form :model="form">
-              <el-form-item label="Name" :label-width="formLabelWidth">
-                <el-input v-model="form.name" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="Area" :label-width="formLabelWidth">
-                <el-select
-                  v-model="form.region"
-                  placeholder="Please select activity area"
+            <el-form :model="drwaerDateNode">
+              <el-descriptions :column="1" border>
+                <el-descriptions-item
+                  label="Address"
+                  label-align="center"
+                  align="center"
+                  label-class-name="my-label"
+                  class-name="my-content"
+                  >{{drwaerDateNode.address}}</el-descriptions-item
                 >
-                  <el-option label="Area1" value="shanghai"></el-option>
-                  <el-option label="Area2" value="beijing"></el-option>
-                </el-select>
-              </el-form-item>
+                <el-descriptions-item
+                  label="Transactions"
+                  label-align="center"
+                  align="center"
+                  >{{drwaerDateNode.transactions}}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Total Received"
+                  label-align="center"
+                  align="center"
+                >
+                  {{drwaerDateNode.totalReceived}}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Total Sent"
+                  label-align="center"
+                  align="center"
+                >
+                  {{drwaerDateNode.totalSent}}
+                </el-descriptions-item>
+                <el-descriptions-item
+                  label="Final Balance"
+                  label-align="center"
+                  align="center"
+                  >{{drwaerDateNode.balance}}</el-descriptions-item
+                >
+              </el-descriptions>
+              <el-button type="text" @click="innerDrawer2 = true"
+                >节点内所有交易详情</el-button
+              >
+              <el-drawer
+                v-model="innerDrawer2"
+                direction="rtl"
+                title="I'm inner Drawer"
+                :append-to-body="true"
+                :before-close="NodeDetailHandleClose"
+              >
+                <p>_(:зゝ∠)_</p>
+              </el-drawer>
             </el-form>
             <div class="demo-drawer__footer">
               <el-button @click="cancelForm2">Cancel</el-button>
@@ -240,17 +360,40 @@ import { ref, reactive } from "vue";
 import Draggable from "vuedraggable";
 import { ElMessageBox } from "element-plus";
 import { ElMessage } from "element-plus";
-import type { ElDrawer } from "element-plus";
+import type { ElDrawer, Action } from "element-plus";
+import {
+  clearCache,
+  createNewNode,
+  createNewBlock,
+  deleteNode,
+  findNodeByAddressId,
+  findBlockByBlockId,
+} from "../api/apis";
+import { uuid, getDataString } from "../utils/utils";
+import { t } from "element-plus/es/locale";
 const drawerType = {
   node: 0,
   link: 1,
 };
+
+//连线数据存储集合
+const linkListId = reactive([]);
+//节点数据存储
+const nodeListId = reactive([]);
+//区块数据存储
+const blockListId = reactive([]);
+
+//总连线集合
+const totalLinkList = reactive([]);
 
 export default {
   components: {
     Draggable,
   },
   setup() {
+    //区块共识选择
+    const consensusVisible = ref(false);
+    const consensusChoose = ref("1");
     //拖拽区块节点配置
     const disabled = ref(false);
     const node1 = reactive([]);
@@ -290,6 +433,7 @@ export default {
 
     const dialog = ref(false);
     const innerDrawer = ref(false);
+    const innerDrawer2 = ref(false);
     const dialog2 = ref(false);
     const loading = ref(false);
 
@@ -385,6 +529,33 @@ export default {
       clearTimeout(timer);
     };
 
+    const consensusHandleClose = (done: () => void) => {
+      ElMessageBox.confirm("Are you sure to close this dialog?")
+        .then(() => {
+          done();
+        })
+        .catch(() => {
+          // catch error
+        });
+    };
+    const blockTranSim = (done: () => void) => {
+      ElMessageBox.alert("即将开始区块传输模拟!", "区块传输", {
+        confirmButtonText: "OK",
+        callback: (action: Action) => {
+          ElMessage({
+            message: `开始传输`,
+          });
+        },
+      });
+    };
+    const drawerTrue = (name) => {
+      if (name == "dialog") {
+        dialog.value = true;
+      } else if (name == "dialog2") {
+        dialog2.value = true;
+      }
+    };
+
     return {
       disabled,
       node1,
@@ -401,6 +572,7 @@ export default {
       timer,
       dialog,
       dialog2,
+      drawerTrue,
       loading,
       form,
       onClick,
@@ -411,10 +583,91 @@ export default {
       cancelForm2,
       drawerBlockTrue,
       innerDrawer,
+      innerDrawer2,
       NodeDetailHandleClose,
+      consensusHandleClose,
+      consensusVisible,
+      consensusChoose,
+      blockTranSim,
     };
   },
   data() {
+    //抽屉中的节点和区块数据
+    let wqeqweqew = "sdadasd";
+    let drwaerDateBlock = reactive({
+      id: 1,
+      blockID: "GenesisBlock1",
+      height: 1,
+      hash: ["000a6c2a3347ff2ef0a48ae2508716","cfab42ae75b71d52ab36d2815ead9efa35"],
+      timestamp: "2022-02-16 23:15:09",
+      confirmations: 1,
+      miner: null,
+      numOfTransac: null,
+      difficulty: 1275840,
+      nonce: 5316,
+      transactionVolume: 0,
+      reward: 10,
+      feeReward: 0,
+      prevBlockHash: "0000000000000000000000000000000000000000000000000000000000000000",
+    });
+    let drwaerDateNode = reactive({
+      id: 1,
+      address: "1CVrnHbS5qu6kSXFoCpwnCW1sqPQuaHhoJ",
+      addressId: "Node1",
+      transactions: 0,
+      totalReceived: 0,
+      totalSent: 0,
+      balance: 0,
+    });
+    //连线集合
+    let linkList = reactive([]);
+
+    let nodeList = [];
+    //概要信息
+    let summaryMes = reactive([
+      {
+        tabName: "仿真时间:  ",
+        data: "0",
+      },
+      {
+        tabName: "节点数量:  ",
+        data: "0",
+      },
+      {
+        tabName: "区块数量:  ",
+        data: "0",
+      },
+      {
+        tabName: "First block:  ",
+        data: "0",
+      },
+      {
+        tabName: "Last block:  ",
+        data: "0",
+      },
+      {
+        tabName: "传播延迟:  ",
+        data: "0",
+      },
+      {
+        tabName: "交易发生次数:  ",
+        data: "0",
+      },
+    ]);
+    //详情信息
+    let eventMes = reactive([
+      {
+        eventName: "仿真准备:  ",
+        data: "START!",
+      },
+    ]);
+
+    const LogEvent = (eventName, data) => {
+      eventMes.push({
+        eventName: eventName,
+        data: data,
+      });
+    };
     return {
       drawerType,
       linkSetting: {
@@ -424,10 +677,7 @@ export default {
         name: "",
         desc: "",
       },
-      //连线集合
-      linkList: [],
-      linkListId: [],
-      nodeListId: [],
+
       dragConf: {
         isDown: false,
         isMove: false,
@@ -445,7 +695,7 @@ export default {
             width: 100,
             height: 30,
             meta: {
-              label: "1",
+              label: "node1",
               prop: "node",
               name: "节点",
             },
@@ -457,7 +707,7 @@ export default {
             width: 100,
             height: 30,
             meta: {
-              label: "2",
+              label: "block2",
               prop: "block",
               name: "区块",
             },
@@ -473,46 +723,154 @@ export default {
             // 选项是否禁用
             // 选项选中后回调函数
             selected(graph, coordinate) {
-              graph.addNode({
-                width: 100,
-                height: 30,
-                coordinate,
-                meta: {
-                  label: "1",
-                  name: "节点",
-                },
+              createNewNode(null).then((res) => {
+                graph.addNode({
+                  width: 100,
+                  height: 30,
+                  coordinate,
+                  meta: {
+                    label: res.addressId,
+                    name: res.addressId,
+                    prop: "node",
+                  },
+                });
+                LogEvent("create new " + res.addressId + ":", res.address);
+                // const nodeListIdsdadsaa = this.nodeListId;
+                // const newNodelist2 = this.$refs.superFlow.graph;
+                const newNodelist = graph.nodeList;
+                const presentNode = newNodelist[newNodelist.length - 1];
+                presentNode.meta.name = res.addressId;
+                // let presentNodsd=presentNode.id;
+                nodeListId.push({
+                  lable: presentNode.meta.label,
+                  id: presentNode.id,
+                });
+                const data = nodeListId.length;
+                this.summaryMes[1].data = data;
+                // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
               });
             },
           },
-          {
-            label: "新键区块",
-            selected(graph, coordinate) {
-              graph.addNode({
-                width: 100,
-                height: 30,
-                coordinate,
-                meta: {
-                  label: "2",
-                  name: "区块",
-                },
-              });
-            },
-          },
+          // {
+          //   label: "新键区块",
+          //   selected(graph, coordinate) {
+          //     let dsad = graph.nodelist;
+          //     if (graph.nodeList.length > 0) {
+          //       createNewBlock(null).then((res) => {
+          //         graph.addNode({
+          //           width: 100,
+          //           height: 30,
+          //           coordinate,
+          //           meta: {
+          //             label: res.blockID,
+          //             name: res.blockID,
+          //             prop: "block",
+          //           },
+          //         });
+          //         const newBlocklist = graph.nodeList;
+          //         const presentBlock = newBlocklist[newBlocklist.length - 1];
+          //         presentBlock.meta.name = res.blockID;
+          //         if (presentBlock.meta.prop == "block") {
+          //           // let presentNodsd=presentNode.id;
+          //           blockListId.push({
+          //             lable: presentBlock.meta.label,
+          //             id: presentBlock.id,
+          //           });
+          //         }
+
+          //         const newId = uuid("link");
+          //         const lengthblockListId = blockListId.length;
+          //         if (lengthblockListId >= 2) {
+          //           const lengthLinklength = linkList.length;
+          //           const targetLinkList = [];
+          //           if (lengthLinklength > 0) {
+          //             for (var i = 0; i < lengthLinklength; i++) {
+          //               targetLinkList.push(linkList[i]);
+          //             }
+          //           }
+          //           targetLinkList.push({
+          //             id: newId,
+          //             startId: blockListId[lengthblockListId - 2].id,
+          //             endId: blockListId[lengthblockListId - 1].id,
+          //             startAt: [100, 24],
+          //             endAt: [0, 25],
+          //             meta: "block",
+          //           });
+          //           linkList = targetLinkList;
+          //         }
+          // const data = blockListId.length;
+          // this.summaryMes[2].data = data;
+          // const newId = uuid("link");
+          // const lengthLink = blockListId.length;
+
+          // if (lengthLink >= 2) {
+          //   const dsaadf = totalLinkList;
+          //   totalLinkList.push({
+          //     id: newId,
+          //     startId: blockListId[lengthLink-2].id,
+          //     endId: blockListId[lengthLink-1].id,
+          //     startAt: [160, 40],
+          //     endAt: [0, 25],
+          //     meta: null,
+          //   });
+          // }
+
+          // this.$refs.superFlow.addNode({
+          //   coordinate,
+          //   ...conf.info,
+          // });
+          //       });
+          //     } else {
+          //       ElMessage({
+          //         message: "创建区块前请先创建节点.",
+          //         type: "warning",
+          //       });
+          //     }
+          //   },
+          // },
           {
             label: "创世块",
             disable(graph) {
-              return !!graph.nodeList.find((node) => node.meta.label === "3");
+              return !!graph.nodeList.find((node) => node.meta.label === "GenesisBlock1");
             },
             selected(graph, coordinate) {
-              graph.addNode({
-                width: 100,
-                height: 30,
-                coordinate,
-                meta: {
-                  label: "3",
-                  name: "genesisBlock",
-                },
-              });
+              if (graph.nodeList.length > 0) {
+                createNewBlock(null).then((res) => {
+                  graph.addNode({
+                    width: 100,
+                    height: 30,
+                    coordinate,
+                    meta: {
+                      label: res.blockID,
+                      name: res.blockID,
+                      prop: "block",
+                    },
+                  });
+                  LogEvent("create new " + res.blockID + ":", res.hash);
+                  const newBlocklist = graph.nodeList;
+                  const presentBlock = newBlocklist[newBlocklist.length - 1];
+                  presentBlock.meta.name = res.blockID;
+                  if (presentBlock.meta.prop == "block") {
+                    // let presentNodsd=presentNode.id;
+                    blockListId.push({
+                      lable: presentBlock.meta.label,
+                      id: presentBlock.id,
+                    });
+                  }
+                  summaryMes[2].data = "1";
+                  summaryMes[3].data = "GenesisBlock1";
+                  summaryMes[4].data = "GenesisBlock1";
+                  // this.$refs.superFlow.addNode({
+                  //   coordinate,
+                  //   ...conf.info,
+                  // });
+                });
+              } else {
+                ElMessage({
+                  message: "创建区块前请先创建节点.",
+                  type: "warning",
+                });
+              }
             },
           },
         ],
@@ -535,13 +893,61 @@ export default {
         [
           {
             label: "删除",
+            hidden(node) {
+              return (
+                node.meta.name === "GenesisBlock1" ||
+                node.meta.name.indexOf("Block") != -1
+              );
+            },
             selected: (node) => {
-              node.remove();
+              const val = node.meta.name;
+              const target = nodeListId;
+              var index = 0;
+              for (var i = 0; i < target.length; i++) {
+                if (target[i].lable == val) {
+                  index = i;
+                }
+              }
+              if (index > -1) {
+                target.splice(index, 1);
+              }
+              this.removeNodes();
+              deleteNode({ addressId: node.meta.name }).then((res) => {
+                if (res == true) {
+                  node.remove();
+                  LogEvent("delete : ", node.meta.name);
+                }
+              });
             },
           },
           {
             label: "编辑",
             selected: (node) => {
+              if (node.meta.prop == "node") {
+                findNodeByAddressId({ addressId: node.meta.name }).then((res) => {
+                  if (res == null) {
+                    ElMessage.error("无法编辑!");
+                  } else {
+                    drwaerDateNode = res;
+                    let sue = drwaerDateNode;
+                    this.drawerTrue("dialog2");
+                  }
+                });
+              } else if (node.meta.prop == "block") {
+                findBlockByBlockId({ blockId: node.meta.name }).then((res) => {
+                  if (res == null) {
+                    ElMessage.error("无法编辑!");
+                  } else {
+                    drwaerDateBlock = res;
+                    if(drwaerDateBlock.hash){
+                      let lengths = res.hash.length;
+                      drwaerDateBlock.hash=[res.hash.substring(0,lengths/2),res.hash.substring(lengths/2,lengths)]
+                    }
+                    let sue = drwaerDateBlock;
+                    this.drawerTrue("dialog");
+                  }
+                });
+              }
               console.log("关了吧");
             },
           },
@@ -563,44 +969,6 @@ export default {
           },
         ],
       ],
-      //概要信息
-      summaryMes:reactive([
-        {
-          tabName:"仿真时间:",
-          data:"0"
-        },
-        {
-          tabName:"区块数量:",
-          data:"0"
-        },
-        {
-          tabName:"节点数量:",
-          data:"0"
-        },
-        {
-          tabName:"First block:",
-          data:"0"
-        },
-        {
-          tabName:"Last block:",
-          data:"0"
-        },
-        {
-          tabName:"传播延迟:",
-          data:"0"
-        },
-        {
-          tabName:"交易发生次数:",
-          data:"0"
-        },
-      ]),
-      //详情信息
-      eventMes:reactive([
-          {
-            eventName:"仿真准备:",
-            data:"START!"
-          }
-      ]),
 
       linkBaseStyle: {
         color: "#666666", // line 颜色
@@ -613,7 +981,19 @@ export default {
         background: "rgba(255,255,255,0.6)", // 描述文字背景色
       },
       fontList: ["14px Arial", "italic small-caps bold 12px arial"],
+      summaryMes,
+      eventMes,
+      linkList,
+      nodeList,
+      LogEvent,
+      drwaerDateBlock,
+      drwaerDateNode
     };
+  },
+  created() {
+    clearCache();
+    const data = getDataString();
+    this.summaryMes[0].data = data;
   },
   mounted() {
     document.addEventListener("mousemove", this.docMousemove);
@@ -661,6 +1041,31 @@ export default {
     nodeClick() {
       console.log(arguments);
     },
+
+    clearCache() {
+      const nodelistLength = this.$refs.superFlow.graph.nodeList.length;
+      if (nodelistLength > 0) {
+        ElMessage({
+          message: "仿真已开始,不需要清除缓存!",
+        });
+        this.LogEvent("There is no need to clear the cache! ", null);
+      } else {
+        clearCache(null).then((res) => {
+          if (res == true) {
+            ElMessage({
+              message: "清除缓存成功!",
+              type: "success",
+            });
+          } else {
+            ElMessage.error("清除缓存失败!");
+          }
+        });
+        this.LogEvent("Clear cache! ", null);
+      }
+      const data = getDataString();
+      this.summaryMes[0].data = data;
+      
+    },
     //拖拽过程动作
     docMousemove({ clientX, clientY }) {
       const conf = this.dragConf;
@@ -697,17 +1102,95 @@ export default {
 
           // 添加节点或区块
           if (conf.info.meta.prop == "node") {
-            const nodelist = this.$refs.superFlow.graph;
-            this.$refs.superFlow.addNode({
-              coordinate,
-              ...conf.info,
+            createNewNode(null).then((res) => {
+              const confInfo = conf.info;
+              confInfo.meta.label = res.addressId;
+              // confInfo.meta.name =
+              this.$refs.superFlow.addNode({
+                width: 100,
+                height: 30,
+                coordinate,
+                meta: {
+                  label: res.addressId,
+                  name: res.addressId,
+                  prop: "node",
+                },
+              });
+              this.LogEvent("create new " + res.addressId + ":", res.address);
+              const nodeListIdsdadsaa = this.linkList;
+              // const newNodelist2 = this.$refs.superFlow.graph;
+              const newNodelist = this.$refs.superFlow.graph.nodeList;
+              const presentNode = newNodelist[newNodelist.length - 1];
+              presentNode.meta.name = res.addressId;
+              if (presentNode.meta.prop == "node") {
+                // let presentNodsd=presentNode.id;
+                nodeListId.push({
+                  lable: presentNode.meta.label,
+                  id: presentNode.id,
+                });
+                const data = nodeListId.length;
+                this.summaryMes[1].data = data;
+              }
+
+              // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
             });
           } else {
             const nodeEx = this.haveNodeMe(this.$refs.superFlow.graph);
             if (nodeEx) {
-              this.$refs.superFlow.addNode({
-                coordinate,
-                ...conf.info,
+              createNewBlock(null).then((res) => {
+                this.$refs.superFlow.addNode({
+                  width: 100,
+                  height: 30,
+                  coordinate,
+                  meta: {
+                    label: res.blockID,
+                    name: res.blockID,
+                    prop: "block",
+                  },
+                });
+                this.LogEvent("create new " + res.blockID + ":", res.hash);
+                const nodeListIdsdadsaa = blockListId;
+                const newBlocklist = this.$refs.superFlow.graph.nodeList;
+                const presentBlock = newBlocklist[newBlocklist.length - 1];
+                presentBlock.meta.name = res.blockID;
+                if (presentBlock.meta.prop == "block") {
+                  // let presentNodsd=presentNode.id;
+                  blockListId.push({
+                    lable: presentBlock.meta.label,
+                    id: presentBlock.id,
+                  });
+                }
+                if (this.summaryMes[3].data == "0") {
+                  this.summaryMes[3].data = presentBlock.meta.label;
+                }
+                this.summaryMes[4].data = presentBlock.meta.label;
+                const newId = uuid("link");
+                const lengthblockListId = blockListId.length;
+                if (lengthblockListId >= 2) {
+                  const lengthLinklength = this.linkList.length;
+                  const targetLinkList = [];
+                  if (lengthLinklength > 0) {
+                    for (var i = 0; i < lengthLinklength; i++) {
+                      targetLinkList.push(this.linkList[i]);
+                    }
+                  }
+                  targetLinkList.push({
+                    id: newId,
+                    startId: blockListId[lengthblockListId - 2].id,
+                    endId: blockListId[lengthblockListId - 1].id,
+                    startAt: [100, 24],
+                    endAt: [0, 25],
+                    meta: "block",
+                  });
+                  this.linkList = targetLinkList;
+                }
+
+                const data = blockListId.length;
+                this.summaryMes[2].data = data;
+                // this.$refs.superFlow.addNode({
+                //   coordinate,
+                //   ...conf.info,
+                // });
               });
             } else {
               ElMessage({
@@ -767,6 +1250,7 @@ export default {
       }
       return false;
     },
+    removeNodes(target, val) {},
   },
 };
 </script>
@@ -784,6 +1268,7 @@ export default {
     padding: 0 10px;
     background: #e3e3e3;
     border-radius: 5px;
+    text-align: center;
   }
 }
 .el-row {
@@ -802,7 +1287,7 @@ export default {
   background: #d3dce6;
 }
 .bg-purple-light {
-  background: #e5e9f2;
+  background: #3be8ff;
 }
 .grid-content {
   border-radius: 4px;
@@ -894,10 +1379,15 @@ export default {
 
 .text {
   font-size: 14px;
+  text-align: left;
+  color: rgb(99, 98, 98);
 }
 
 .item {
-  margin-bottom: 18px;
+  margin-bottom: 8px;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-bottom: 2px solid var(--el-border-color-base);
 }
 .el-drawer__title {
   align-items: center;
@@ -906,5 +1396,15 @@ export default {
   margin-bottom: 10px;
   padding: var(--el-drawer-padding-primary);
   padding-bottom: 0;
+}
+.base_title {
+  width: 100%;
+  height: 20px;
+  margin-bottom: 10px;
+}
+.opButton {
+  margin-bottom: 10px;
+  width: 70%;
+  text-align: center;
 }
 </style>
