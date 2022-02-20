@@ -5,7 +5,57 @@
         ><div class="grid-content">
           <div class="base_title">节点操作</div>
           <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small">交易模拟 </el-button>
+            <el-button
+              class="opButton"
+              type="primary"
+              size="small"
+              @click="startTransactionSimVis"
+              >交易模拟
+            </el-button>
+            <el-dialog
+              v-model="transactionSimVis"
+              title="模拟交易"
+              width="50%"
+              :before-close="transSimVisHandleClose"
+            >
+              <div>
+                <el-select v-model="valueTrans1" placeholder="交易发起者">
+                  <el-option
+                    v-for="item in NodeTrans"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+                <span style="padding: 10px">TO:</span>
+                <el-select
+                  v-model="valueTrans2"
+                  collapse-tags
+                  style="margin-left: 20px"
+                  placeholder="交易接收者"
+                >
+                  <el-option
+                    v-for="item in NodeTrans"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </div>
+              <div style="padding-top: 20px">
+                交易金额 :<el-input-number v-model="numTrans" :min="1" />
+              </div>
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="changetransactionSimVis">Cancel</el-button>
+                  <el-button type="primary" @click="changetransactionSimVis"
+                    >Confirm</el-button
+                  >
+                </span>
+              </template>
+            </el-dialog>
           </div>
           <div class="drag-box">
             <el-button class="opButton" type="primary" size="small">区块传输 </el-button>
@@ -122,6 +172,34 @@
                 </super-flow>
               </div>
 
+              <el-dialog
+                v-model="nodeType"
+                title="节点类型选择"
+                width="30%"
+                :show-close="false"
+                :before-close="nodetypeHandleClose"
+              >
+                <div :model="presentTypeNode" style="left: 0">
+                  当前节点: {{ presentTypeNode }}
+                </div>
+                <div>
+                  <el-radio v-model="nodeTypeChoose" label="fullNode" size="large"
+                    >全节点</el-radio
+                  >
+                  <el-radio v-model="nodeTypeChoose" label="lightNode" size="large"
+                    >轻节点</el-radio
+                  >
+                  <el-radio v-model="nodeTypeChoose" label="miningNode" size="large"
+                    >产块节点</el-radio
+                  >
+                </div>
+                <template #footer>
+                  <span class="dialog-footer">
+                    <el-button type="primary" @click="setNodeType">保存</el-button>
+                  </span>
+                </template>
+              </el-dialog>
+
               <!-- <Draggable
                 :list="node1"
                 item-key="id"
@@ -196,70 +274,65 @@
               <el-descriptions :column="1" border>
                 <el-descriptions-item
                   label="Hash"
-                  label-align="left"
+                  label-align="center"
                   align="center"
                   label-class-name="my-label"
                   class-name="my-content"
-                  >{{
-                    drwaerDateBlock.hash[0]
-                  }}
+                  >{{ drwaerDateBlock.hash[0] }}
 
-                  {{
-                    drwaerDateBlock.hash[1]
-                  }}
-                  </el-descriptions-item
-                >
+                  {{ drwaerDateBlock.hash[1] }}
+                </el-descriptions-item>
                 <el-descriptions-item
                   label="Confirmations"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateBlock.confirmations}}</el-descriptions-item
+                  >{{ drwaerDateBlock.confirmations }}</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Timestamp"
                   label-align="center"
                   align="center"
                 >
-                  {{drwaerDateBlock.timestamp}}</el-descriptions-item
+                  {{ drwaerDateBlock.timestamp }}</el-descriptions-item
                 >
                 <el-descriptions-item label="Height" label-align="center" align="center">
-                  {{drwaerDateBlock.height}}
+                  {{ drwaerDateBlock.height }}
                 </el-descriptions-item>
-                <el-descriptions-item label="Miner" label-align="center" align="center"
-                  >{{drwaerDateBlock.miner}}</el-descriptions-item
-                >
+                <el-descriptions-item label="Miner" label-align="center" align="center">{{
+                  drwaerDateBlock.miner
+                }}</el-descriptions-item>
                 <el-descriptions-item
                   label="Number of Transactions"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateBlock.numOfTransac}}</el-descriptions-item
+                  >{{ drwaerDateBlock.numOfTransac }}</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Difficulty"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateBlock.difficulty}}</el-descriptions-item
+                  >{{ drwaerDateBlock.difficulty }}</el-descriptions-item
                 >
-                <el-descriptions-item label="Nonce" label-align="center" align="center"
-                  >{{drwaerDateBlock.nonce}}</el-descriptions-item
-                >
+                <el-descriptions-item label="Nonce" label-align="center" align="center">{{
+                  drwaerDateBlock.nonce
+                }}</el-descriptions-item>
                 <el-descriptions-item
                   label="Transaction Volume"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateBlock.transactionVolume}}</el-descriptions-item
+                  >{{ drwaerDateBlock.transactionVolume }}</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Block Reward"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateBlock.reward}}</el-descriptions-item
+                  >{{ drwaerDateBlock.reward }}</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Fee Reward"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateBlock.feeReward}}</el-descriptions-item
+                  >{{ drwaerDateBlock.feeReward }}</el-descriptions-item
                 >
               </el-descriptions>
               <el-button type="text" @click="innerDrawer = true"
@@ -301,35 +374,92 @@
                   align="center"
                   label-class-name="my-label"
                   class-name="my-content"
-                  >{{drwaerDateNode.address}}</el-descriptions-item
+                  >{{ drwaerDateNode.address }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="AddressID"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.addressId }}</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Transactions"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateNode.transactions}}</el-descriptions-item
+                  >{{ drwaerDateNode.transactions }}</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Total Received"
                   label-align="center"
                   align="center"
                 >
-                  {{drwaerDateNode.totalReceived}}</el-descriptions-item
+                  {{ drwaerDateNode.totalReceived }}</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Total Sent"
                   label-align="center"
                   align="center"
                 >
-                  {{drwaerDateNode.totalSent}}
+                  {{ drwaerDateNode.totalSent }}
                 </el-descriptions-item>
                 <el-descriptions-item
                   label="Final Balance"
                   label-align="center"
                   align="center"
-                  >{{drwaerDateNode.balance}}</el-descriptions-item
+                  >{{ drwaerDateNode.balance }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="NodeType"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.nodeType }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Wallet Id"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.walletId
+                  }}<el-button type="text" @click="checkWallet(drwaerDateNode.walletId)"
+                    >查看</el-button
+                  ></el-descriptions-item
                 >
               </el-descriptions>
+              <el-dialog v-model="dialogWalletVisible" width="440px">
+                <c-scrollbar maxWidth="400" trigger="hover">
+                  <el-form :model="walletData">
+                    <el-descriptions title="钱包结构" :column="1" border>
+                      <el-descriptions-item
+                        label="id"
+                        label-align="left"
+                        align="left"
+                        min-width="100px"
+                        ><el-tag size="small">{{
+                          walletData.id
+                        }}</el-tag></el-descriptions-item
+                      >
+                      <el-descriptions-item
+                        label="publicKkey"
+                        label-align="left"
+                        align="left"
+                        >{{ walletData.publicKkey }}</el-descriptions-item
+                      >
+                      <el-descriptions-item
+                        label="Address"
+                        label-align="left"
+                        align="left"
+                        >{{ walletData.address }}</el-descriptions-item
+                      >
+                      <el-descriptions-item
+                        label="privateKey"
+                        label-align="left"
+                        align="left"
+                      >
+                        {{ walletData.privateKey }}
+                      </el-descriptions-item>
+                    </el-descriptions></el-form
+                  ></c-scrollbar
+                >
+              </el-dialog>
               <el-button type="text" @click="innerDrawer2 = true"
                 >节点内所有交易详情</el-button
               >
@@ -368,6 +498,9 @@ import {
   deleteNode,
   findNodeByAddressId,
   findBlockByBlockId,
+  updateNodeType,
+  findMinExist,
+  findWalletCon,
 } from "../api/apis";
 import { uuid, getDataString } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -393,7 +526,9 @@ export default {
   setup() {
     //区块共识选择
     const consensusVisible = ref(false);
+
     const consensusChoose = ref("1");
+
     //拖拽区块节点配置
     const disabled = ref(false);
     const node1 = reactive([]);
@@ -592,13 +727,106 @@ export default {
     };
   },
   data() {
+    //交易模拟界面
+    const transactionSimVis = ref(false);
+
+    const changetransactionSimVis = () => {
+      if (transactionSimVis.value == true) {
+        transactionSimVis.value = false;
+      } else {
+        transactionSimVis.value = true;
+      }
+    };
+
+    const startTransactionSimVis = () => {
+      transactionSimVis.value = true;
+      const graph = this.flowNodeGraph();
+      const nodelistSize = nodeListId.length;
+      if (nodelistSize <= 1) {
+        setTimeout(() => {
+          ElMessageBox.alert("可供交易节点数量较少,请先创建节点!", "WARN", {
+            confirmButtonText: "OK",
+          });
+        }, 400);
+      } else {
+        if (NodeTrans != null) {
+          NodeTrans.length = 0;
+        }
+        for (let i = 0; i < nodelistSize; i++) {
+          NodeTrans.push({
+            value: nodeListId[i].lable,
+            label: nodeListId[i].lable,
+          });
+        }
+        const graphsss2 = nodeListId;
+        const dadsasdad = NodeTrans;
+        const graphsss = nodeListId;
+      }
+    };
+
+    const transSimVisHandleClose = (done: () => void) => {
+      ElMessageBox.confirm("确定要关闭当前交易吗?")
+        .then(() => {
+          done();
+        })
+        .catch(() => {
+          // catch error
+        });
+    };
+    //交易量计数器
+    const numTrans = ref(1);
+    //交易发起者
+    const valueTrans1 = ref([]);
+    //交易接收者
+    const valueTrans2 = ref([]);
+    //选择列表
+    let NodeTrans = reactive([
+      {
+        value: "Option1",
+        label: "Option1",
+      },
+      {
+        value: "Option2",
+        label: "Option2",
+      },
+    ]);
+
+    //节点类型设置
+    const nodeType = ref(false);
+
+    let presentTypeNode = "Node1";
+    //钱包结构查看
+    let walletData = reactive({
+      id: "2016-05-02",
+      address: "asd",
+      publicKkey: "No.1518,  Jinshajiang Road, Putuo District",
+      privateKey: "John Smith",
+    });
+    const dialogWalletVisible = ref(false);
+
+    const checkWallet = (walletId) => {
+      findWalletCon({ walletId: walletId + "" }).then((res) => {
+        if (res != null || res != "") {
+          walletData.id = res.id;
+          walletData.publicKkey = res.publicKey;
+          walletData.privateKey = res.privateKey;
+          walletData.address = res.address;
+          dialogWalletVisible.value = true;
+        } else {
+          ElMessageBox.alert("查看失败", "WARN", {
+            confirmButtonText: "OK",
+          });
+        }
+      });
+    };
+
+    const nodeTypeChoose = ref("fullNode");
     //抽屉中的节点和区块数据
-    let wqeqweqew = "sdadasd";
     let drwaerDateBlock = reactive({
       id: 1,
       blockID: "GenesisBlock1",
       height: 1,
-      hash: ["000a6c2a3347ff2ef0a48ae2508716","cfab42ae75b71d52ab36d2815ead9efa35"],
+      hash: ["000a6c2a3347ff2ef0a48ae2508716", "cfab42ae75b71d52ab36d2815ead9efa35"],
       timestamp: "2022-02-16 23:15:09",
       confirmations: 1,
       miner: null,
@@ -614,10 +842,12 @@ export default {
       id: 1,
       address: "1CVrnHbS5qu6kSXFoCpwnCW1sqPQuaHhoJ",
       addressId: "Node1",
+      nodeType: "fullNode",
       transactions: 0,
       totalReceived: 0,
       totalSent: 0,
       balance: 0,
+      walletId: 0,
     });
     //连线集合
     let linkList = reactive([]);
@@ -667,6 +897,43 @@ export default {
         eventName: eventName,
         data: data,
       });
+    };
+
+    const setNodeType = () => {
+      let nowNodeType = nodeTypeChoose;
+      let nowNodeType1 = presentTypeNode;
+      let nowNodeType2 = nowNodeType.value;
+
+      const nodeTypeC = { addressId: presentTypeNode, nodeType: nowNodeType.value };
+      if (nowNodeType) {
+        updateNodeType(nodeTypeC).then((res) => {
+          if (res) {
+            changeNodetype();
+          } else {
+            changeNodetype();
+          }
+        });
+      }
+      nodeTypeChoose.value = "fullNode";
+    };
+
+    //节点类型窗口关闭
+    const nodetypeHandleClose = () => {
+      ElMessageBox.confirm("请保存后退出!");
+    };
+
+    const changeNodetype = () => {
+      if (nodeType.value == true) {
+        nodeType.value = false;
+      } else {
+        nodeType.value = true;
+      }
+    };
+
+    const setPresentTypeNode = (presentTypeNodes) => {
+      if (presentTypeNodes) {
+        presentTypeNode = presentTypeNodes;
+      }
     };
     return {
       drawerType,
@@ -746,7 +1013,9 @@ export default {
                   id: presentNode.id,
                 });
                 const data = nodeListId.length;
-                this.summaryMes[1].data = data;
+                summaryMes[1].data = data + "";
+                presentTypeNode = res.addressId;
+                nodeType.value = true;
                 // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
               });
             },
@@ -928,9 +1197,17 @@ export default {
                   if (res == null) {
                     ElMessage.error("无法编辑!");
                   } else {
-                    drwaerDateNode = res;
+                    drwaerDateNode.address = res.address;
+                    drwaerDateNode.addressId = res.addressId;
+                    drwaerDateNode.transactions = res.transactions;
+                    drwaerDateNode.totalReceived = res.totalReceived;
+                    drwaerDateNode.totalSent = res.totalSent;
+                    drwaerDateNode.balance = res.balance;
+                    drwaerDateNode.nodeType = res.nodeType;
+                    drwaerDateNode.walletId = res.walletId;
                     let sue = drwaerDateNode;
                     this.drawerTrue("dialog2");
+                    setPresentTypeNode(res.addressId);
                   }
                 });
               } else if (node.meta.prop == "block") {
@@ -938,10 +1215,23 @@ export default {
                   if (res == null) {
                     ElMessage.error("无法编辑!");
                   } else {
-                    drwaerDateBlock = res;
-                    if(drwaerDateBlock.hash){
+                    drwaerDateBlock.hash = res.hash;
+                    drwaerDateBlock.confirmations = res.confirmations;
+                    drwaerDateBlock.timestamp = res.timestamp;
+                    drwaerDateBlock.height = res.height;
+                    drwaerDateBlock.miner = res.miner;
+                    drwaerDateBlock.numOfTransac = res.numOfTransac;
+                    drwaerDateBlock.difficulty = res.difficulty;
+                    drwaerDateBlock.nonce = res.nonce;
+                    drwaerDateBlock.transactionVolume = res.transactionVolume;
+                    drwaerDateBlock.reward = res.reward;
+                    drwaerDateBlock.feeReward = res.feeReward;
+                    if (drwaerDateBlock.hash) {
                       let lengths = res.hash.length;
-                      drwaerDateBlock.hash=[res.hash.substring(0,lengths/2),res.hash.substring(lengths/2,lengths)]
+                      drwaerDateBlock.hash = [
+                        res.hash.substring(0, lengths / 2),
+                        res.hash.substring(lengths / 2, lengths),
+                      ];
                     }
                     let sue = drwaerDateBlock;
                     this.drawerTrue("dialog");
@@ -987,7 +1277,25 @@ export default {
       nodeList,
       LogEvent,
       drwaerDateBlock,
-      drwaerDateNode
+      drwaerDateNode,
+      nodeType,
+      nodeTypeChoose,
+      changeNodetype,
+      setNodeType,
+      presentTypeNode,
+      nodetypeHandleClose,
+      setPresentTypeNode,
+      walletData,
+      dialogWalletVisible,
+      checkWallet,
+      changetransactionSimVis,
+      transSimVisHandleClose,
+      transactionSimVis,
+      numTrans,
+      valueTrans1,
+      valueTrans2,
+      NodeTrans,
+      startTransactionSimVis,
     };
   },
   created() {
@@ -1004,8 +1312,8 @@ export default {
     document.removeEventListener("mouseup", this.docMouseup);
   },
   methods: {
-    flowNodeClick(meta) {
-      console.log(this.$refs.superFlow.graph);
+    flowNodeGraph() {
+      return this.$refs.superFlow.graph;
     },
     linkStyle(link) {
       return {
@@ -1064,7 +1372,6 @@ export default {
       }
       const data = getDataString();
       this.summaryMes[0].data = data;
-      
     },
     //拖拽过程动作
     docMousemove({ clientX, clientY }) {
@@ -1131,67 +1438,135 @@ export default {
                 const data = nodeListId.length;
                 this.summaryMes[1].data = data;
               }
-
+              this.setPresentTypeNode(res.addressId);
+              this.changeNodetype();
               // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
             });
           } else {
             const nodeEx = this.haveNodeMe(this.$refs.superFlow.graph);
             if (nodeEx) {
-              createNewBlock(null).then((res) => {
-                this.$refs.superFlow.addNode({
-                  width: 100,
-                  height: 30,
-                  coordinate,
-                  meta: {
-                    label: res.blockID,
-                    name: res.blockID,
-                    prop: "block",
-                  },
-                });
-                this.LogEvent("create new " + res.blockID + ":", res.hash);
-                const nodeListIdsdadsaa = blockListId;
-                const newBlocklist = this.$refs.superFlow.graph.nodeList;
-                const presentBlock = newBlocklist[newBlocklist.length - 1];
-                presentBlock.meta.name = res.blockID;
-                if (presentBlock.meta.prop == "block") {
-                  // let presentNodsd=presentNode.id;
-                  blockListId.push({
-                    lable: presentBlock.meta.label,
-                    id: presentBlock.id,
+              if (blockListId.length == 0) {
+                createNewBlock(null).then((res) => {
+                  this.$refs.superFlow.addNode({
+                    width: 100,
+                    height: 30,
+                    coordinate,
+                    meta: {
+                      label: res.blockID,
+                      name: res.blockID,
+                      prop: "block",
+                    },
                   });
-                }
-                if (this.summaryMes[3].data == "0") {
-                  this.summaryMes[3].data = presentBlock.meta.label;
-                }
-                this.summaryMes[4].data = presentBlock.meta.label;
-                const newId = uuid("link");
-                const lengthblockListId = blockListId.length;
-                if (lengthblockListId >= 2) {
-                  const lengthLinklength = this.linkList.length;
-                  const targetLinkList = [];
-                  if (lengthLinklength > 0) {
-                    for (var i = 0; i < lengthLinklength; i++) {
-                      targetLinkList.push(this.linkList[i]);
-                    }
+                  this.LogEvent("create new " + res.blockID + ":", res.hash);
+                  const nodeListIdsdadsaa = blockListId;
+                  const newBlocklist = this.$refs.superFlow.graph.nodeList;
+                  const presentBlock = newBlocklist[newBlocklist.length - 1];
+                  presentBlock.meta.name = res.blockID;
+                  if (presentBlock.meta.prop == "block") {
+                    // let presentNodsd=presentNode.id;
+                    blockListId.push({
+                      lable: presentBlock.meta.label,
+                      id: presentBlock.id,
+                    });
                   }
-                  targetLinkList.push({
-                    id: newId,
-                    startId: blockListId[lengthblockListId - 2].id,
-                    endId: blockListId[lengthblockListId - 1].id,
-                    startAt: [100, 24],
-                    endAt: [0, 25],
-                    meta: "block",
-                  });
-                  this.linkList = targetLinkList;
-                }
+                  if (this.summaryMes[3].data == "0") {
+                    this.summaryMes[3].data = presentBlock.meta.label;
+                  }
+                  this.summaryMes[4].data = presentBlock.meta.label;
+                  const newId = uuid("link");
+                  const lengthblockListId = blockListId.length;
+                  if (lengthblockListId >= 2) {
+                    const lengthLinklength = this.linkList.length;
+                    const targetLinkList = [];
+                    if (lengthLinklength > 0) {
+                      for (var i = 0; i < lengthLinklength; i++) {
+                        targetLinkList.push(this.linkList[i]);
+                      }
+                    }
+                    targetLinkList.push({
+                      id: newId,
+                      startId: blockListId[lengthblockListId - 2].id,
+                      endId: blockListId[lengthblockListId - 1].id,
+                      startAt: [100, 24],
+                      endAt: [0, 25],
+                      meta: "block",
+                    });
+                    this.linkList = targetLinkList;
+                  }
 
-                const data = blockListId.length;
-                this.summaryMes[2].data = data;
-                // this.$refs.superFlow.addNode({
-                //   coordinate,
-                //   ...conf.info,
-                // });
-              });
+                  const data = blockListId.length;
+                  this.summaryMes[2].data = data;
+                  // this.$refs.superFlow.addNode({
+                  //   coordinate,
+                  //   ...conf.info,
+                  // });
+                });
+              } else {
+                findMinExist(null).then((isExist) => {
+                  if (isExist) {
+                    createNewBlock(null).then((res) => {
+                      this.$refs.superFlow.addNode({
+                        width: 100,
+                        height: 30,
+                        coordinate,
+                        meta: {
+                          label: res.blockID,
+                          name: res.blockID,
+                          prop: "block",
+                        },
+                      });
+                      this.LogEvent("create new " + res.blockID + ":", res.hash);
+                      const nodeListIdsdadsaa = blockListId;
+                      const newBlocklist = this.$refs.superFlow.graph.nodeList;
+                      const presentBlock = newBlocklist[newBlocklist.length - 1];
+                      presentBlock.meta.name = res.blockID;
+                      if (presentBlock.meta.prop == "block") {
+                        // let presentNodsd=presentNode.id;
+                        blockListId.push({
+                          lable: presentBlock.meta.label,
+                          id: presentBlock.id,
+                        });
+                      }
+                      if (this.summaryMes[3].data == "0") {
+                        this.summaryMes[3].data = presentBlock.meta.label;
+                      }
+                      this.summaryMes[4].data = presentBlock.meta.label;
+                      const newId = uuid("link");
+                      const lengthblockListId = blockListId.length;
+                      if (lengthblockListId >= 2) {
+                        const lengthLinklength = this.linkList.length;
+                        const targetLinkList = [];
+                        if (lengthLinklength > 0) {
+                          for (var i = 0; i < lengthLinklength; i++) {
+                            targetLinkList.push(this.linkList[i]);
+                          }
+                        }
+                        targetLinkList.push({
+                          id: newId,
+                          startId: blockListId[lengthblockListId - 2].id,
+                          endId: blockListId[lengthblockListId - 1].id,
+                          startAt: [100, 24],
+                          endAt: [0, 25],
+                          meta: "block",
+                        });
+                        this.linkList = targetLinkList;
+                      }
+
+                      const data = blockListId.length;
+                      this.summaryMes[2].data = data;
+                      // this.$refs.superFlow.addNode({
+                      //   coordinate,
+                      //   ...conf.info,
+                      // });
+                    });
+                  } else {
+                    ElMessage({
+                      message: "创建非创世块时请先创建产块节点.",
+                      type: "warning",
+                    });
+                  }
+                });
+              }
             } else {
               ElMessage({
                 message: "创建区块前请先创建节点.",

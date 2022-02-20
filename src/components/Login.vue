@@ -9,15 +9,15 @@
               label-width="60px"
               :model="state.formLabelAlign"
             >
-             
-              <h1 style="padding-bottom:40px">欢迎来到Simblockchain</h1>
+              <h1 style="padding-bottom: 40px">欢迎来到Simblockchain</h1>
             </el-form>
             <el-button
               type="primary"
               class="login"
               :loading="state.loginLoading"
               @click="login"
-            >{{t('simblock')}}</el-button>
+              >{{ t("simblock") }}</el-button
+            >
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@ import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { getDate } from "../utils/utils";
 import { useRouter } from "vue-router";
-import { getLoginMes ,getUserData} from "../api/apis";
+import { getLoginMes, getUserData, getLogin } from "../api/apis";
 
 defineProps({
   msg: String,
@@ -46,8 +46,8 @@ const router = useRouter();
 const store = useStore();
 
 const isPhone = computed(() => {
-  return store.getters.getIsPhone
-})
+  return store.getters.getIsPhone;
+});
 
 const state = reactive({
   count: 0,
@@ -74,35 +74,47 @@ function changeType() {
 //   getLoginMes(params).then((res) =>{
 //     console.log("获取数据:");
 //     console.log(res);
-//   }); 
+//   });
 // }
 function login() {
   const params = {
-    "username": "admin",
-    "password": "111111"
-    }
+    username: "admin",
+    password: "111111",
+  };
 
   // JSON.parse(JSON.stringify(state.formLabelAlign));
-  state.loginLoading = true
-  getLoginMes(params).then((res) => {
-    if (res.status === 1) {
-      store.commit('getUser', {token: res.data._id, ...res.data})
-      console.log('store', store)
-      store.dispatch('asyncGetRoutes', res.data.auth).then((path) => {
-        console.log('path', path)
-        state.loginLoading = false
-        router.push('/layout/' + path[0].path)
-      }).catch(() => {
-        console.log('store2', store)
-        state.loginLoading = false
+  state.loginLoading = true;
+  const res = {
+    status: 1,
+    msg: "登录成功",
+    data: {
+      _id: "60405311da60180001956279",
+      password: "111111",
+      username: "admin",
+      auth: "admin",
+      create_date: "2022/3/23",
+      delete_date: "0",
+    },
+  };
+  if (res.status === 1) {
+    store.commit("getUser", { token: res.data._id, ...res.data });
+    console.log("store", store);
+    store
+      .dispatch("asyncGetRoutes", res.data.auth)
+      .then((path) => {
+        console.log("path", path);
+        state.loginLoading = false;
+        router.push("/layout/" + path[0].path);
       })
-      // console.log(store.dispatch('asyncGetRoutes'))
-    } else {
-      state.loginLoading = false
-    }
-  }).catch(() => {
-    state.loginLoading = false
-  });
+      .catch(() => {
+        console.log("store2", store);
+        state.loginLoading = false;
+      });
+    // console.log(store.dispatch('asyncGetRoutes'))
+  } else {
+    state.loginLoading = false;
+  }
+
   console.log(params);
 }
 

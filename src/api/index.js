@@ -4,7 +4,7 @@ const base_url = import.meta.env.VITE_BASE_URL;
 //创建axios的一个实例 
 const http = axios.create({
     baseURL:    base_url, //接口统一域名
-    timeout:    6000      //设置超时
+    timeout:    60000      //设置超时
 })
  
  
