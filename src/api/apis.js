@@ -74,6 +74,25 @@ export const deleteNode = function (data) {
     return http('post', 'http://localhost:8081/singleNode/deleteNode', data)
 }
 
+//清楚仿真数据缓存
+export const TransactionSingle = function (data) {
+    return http('post', 'http://localhost:8081/transSingle/createTrans', data)
+}
+
+//通过ID列表查询所有交易
+export const FindTransListBYid = function (data) {
+    return http('post', 'http://localhost:8081/transSingle/findTransListBYid', data)
+}
+
+//通过ID交易详情
+export const findTransCon = function (data) {
+    return http('post', 'http://localhost:8081/transSingle/findTransId', data)
+}
+
+//获取当前账本拥有者
+export const findpresentMin = function (data) {
+    return http('get', 'http://localhost:8081/singleBlock/findpresentMin', data)
+}
 // 新键区块
 export const createNewBlock = function (data) {
     return http('get', 'http://localhost:8081/singleBlock/createBlock', data)

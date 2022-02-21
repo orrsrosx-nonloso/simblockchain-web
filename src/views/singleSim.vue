@@ -50,21 +50,25 @@
               <template #footer>
                 <span class="dialog-footer">
                   <el-button @click="changetransactionSimVis">Cancel</el-button>
-                  <el-button type="primary" @click="changetransactionSimVis"
-                    >Confirm</el-button
-                  >
+                  <el-button type="primary" @click="startTransSim">Confirm</el-button>
                 </span>
               </template>
             </el-dialog>
           </div>
+
           <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small">区块传输 </el-button>
+            <el-button
+              class="opButton"
+              type="primary"
+              size="small"
+              @click="dialogWalletVisible = true"
+              >钱包结构
+            </el-button>
           </div>
           <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small">钱包结构 </el-button>
-          </div>
-          <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small">网络延迟 </el-button>
+            <el-button class="opButton" type="primary" size="small"
+              >P2P网络模拟
+            </el-button>
           </div>
           <div class="base_title">区块操作</div>
           <div class="drag-box">
@@ -100,9 +104,7 @@
               >区块传输模拟
             </el-button>
           </div>
-          <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small">区块传输 </el-button>
-          </div>
+
           <div class="drag-box">
             <el-button class="opButton" type="primary" size="small"
               >新区块获取难度
@@ -270,7 +272,7 @@
           width="350px"
         >
           <div class="demo-drawer__content">
-            <el-form :model="wqeqweqew">
+            <el-form :model="drwaerDateBlock">
               <el-descriptions :column="1" border>
                 <el-descriptions-item
                   label="Hash"
@@ -334,18 +336,40 @@
                   align="center"
                   >{{ drwaerDateBlock.feeReward }}</el-descriptions-item
                 >
+                <el-descriptions-item
+                  label="交易列表id"
+                  label-align="center"
+                  align="center"
+                >
+                  <el-button
+                    type="text"
+                    @click="findTransList1(drwaerDateBlock.transactionId)"
+                    >{{ drwaerDateBlock.transactionId }}</el-button
+                  >
+                </el-descriptions-item>
               </el-descriptions>
-              <el-button type="text" @click="innerDrawer = true"
-                >区块内所有交易详情</el-button
-              >
+
               <el-drawer
                 v-model="innerDrawer"
                 direction="ltr"
-                title="I'm inner Drawer"
+                title="交易列表"
                 :append-to-body="true"
                 :before-close="NodeDetailHandleClose"
+                size="60%"
               >
-                <p>_(:зゝ∠)_</p>
+                <c-scrollbar maxWidth="400" height="640px" trigger="hover">
+                  <el-table :data="blockTableData" style="width: 100%">
+                    <el-table-column prop="id" label="id" width="40" />
+                    <el-table-column prop="hash" label="hash" width="200" />
+                    <el-table-column prop="inputsId" label="inputsId" width="100" />
+                    <el-table-column prop="outputsId" label="outputsId" width="100" />
+                    <el-table-column prop="totalInput" label="totalInput" width="100" />
+                    <el-table-column prop="totalOutput" label="totalOutput" width="110" />
+                    <el-table-column prop="createTime" label="createTime" width="200" />
+                    <el-table-column prop="status" label="status" width="100" />
+                    <el-table-column prop="utxo" label="utxo" width="100" />
+                  </el-table>
+                </c-scrollbar>
               </el-drawer>
             </el-form>
             <div class="demo-drawer__footer">
@@ -423,54 +447,40 @@
                     >查看</el-button
                   ></el-descriptions-item
                 >
-              </el-descriptions>
-              <el-dialog v-model="dialogWalletVisible" width="440px">
-                <c-scrollbar maxWidth="400" trigger="hover">
-                  <el-form :model="walletData">
-                    <el-descriptions title="钱包结构" :column="1" border>
-                      <el-descriptions-item
-                        label="id"
-                        label-align="left"
-                        align="left"
-                        min-width="100px"
-                        ><el-tag size="small">{{
-                          walletData.id
-                        }}</el-tag></el-descriptions-item
-                      >
-                      <el-descriptions-item
-                        label="publicKkey"
-                        label-align="left"
-                        align="left"
-                        >{{ walletData.publicKkey }}</el-descriptions-item
-                      >
-                      <el-descriptions-item
-                        label="Address"
-                        label-align="left"
-                        align="left"
-                        >{{ walletData.address }}</el-descriptions-item
-                      >
-                      <el-descriptions-item
-                        label="privateKey"
-                        label-align="left"
-                        align="left"
-                      >
-                        {{ walletData.privateKey }}
-                      </el-descriptions-item>
-                    </el-descriptions></el-form
-                  ></c-scrollbar
+                <el-descriptions-item
+                  label="交易列表ID"
+                  label-align="center"
+                  align="center"
                 >
-              </el-dialog>
-              <el-button type="text" @click="innerDrawer2 = true"
-                >节点内所有交易详情</el-button
-              >
+                  <el-button
+                    type="text"
+                    @click="findTransList2(drwaerDateNode.transactionId)"
+                    >{{ drwaerDateNode.transactionId }}</el-button
+                  ></el-descriptions-item
+                >
+              </el-descriptions>
+
               <el-drawer
                 v-model="innerDrawer2"
                 direction="rtl"
-                title="I'm inner Drawer"
+                title="交易列表"
                 :append-to-body="true"
                 :before-close="NodeDetailHandleClose"
+                size="72%"
               >
-                <p>_(:зゝ∠)_</p>
+                <c-scrollbar maxWidth="400" height="640px" trigger="hover">
+                  <el-table :data="nodeTableData" style="width: 100%">
+                    <el-table-column prop="id" label="id" width="40" />
+                    <el-table-column prop="hash" label="hash" width="200" />
+                    <el-table-column prop="inputsId" label="inputsId" width="100" />
+                    <el-table-column prop="outputsId" label="outputsId" width="100" />
+                    <el-table-column prop="totalInput" label="totalInput" width="100" />
+                    <el-table-column prop="totalOutput" label="totalOutput" width="110" />
+                    <el-table-column prop="createTime" label="createTime" width="200" />
+                    <el-table-column prop="status" label="status" width="100" />
+                    <el-table-column prop="utxo" label="utxo" width="100" />
+                  </el-table>
+                </c-scrollbar>
               </el-drawer>
             </el-form>
             <div class="demo-drawer__footer">
@@ -484,12 +494,36 @@
       </el-col>
     </el-row>
   </el-scrollbar>
+  <el-dialog v-model="dialogWalletVisible" width="440px">
+    <c-scrollbar maxWidth="400" trigger="hover">
+      <el-form :model="walletData">
+        <el-descriptions title="钱包结构" :column="1" border>
+          <el-descriptions-item
+            label="id"
+            label-align="left"
+            align="left"
+            min-width="100px"
+            ><el-tag size="small">{{ walletData.id }}</el-tag></el-descriptions-item
+          >
+          <el-descriptions-item label="publicKkey" label-align="left" align="left">{{
+            walletData.publicKkey
+          }}</el-descriptions-item>
+          <el-descriptions-item label="Address" label-align="left" align="left">{{
+            walletData.address
+          }}</el-descriptions-item>
+          <el-descriptions-item label="privateKey" label-align="left" align="left">
+            {{ walletData.privateKey }}
+          </el-descriptions-item>
+        </el-descriptions></el-form
+      ></c-scrollbar
+    >
+  </el-dialog>
 </template>
 <script lang="ts">
 import { ref, reactive } from "vue";
 import Draggable from "vuedraggable";
 import { ElMessageBox } from "element-plus";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import type { ElDrawer, Action } from "element-plus";
 import {
   clearCache,
@@ -501,6 +535,9 @@ import {
   updateNodeType,
   findMinExist,
   findWalletCon,
+  TransactionSingle,
+  FindTransListBYid,
+  findpresentMin,
 } from "../api/apis";
 import { uuid, getDataString } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -518,6 +555,10 @@ const blockListId = reactive([]);
 
 //总连线集合
 const totalLinkList = reactive([]);
+
+let blockTableData = reactive([]);
+
+let nodeTableData = reactive([]);
 
 export default {
   components: {
@@ -571,6 +612,58 @@ export default {
     const innerDrawer2 = ref(false);
     const dialog2 = ref(false);
     const loading = ref(false);
+
+    let List = {
+      transListId: "",
+      id: "",
+      hash: "",
+    };
+    //交易详情页
+    const findTransList1 = (list) => {
+      List.transListId = list;
+      FindTransListBYid(List).then((res) => {
+        let lengths = res.length;
+        for (let i = 0; i < lengths; i++) {
+          blockTableData.push({
+            id: res[i].id,
+            hash: res[i].txIdHash,
+            inputId: res[i].inputsId,
+            outputsId: res[i].outputsId,
+            totalInput: res[i].totalInput,
+            totalOutput: res[i].totalOutput,
+            createTime: res[i].createTime,
+            status: res[i].status,
+            utxo: res[i].utxo,
+          });
+        }
+
+        let aasa = blockTableData;
+        innerDrawer.value = true;
+      });
+    };
+
+    const findTransList2 = (list) => {
+      List.transListId = list;
+      FindTransListBYid(List).then((res) => {
+        let lengths = res.length;
+        for (let i = 0; i < lengths; i++) {
+          nodeTableData.push({
+            id: res[i].id,
+            hash: res[i].txIdHash,
+            inputId: res[i].inputsId,
+            outputsId: res[i].outputsId,
+            totalInput: res[i].totalInput,
+            totalOutput: res[i].totalOutput,
+            createTime: res[i].createTime,
+            status: res[i].status,
+            utxo: res[i].utxo,
+          });
+        }
+
+        let aasa = nodeTableData;
+        innerDrawer2.value = true;
+      });
+    };
 
     const NodeDetailHandleClose = (done: () => void) => {
       ElMessageBox.confirm("close?")
@@ -674,15 +767,50 @@ export default {
         });
     };
     const blockTranSim = (done: () => void) => {
-      ElMessageBox.alert("即将开始区块传输模拟!", "区块传输", {
-        confirmButtonText: "OK",
-        callback: (action: Action) => {
-          ElMessage({
-            message: `开始传输`,
-          });
-        },
+      findpresentMin(null).then((res) => {
+        if (res == null||res=="") {
+          ElMessageBox.alert(
+            "请创建新区块!",
+            "WARING",
+            {
+              confirmButtonText: "OK",
+            }
+          );
+        } else {
+          ElMessageBox.alert(
+            "即将开始区块传输模拟(当前记账权拥有者:" + res + ")!",
+            "区块传输",
+            {
+              confirmButtonText: "OK",
+              callback: (action: Action) => {
+                ElMessage({
+                  message: `开始传输`,
+                });
+              },
+            }
+          );
+          SimBlockTrans(res);
+        }
       });
     };
+
+    //模拟区块传输
+    const SimBlockTrans = (miner) =>{
+      let minerKey = "";
+      nodeListId.forEach(function(element){
+          if(element.lable == miner){
+            minerKey = element.id;
+          }
+      });
+    
+
+    }
+    //模拟区块传输
+    const createNewLink = (miner) =>{};
+
+    //模拟区块传输
+    const deleteLink = (miner) =>{};
+
     const drawerTrue = (name) => {
       if (name == "dialog") {
         dialog.value = true;
@@ -724,9 +852,37 @@ export default {
       consensusVisible,
       consensusChoose,
       blockTranSim,
+      blockTableData,
+      nodeTableData,
+      findTransList1,
+      findTransList2,
     };
   },
   data() {
+    //页面加载
+    const openFullScreen = () => {
+      const loading = ElLoading.service({
+        lock: true,
+        text: "交易中!",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      setTimeout(() => {
+        loading.close();
+      }, 1000);
+    };
+
+    //页面加载
+    const openBlockCreate = () => {
+      const loading = ElLoading.service({
+        lock: true,
+        text: "产生区块中!",
+        background: "rgba(0, 0, 0)",
+      });
+      setTimeout(() => {
+        loading.close();
+      }, 2000);
+    };
+
     //交易模拟界面
     const transactionSimVis = ref(false);
 
@@ -747,7 +903,8 @@ export default {
           ElMessageBox.alert("可供交易节点数量较少,请先创建节点!", "WARN", {
             confirmButtonText: "OK",
           });
-        }, 400);
+          transactionSimVis.value = false;
+        }, 200);
       } else {
         if (NodeTrans != null) {
           NodeTrans.length = 0;
@@ -764,6 +921,38 @@ export default {
       }
     };
 
+    //开始交易
+    const startTransSim = () => {
+      const sda = valueTrans1.value;
+      //交易接收者
+      if (
+        valueTrans1.value == valueTrans2.value ||
+        valueTrans1.value == undefined ||
+        valueTrans2.value == undefined
+      ) {
+        ElMessageBox.alert("交易两方不能相同或为空.", "WARN", {
+          confirmButtonText: "OK",
+        });
+        changetransactionSimVis();
+      } else {
+        const transInputType = {
+          inputAddressId: valueTrans1.value,
+          outputAddressId: valueTrans2.value,
+          transValue: numTrans.value,
+        };
+        TransactionSingle(transInputType).then((res) => {
+          openFullScreen();
+          setTimeout(() => {
+            ElMessageBox.alert(res.mes, "交易结果", {
+              confirmButtonText: "OK",
+            });
+          }, 1000);
+          changetransactionSimVis();
+          LogEvent("TransactionSingle  :", valueTrans1.value + "T O" + valueTrans2.value);
+        });
+      }
+    };
+
     const transSimVisHandleClose = (done: () => void) => {
       ElMessageBox.confirm("确定要关闭当前交易吗?")
         .then(() => {
@@ -776,18 +965,14 @@ export default {
     //交易量计数器
     const numTrans = ref(1);
     //交易发起者
-    const valueTrans1 = ref([]);
+    const valueTrans1 = ref();
     //交易接收者
-    const valueTrans2 = ref([]);
+    const valueTrans2 = ref();
     //选择列表
     let NodeTrans = reactive([
       {
-        value: "Option1",
-        label: "Option1",
-      },
-      {
-        value: "Option2",
-        label: "Option2",
+        value: "",
+        label: "",
       },
     ]);
 
@@ -797,10 +982,12 @@ export default {
     let presentTypeNode = "Node1";
     //钱包结构查看
     let walletData = reactive({
-      id: "2016-05-02",
-      address: "asd",
-      publicKkey: "No.1518,  Jinshajiang Road, Putuo District",
-      privateKey: "John Smith",
+      id: "1",
+      address: "122o4YRDAJGYJEPUGcT6RMamKRWdvStnPv",
+      publicKkey:
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAECFGthZ5/pFz6eRNr1UX+HuqE9Aa/bsyFOxnlvaJLICIAzlrqFRdQ3TrGkDfuX6JGPzpgeHNKHXuu/gLXNQqAVA==",
+      privateKey:
+        "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgVdVHyHHTZXHuL2wRbXhKseA+edBkwxhnkyh8ZUopXeOgCgYIKoZIzj0DAQehRANCAAQIUa2Fnn+kXPp5E2vVRf4e6oT0Br9uzIU7GeW9oksgIgDOWuoVF1DdOsaQN+5fokY/OmB4c0ode67+Atc1CoBU",
     });
     const dialogWalletVisible = ref(false);
 
@@ -837,6 +1024,7 @@ export default {
       reward: 10,
       feeReward: 0,
       prevBlockHash: "0000000000000000000000000000000000000000000000000000000000000000",
+      transactionId: "",
     });
     let drwaerDateNode = reactive({
       id: 1,
@@ -848,6 +1036,7 @@ export default {
       totalSent: 0,
       balance: 0,
       walletId: 0,
+      transactionId: "",
     });
     //连线集合
     let linkList = reactive([]);
@@ -1104,6 +1293,7 @@ export default {
             },
             selected(graph, coordinate) {
               if (graph.nodeList.length > 0) {
+                openBlockCreate();
                 createNewBlock(null).then((res) => {
                   graph.addNode({
                     width: 100,
@@ -1205,6 +1395,7 @@ export default {
                     drwaerDateNode.balance = res.balance;
                     drwaerDateNode.nodeType = res.nodeType;
                     drwaerDateNode.walletId = res.walletId;
+                    drwaerDateNode.transactionId = res.transactionsId;
                     let sue = drwaerDateNode;
                     this.drawerTrue("dialog2");
                     setPresentTypeNode(res.addressId);
@@ -1226,6 +1417,7 @@ export default {
                     drwaerDateBlock.transactionVolume = res.transactionVolume;
                     drwaerDateBlock.reward = res.reward;
                     drwaerDateBlock.feeReward = res.feeReward;
+                    drwaerDateBlock.transactionId = res.transactions;
                     if (drwaerDateBlock.hash) {
                       let lengths = res.hash.length;
                       drwaerDateBlock.hash = [
@@ -1296,6 +1488,9 @@ export default {
       valueTrans2,
       NodeTrans,
       startTransactionSimVis,
+      startTransSim,
+      openFullScreen,
+      openBlockCreate,
     };
   },
   created() {
@@ -1447,6 +1642,7 @@ export default {
             if (nodeEx) {
               if (blockListId.length == 0) {
                 createNewBlock(null).then((res) => {
+                  this.openBlockCreate();
                   this.$refs.superFlow.addNode({
                     width: 100,
                     height: 30,
@@ -1505,6 +1701,7 @@ export default {
                 findMinExist(null).then((isExist) => {
                   if (isExist) {
                     createNewBlock(null).then((res) => {
+                      this.openBlockCreate();
                       this.$refs.superFlow.addNode({
                         width: 100,
                         height: 30,
