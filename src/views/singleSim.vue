@@ -493,31 +493,31 @@
         </el-drawer>
       </el-col>
     </el-row>
+    <el-dialog v-model="dialogWalletVisible" width="440px">
+      <c-scrollbar maxWidth="400" trigger="hover">
+        <el-form :model="walletData">
+          <el-descriptions title="钱包结构" :column="1" border>
+            <el-descriptions-item
+              label="id"
+              label-align="left"
+              align="left"
+              min-width="100px"
+              ><el-tag size="small">{{ walletData.id }}</el-tag></el-descriptions-item
+            >
+            <el-descriptions-item label="publicKkey" label-align="left" align="left">{{
+              walletData.publicKkey
+            }}</el-descriptions-item>
+            <el-descriptions-item label="Address" label-align="left" align="left">{{
+              walletData.address
+            }}</el-descriptions-item>
+            <el-descriptions-item label="privateKey" label-align="left" align="left">
+              {{ walletData.privateKey }}
+            </el-descriptions-item>
+          </el-descriptions></el-form
+        ></c-scrollbar
+      >
+    </el-dialog>
   </el-scrollbar>
-  <el-dialog v-model="dialogWalletVisible" width="440px">
-    <c-scrollbar maxWidth="400" trigger="hover">
-      <el-form :model="walletData">
-        <el-descriptions title="钱包结构" :column="1" border>
-          <el-descriptions-item
-            label="id"
-            label-align="left"
-            align="left"
-            min-width="100px"
-            ><el-tag size="small">{{ walletData.id }}</el-tag></el-descriptions-item
-          >
-          <el-descriptions-item label="publicKkey" label-align="left" align="left">{{
-            walletData.publicKkey
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Address" label-align="left" align="left">{{
-            walletData.address
-          }}</el-descriptions-item>
-          <el-descriptions-item label="privateKey" label-align="left" align="left">
-            {{ walletData.privateKey }}
-          </el-descriptions-item>
-        </el-descriptions></el-form
-      ></c-scrollbar
-    >
-  </el-dialog>
 </template>
 <script lang="ts">
 import { ref, reactive } from "vue";
@@ -768,14 +768,10 @@ export default {
     };
     const blockTranSim = (done: () => void) => {
       findpresentMin(null).then((res) => {
-        if (res == null||res=="") {
-          ElMessageBox.alert(
-            "请创建新区块!",
-            "WARING",
-            {
-              confirmButtonText: "OK",
-            }
-          );
+        if (res == null || res == "") {
+          ElMessageBox.alert("请创建新区块!", "WARING", {
+            confirmButtonText: "OK",
+          });
         } else {
           ElMessageBox.alert(
             "即将开始区块传输模拟(当前记账权拥有者:" + res + ")!",
@@ -795,21 +791,19 @@ export default {
     };
 
     //模拟区块传输
-    const SimBlockTrans = (miner) =>{
+    const SimBlockTrans = (miner) => {
       let minerKey = "";
-      nodeListId.forEach(function(element){
-          if(element.lable == miner){
-            minerKey = element.id;
-          }
+      nodeListId.forEach(function (element) {
+        if (element.lable == miner) {
+          minerKey = element.id;
+        }
       });
-    
-
-    }
+    };
     //模拟区块传输
-    const createNewLink = (miner) =>{};
+    const createNewLink = (miner) => {};
 
     //模拟区块传输
-    const deleteLink = (miner) =>{};
+    const deleteLink = (miner) => {};
 
     const drawerTrue = (name) => {
       if (name == "dialog") {
