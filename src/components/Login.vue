@@ -4,12 +4,25 @@
       <div>
         <div class="box">
           <div class="box-card">
+            <div class="toptitle">SIMBLOCKCHAIN</div>
             <el-form
               :label-position="state.labelPosition"
               label-width="60px"
               :model="state.formLabelAlign"
             >
-              <h1 style="padding-bottom: 40px">欢迎来到Simblockchain</h1>
+              <el-form-item :label="t('username')">
+                <el-input v-model="state.formLabelAlign.username"></el-input>
+              </el-form-item>
+              <el-form-item :label="t('password')">
+                <el-input
+                  v-model="state.formLabelAlign.password"
+                  :type="state.passwordType"
+                >
+                  <template #suffix>
+                    <i class="el-input__icon el-icon-view" @click="changeType"></i>
+                  </template>
+                </el-input>
+              </el-form-item>
             </el-form>
             <el-button
               type="primary"
@@ -18,6 +31,7 @@
               @click="login"
               >{{ t("simblock") }}</el-button
             >
+            <div class="regist" @click="regist">{{ t("regist") }}</div>
           </div>
         </div>
       </div>
@@ -77,10 +91,8 @@ function changeType() {
 //   });
 // }
 function login() {
-  const params = {
-    username: "admin",
-    password: "111111",
-  };
+
+  const params = JSON.parse(JSON.stringify(state.formLabelAlign));
 
   // JSON.parse(JSON.stringify(state.formLabelAlign));
   state.loginLoading = true;
@@ -90,31 +102,32 @@ function login() {
     data: {
       _id: "60405311da60180001956279",
       password: "111111",
-      username: "admin",
-      auth: "admin",
+      username: "admin1",
+      auth: "admin1",
       create_date: "2022/3/23",
       delete_date: "0",
     },
   };
-  if (res.status === 1) {
-    store.commit("getUser", { token: res.data._id, ...res.data });
-    console.log("store", store);
-    store
-      .dispatch("asyncGetRoutes", res.data.auth)
-      .then((path) => {
-        console.log("path", path);
-        state.loginLoading = false;
-        router.push("/layout/" + path[0].path);
-      })
-      .catch(() => {
-        console.log("store2", store);
-        state.loginLoading = false;
-      });
-    // console.log(store.dispatch('asyncGetRoutes'))
-  } else {
-    state.loginLoading = false;
-  }
-
+  getLoginMes(params).then((res) => {
+    if (res.status === 1) {
+      store.commit("getUser", { token: res.data._id, ...res.data });
+      console.log("store", store);
+      store
+        .dispatch("asyncGetRoutes", res.data.auth)
+        .then((path) => {
+          console.log("path", path);
+          state.loginLoading = false;
+          router.push("/layout/" + path[0].path);
+        })
+        .catch(() => {
+          console.log("store2", store);
+          state.loginLoading = false;
+        });
+      // console.log(store.dispatch('asyncGetRoutes'))
+    } else {
+      state.loginLoading = false;
+    }
+  });
   console.log(params);
 }
 
@@ -154,9 +167,10 @@ function login() {
     align-items: center;
     .box-card {
       background-color: rgba(255, 255, 255, 0.6);
-      padding: 40px;
+      padding: 60px;
       .login {
-        width: 70%;
+        width: 60%;
+        margin-top: 20px;
       }
       .regist {
         text-align: right;
@@ -167,5 +181,11 @@ function login() {
       }
     }
   }
+}
+
+.toptitle {
+  font-family: "Hiragino Sans GB";
+  font-size: 24px;
+  padding-bottom: 24px;
 }
 </style>

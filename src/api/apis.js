@@ -7,7 +7,7 @@ export const getLogin = function (data) {
 }
 // 登录
 export const getLoginMes = function (data) {
-    return http('post', 'http://localhost:8081/user/login', data)
+    return http('post', 'http://localhost:8081/user/getLogin', data)
 }
 
 // 获取用户数据
@@ -38,11 +38,11 @@ export const getRoutesApi = function (data) {
 
 // 新键节点
 export const createNewNode = function (data) {
-    return http('get', 'http://localhost:8081/singleNode/createNode', data)
+    return http('post', 'http://localhost:8081/singleNode/createNode', data)
 }
 //清楚仿真数据缓存
 export const clearCache = function (data) {
-    return http('get', 'http://localhost:8081/singleNode/clearCache', data)
+    return http('post', 'http://localhost:8081/singleNode/clearCache', data)
 }
 //查找节点
 export const findNodeByAddressId = function (data) {
@@ -54,12 +54,12 @@ export const updateNodeType = function (data) {
     return http('post', 'http://localhost:8081/singleNode/setNodeType', data)
 }
 
-//设置节点类型
+//查看矿工是否存在
 export const findMinExist = function (data) {
     return http('get', 'http://localhost:8081/singleNode/isMiningExist', data)
 }
 
-//设置节点类型
+//查找钱包结构
 export const findWalletCon = function (data) {
     return http('post', 'http://localhost:8081/wallet/findWalletById', data)
 }
@@ -69,12 +69,12 @@ export const findBlockByBlockId = function (data) {
     return http('post', 'http://localhost:8081/singleBlock/findByBlockId', data)
 }
 
-//清楚仿真数据缓存
+//删除节点
 export const deleteNode = function (data) {
     return http('post', 'http://localhost:8081/singleNode/deleteNode', data)
 }
 
-//清楚仿真数据缓存
+//创建交易
 export const TransactionSingle = function (data) {
     return http('post', 'http://localhost:8081/transSingle/createTrans', data)
 }

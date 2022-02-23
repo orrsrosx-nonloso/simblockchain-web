@@ -541,6 +541,9 @@ import {
 } from "../api/apis";
 import { uuid, getDataString } from "../utils/utils";
 import { t } from "element-plus/es/locale";
+import { useStore } from "vuex";
+import { computed } from "vue";
+
 const drawerType = {
   node: 0,
   link: 1,
@@ -780,7 +783,8 @@ export default {
               confirmButtonText: "OK",
               callback: (action: Action) => {
                 ElMessage({
-                  message: `开始传输`,
+                  message: `开始传输!`,
+                  type: "success",
                 });
               },
             }
@@ -853,6 +857,14 @@ export default {
     };
   },
   data() {
+    const store = useStore();
+
+    const auth = computed(() => {
+      return store.getters.authGetter;
+    });
+    const getAuth = () => {
+      return auth.value;
+    };
     //页面加载
     const openFullScreen = () => {
       const loading = ElLoading.service({
@@ -973,7 +985,7 @@ export default {
     //节点类型设置
     const nodeType = ref(false);
 
-    let presentTypeNode = "Node1";
+    let presentTypeNode = ref("Node1");
     //钱包结构查看
     let walletData = reactive({
       id: "1",
@@ -1087,7 +1099,7 @@ export default {
       let nowNodeType1 = presentTypeNode;
       let nowNodeType2 = nowNodeType.value;
 
-      const nodeTypeC = { addressId: presentTypeNode, nodeType: nowNodeType.value };
+      const nodeTypeC = { addressId: presentTypeNode.value, nodeType: nowNodeType.value ,auth :getAuth()};
       if (nowNodeType) {
         updateNodeType(nodeTypeC).then((res) => {
           if (res) {
@@ -1115,7 +1127,7 @@ export default {
 
     const setPresentTypeNode = (presentTypeNodes) => {
       if (presentTypeNodes) {
-        presentTypeNode = presentTypeNodes;
+        presentTypeNode.value = presentTypeNodes;
       }
     };
     return {
@@ -1173,7 +1185,10 @@ export default {
             // 选项是否禁用
             // 选项选中后回调函数
             selected(graph, coordinate) {
-              createNewNode(null).then((res) => {
+              let params = {
+                auth: getAuth(),
+              };
+              createNewNode(params).then((res) => {
                 graph.addNode({
                   width: 100,
                   height: 30,
@@ -1197,7 +1212,7 @@ export default {
                 });
                 const data = nodeListId.length;
                 summaryMes[1].data = data + "";
-                presentTypeNode = res.addressId;
+                presentTypeNode.value = res.addressId;
                 nodeType.value = true;
                 // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
               });
@@ -1485,10 +1500,14 @@ export default {
       startTransSim,
       openFullScreen,
       openBlockCreate,
+      getAuth,
     };
   },
   created() {
-    clearCache();
+    let params = {
+      auth: this.getAuth(),
+    };
+    // clearCache(params);
     const data = getDataString();
     this.summaryMes[0].data = data;
   },
@@ -1547,7 +1566,11 @@ export default {
         });
         this.LogEvent("There is no need to clear the cache! ", null);
       } else {
-        clearCache(null).then((res) => {
+        // let user = auth.value;
+        let params = {
+          auth: this.getAuth(),
+        };
+        clearCache(params).then((res) => {
           if (res == true) {
             ElMessage({
               message: "清除缓存成功!",
