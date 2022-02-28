@@ -2,6 +2,7 @@
   "name": "SBC",
   "version": "0.0.1",
   "scripts": {
+    "dev": "vite --host" ,
     "dev:dev": "vite --mode development",
     "build:dev": "vite build --mode development",
     "serve": "vite preview"

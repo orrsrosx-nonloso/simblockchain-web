@@ -40,7 +40,7 @@ export const getRoutesApi = function (data) {
 export const createNewNode = function (data) {
     return http('post', 'http://localhost:8081/singleNode/createNode', data)
 }
-//清楚仿真数据缓存
+//清除仿真数据缓存
 export const clearCache = function (data) {
     return http('post', 'http://localhost:8081/singleNode/clearCache', data)
 }
@@ -56,7 +56,7 @@ export const updateNodeType = function (data) {
 
 //查看矿工是否存在
 export const findMinExist = function (data) {
-    return http('get', 'http://localhost:8081/singleNode/isMiningExist', data)
+    return http('post', 'http://localhost:8081/singleNode/isMiningExist', data)
 }
 
 //查找钱包结构
@@ -79,6 +79,11 @@ export const TransactionSingle = function (data) {
     return http('post', 'http://localhost:8081/transSingle/createTrans', data)
 }
 
+//创建交易
+export const getUnconfirmed = function (data) {
+    return http('post', 'http://localhost:8081/transSingle/getAllUnConfirmedTrans', data)
+}
+
 //通过ID列表查询所有交易
 export const FindTransListBYid = function (data) {
     return http('post', 'http://localhost:8081/transSingle/findTransListBYid', data)
@@ -91,12 +96,29 @@ export const findTransCon = function (data) {
 
 //获取当前账本拥有者
 export const findpresentMin = function (data) {
-    return http('get', 'http://localhost:8081/singleBlock/findpresentMin', data)
+    return http('post', 'http://localhost:8081/singleBlock/findpresentMin', data)
 }
 // 新键区块
 export const createNewBlock = function (data) {
-    return http('get', 'http://localhost:8081/singleBlock/createBlock', data)
+    return http('post', 'http://localhost:8081/singleBlock/createBlock', data)
 }
+
+// 每次创建节点后会进行区块链网络构建
+export const addP2pNet = function (data) {
+    return http('post', 'http://localhost:8081/p2pNetwork/addP2pNet', data)
+}
+
+
+// 每次创建节点后会进行区块链网络构建
+export const getAllNetWork = function (data) {
+    return http('post', 'http://localhost:8081/p2pNetwork/getAllNetWork', data)
+}
+
+// 获取到所以矿工节点
+export const getAllMiner = function (data) {
+    return http('post', 'http://localhost:8081/singleNode/getAllMiner', data)
+}
+
 
 // 获取权限菜单
 export const getRolesApi = function (data) {

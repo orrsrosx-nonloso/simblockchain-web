@@ -57,6 +57,43 @@
           </div>
 
           <div class="drag-box">
+            <el-dropdown>
+              <el-button class="opButtontdrwaer" type="primary" size="small">
+                交易池查看
+                <arrow-down />
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-tooltip content="查看所以经过记账节点确定的交易!" placement="top">
+                    <el-dropdown-item @click="getPresentUtxoData('confirmed')"
+                      >Confirmed</el-dropdown-item
+                    >
+                  </el-tooltip>
+                  <el-tooltip
+                    content="查看点击所以未经过记账节点确定的交易!"
+                    placement="top"
+                  >
+                    <el-dropdown-item @click="getPresentUtxoData('unconfirmed')"
+                      >Unconfirmed</el-dropdown-item
+                    >
+                  </el-tooltip>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-dialog v-model="dialogUtxoVisible" width="840px">
+              <el-table :data="tableUtxoData" height="300" style="width: 100%">
+                <el-table-column prop="TransId" label="交易Id" width="100" />
+                <el-table-column prop="inputId" label="交易输入" width="100" />
+                <el-table-column prop="outPutId" label="交易输出" width="100" />
+                <el-table-column prop="totalInput" label="总交易输入" width="100" />
+                <el-table-column prop="totalOutput" label="总交易输出" width="100" />
+                <el-table-column prop="status" label="状态" width="100" />
+                <el-table-column prop="UtxoBalance" label="未交易事务量" width="120" />
+              </el-table>
+            </el-dialog>
+          </div>
+
+          <div class="drag-box">
             <el-button
               class="opButton"
               type="primary"
@@ -66,9 +103,23 @@
             </el-button>
           </div>
           <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small"
-              >P2P网络模拟
-            </el-button>
+            <el-tooltip content="点击查看当前区块链网络结构!" placement="top">
+              <el-button
+                class="opButton"
+                @click="getPresentP2PNetWork"
+                type="primary"
+                size="small"
+                >P2P网络结构
+              </el-button>
+            </el-tooltip>
+            <el-dialog v-model="dialogP2PNetVisible" width="640px">
+              <el-table :data="tableP2PNetData" height="300" style="width: 100%">
+                <el-table-column prop="addressId" label="节点" width="140" />
+                <el-table-column prop="Neighbor1" label="邻居节点1" width="140" />
+                <el-table-column prop="Neighbor2" label="邻居节点2" width="140" />
+                <el-table-column prop="Neighbor3" label="邻居节点3" width="140" />
+              </el-table>
+            </el-dialog>
           </div>
           <div class="base_title">区块操作</div>
           <div class="drag-box">
@@ -86,8 +137,27 @@
               :before-close="consensusHandleClose"
             >
               <div>
-                <el-radio v-model="consensusChoose" label="1" size="large">POW</el-radio>
-                <el-radio v-model="consensusChoose" label="2" size="large">POS</el-radio>
+                <el-tooltip content="工作量证明共识机制(Proof of Work)" placement="top">
+                  <el-radio v-model="consensusChoose" label="1" size="large"
+                    >POW</el-radio
+                  ></el-tooltip
+                >
+                <el-tooltip
+                  content="股权证明/权益证明共识机制(Proof of Stake)"
+                  placement="top"
+                >
+                  <el-radio v-model="consensusChoose" disabled label="2" size="large"
+                    >POS</el-radio
+                  ></el-tooltip
+                >
+                <el-tooltip
+                  content="历史工作证明共识机制(Proof of History)"
+                  placement="top"
+                >
+                  <el-radio v-model="consensusChoose" disabled label="2" size="large"
+                    >POH</el-radio
+                  ></el-tooltip
+                >
               </div>
               <template #footer>
                 <span class="dialog-footer">
@@ -97,6 +167,44 @@
                   >
                 </span>
               </template>
+            </el-dialog>
+          </div>
+          <div class="drag-box">
+            <el-button
+              class="opButton"
+              type="primary"
+              size="small"
+              @click="stratPowFindHandleClose"
+              >挖矿模拟
+            </el-button>
+            <el-dialog
+              v-model="powFindVisible"
+              title="Loading!"
+              width="40%"
+              :before-close="powFindHandleClose"
+              :show-close="false"
+            >
+              <div style="padding-left: 20%; padding-right: 20%">
+                <!-- <el-progress :percentage="percentage" :color="customColors" /> -->
+                <el-progress
+                  :percentage="percentage"
+                  :color="customColors"
+                  :status="staus"
+                  :indeterminate="true"
+                  :duration="1"
+                  :stroke-width="20"
+                />
+                <el-form :model="showBlockMes">
+                  <el-descriptions title="">
+                    <el-descriptions-item label="">
+                      <span style="font-size: 18px; font-weight: bold"
+                        >当前事件: {{ showBlockMes[0] }}</span
+                      >
+                    </el-descriptions-item></el-descriptions
+                  ></el-form
+                >
+                <div></div>
+              </div>
             </el-dialog>
           </div>
           <div class="drag-box">
@@ -355,7 +463,7 @@
                 title="交易列表"
                 :append-to-body="true"
                 :before-close="NodeDetailHandleClose"
-                size="60%"
+                size="72%"
               >
                 <c-scrollbar maxWidth="400" height="640px" trigger="hover">
                   <el-table :data="blockTableData" style="width: 100%">
@@ -538,6 +646,10 @@ import {
   TransactionSingle,
   FindTransListBYid,
   findpresentMin,
+  addP2pNet,
+  getUnconfirmed,
+  getAllNetWork,
+  getAllMiner,
 } from "../api/apis";
 import { uuid, getDataString } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -562,6 +674,11 @@ const totalLinkList = reactive([]);
 let blockTableData = reactive([]);
 
 let nodeTableData = reactive([]);
+
+//模拟挖矿时需要的数据
+let lastBlockcreate = reactive([]);
+
+let lastBlockCoordinate = reactive([457.8750305175781, 185.0999984741211]);
 
 export default {
   components: {
@@ -616,19 +733,30 @@ export default {
     const dialog2 = ref(false);
     const loading = ref(false);
 
+    const store = useStore();
+
+    const auth = computed(() => {
+      return store.getters.authGetter;
+    });
+    const getAuth = () => {
+      return auth.value;
+    };
+
     let List = {
       transListId: "",
       id: "",
       hash: "",
+      auth: getAuth(),
     };
     //交易详情页
     const findTransList1 = (list) => {
       List.transListId = list;
       FindTransListBYid(List).then((res) => {
+        blockTableData.length = 0;
         let lengths = res.length;
         for (let i = 0; i < lengths; i++) {
           blockTableData.push({
-            id: res[i].id,
+            id: res[i].transId,
             hash: res[i].txIdHash,
             inputId: res[i].inputsId,
             outputsId: res[i].outputsId,
@@ -647,11 +775,12 @@ export default {
 
     const findTransList2 = (list) => {
       List.transListId = list;
+      nodeTableData.length = 0;
       FindTransListBYid(List).then((res) => {
         let lengths = res.length;
         for (let i = 0; i < lengths; i++) {
           nodeTableData.push({
-            id: res[i].id,
+            id: res[i].transId,
             hash: res[i].txIdHash,
             inputId: res[i].inputsId,
             outputsId: res[i].outputsId,
@@ -761,7 +890,7 @@ export default {
     };
 
     const consensusHandleClose = (done: () => void) => {
-      ElMessageBox.confirm("Are you sure to close this dialog?")
+      ElMessageBox.confirm("确定关闭当前界面吗?")
         .then(() => {
           done();
         })
@@ -769,8 +898,9 @@ export default {
           // catch error
         });
     };
+
     const blockTranSim = (done: () => void) => {
-      findpresentMin(null).then((res) => {
+      findpresentMin({ auth: getAuth() }).then((res) => {
         if (res == null || res == "") {
           ElMessageBox.alert("请创建新区块!", "WARING", {
             confirmButtonText: "OK",
@@ -857,6 +987,62 @@ export default {
     };
   },
   data() {
+    //挖矿模拟
+    const powFindHandleClose = (done: () => void) => {
+      ElMessageBox.confirm("程序运行中,无法退出当前界面!")
+        .then(() => {})
+        .catch(() => {
+          // catch error
+        });
+    };
+
+    const stratPowFindHandleClose = () => {
+      powFindVisible.value = true;
+      this.blockCreate();
+    };
+    const percentage = ref(0);
+    const setPercentage = (value) => {
+      powFindVisible.value = value;
+    };
+
+    const powFindVisible = ref(false);
+    const staus = ref("");
+    const setStatus = (value) => {
+      staus.value = value;
+    };
+
+    const customColors = [
+      { color: "#f03030", percentage: 10 },
+      { color: "#f56c6c", percentage: 20 },
+      { color: "#f39d1d", percentage: 30 },
+      { color: "#e6a23c", percentage: 40 },
+      { color: "#f5b95e", percentage: 50 },
+      { color: "#c2f117", percentage: 60 },
+      { color: "#c1e63c", percentage: 70 },
+      { color: "#d7f763", percentage: 80 },
+      { color: "#5cb87a", percentage: 100 },
+    ];
+
+    const increase = () => {
+      percentage.value += 10;
+      if (percentage.value > 100) {
+        percentage.value = 100;
+      }
+    };
+    const decrease = () => {
+      percentage.value -= 10;
+      if (percentage.value < 0) {
+        percentage.value = 0;
+      }
+    };
+
+    const showBlockMes = reactive(["全局查找正在进行挖矿的节点!"]);
+
+    const setShowBlockMes = (value) => {
+      showBlockMes[0] = value;
+    };
+
+    //获取当前用户
     const store = useStore();
 
     const auth = computed(() => {
@@ -878,15 +1064,29 @@ export default {
     };
 
     //页面加载
-    const openBlockCreate = () => {
+    const openBlockCreate = (miner) => {
       const loading = ElLoading.service({
         lock: true,
-        text: "产生区块中!",
+        text: "记账节点正在获取记账权!",
         background: "rgba(0, 0, 0)",
       });
       setTimeout(() => {
-        loading.close();
-      }, 2000);
+        loading.text.value =
+          "当前记账权拥有者" +
+          miner +
+          "。\n" +
+          miner +
+          "正在验证所有未确定交易(每个区块至多验证数量为10)!";
+        setTimeout(() => {
+          loading.text.value = "产生区块中!";
+          setTimeout(() => {
+            loading.text.value = "成功产生区块!";
+            setTimeout(() => {
+              loading.close();
+            }, 400);
+          }, 1100);
+        }, 1100);
+      }, 1100);
     };
 
     //交易模拟界面
@@ -945,9 +1145,13 @@ export default {
           inputAddressId: valueTrans1.value,
           outputAddressId: valueTrans2.value,
           transValue: numTrans.value,
+          auth: getAuth(),
         };
         TransactionSingle(transInputType).then((res) => {
           openFullScreen();
+          if (res.status) {
+            summaryMes[6].data = Number(summaryMes[6].data) + 1;
+          }
           setTimeout(() => {
             ElMessageBox.alert(res.mes, "交易结果", {
               confirmButtonText: "OK",
@@ -998,9 +1202,9 @@ export default {
     const dialogWalletVisible = ref(false);
 
     const checkWallet = (walletId) => {
-      findWalletCon({ walletId: walletId + "" }).then((res) => {
+      findWalletCon({ walletId: walletId + "", auth: getAuth() }).then((res) => {
         if (res != null || res != "") {
-          walletData.id = res.id;
+          walletData.id = res.walletId;
           walletData.publicKkey = res.publicKey;
           walletData.privateKey = res.privateKey;
           walletData.address = res.address;
@@ -1072,11 +1276,11 @@ export default {
       },
       {
         tabName: "传播延迟:  ",
-        data: "0",
+        data: "NON",
       },
       {
         tabName: "交易发生次数:  ",
-        data: "0",
+        data: 0,
       },
     ]);
     //详情信息
@@ -1099,7 +1303,11 @@ export default {
       let nowNodeType1 = presentTypeNode;
       let nowNodeType2 = nowNodeType.value;
 
-      const nodeTypeC = { addressId: presentTypeNode.value, nodeType: nowNodeType.value ,auth :getAuth()};
+      const nodeTypeC = {
+        addressId: presentTypeNode.value,
+        nodeType: nowNodeType.value,
+        auth: getAuth(),
+      };
       if (nowNodeType) {
         updateNodeType(nodeTypeC).then((res) => {
           if (res) {
@@ -1123,6 +1331,83 @@ export default {
       } else {
         nodeType.value = true;
       }
+    };
+
+    //P2P网络结构相关代码
+    const dialogP2PNetVisible = ref(false);
+
+    const tableP2PNetData = reactive([
+      {
+        addressId: "Node1",
+        Neighbor1: "Node2",
+        Neighbor2: "Node3",
+        Neighbor3: "Node4",
+      },
+    ]);
+
+    const getPresentP2PNetWork = () => {
+      getAllNetWork({ auth: getAuth() }).then((res) => {
+        if (res.length == 0) {
+          ElMessage({
+            message: "节点网络未创建,请先创建节点!",
+            type: "warning",
+          });
+        } else {
+          tableP2PNetData.length = 0;
+
+          for (let i = 0; i < res.length; i++) {
+            tableP2PNetData.push({
+              addressId: res[i].nodeAddress,
+              Neighbor1: res[i].neighbourOne,
+              Neighbor2: res[i].neighbourTwo,
+              Neighbor3: res[i].neighbourThree,
+            });
+          }
+          let sada = tableP2PNetData;
+          dialogP2PNetVisible.value = true;
+        }
+      });
+    };
+
+    //所以utxo查看
+    const dialogUtxoVisible = ref(false);
+
+    const tableUtxoData = reactive([
+      {
+        TransId: "Node1",
+        inputId: "Node2",
+        outPutId: "Node3",
+        totalInput: "Node4",
+        totalOutput: "Node4",
+        status: "confirmed",
+        UtxoBalance: "2",
+      },
+    ]);
+
+    const getPresentUtxoData = (status) => {
+      getUnconfirmed({ auth: getAuth(), status: status }).then((res) => {
+        if (res.length == 0) {
+          ElMessage({
+            message: "相关交易未创建,请先创建交易或区块!",
+            type: "warning",
+          });
+        } else {
+          tableUtxoData.length = 0;
+          for (let i = 0; i < res.length; i++) {
+            tableUtxoData.push({
+              TransId: res[i].transId,
+              inputId: res[i].inputsId,
+              outPutId: res[i].outputsId,
+              totalInput: res[i].totalInput,
+              totalOutput: res[i].totalOutput,
+              status: res[i].status,
+              UtxoBalance: res[i].utxo,
+            });
+          }
+          let sada = tableUtxoData;
+          dialogUtxoVisible.value = true;
+        }
+      });
     };
 
     const setPresentTypeNode = (presentTypeNodes) => {
@@ -1188,6 +1473,8 @@ export default {
               let params = {
                 auth: getAuth(),
               };
+              lastBlockCoordinate.length = 0;
+              lastBlockCoordinate = coordinate;
               createNewNode(params).then((res) => {
                 graph.addNode({
                   width: 100,
@@ -1199,9 +1486,29 @@ export default {
                     prop: "node",
                   },
                 });
+                addP2pNet({ addressId: res.addressId, auth: getAuth() }).then((res) => {
+                  if (res.success == "true") {
+                    if (res.addressId == "Node1") {
+                      ElMessage({
+                        message: "节点网络初始化!",
+                        type: "success",
+                      });
+                    } else {
+                      ElMessage({
+                        message: "节点网络添加成功!",
+                        type: "success",
+                      });
+                    }
+                  } else {
+                    ElMessage({
+                      message: "节点网络异常!",
+                      type: "warning",
+                    });
+                  }
+                });
                 LogEvent("create new " + res.addressId + ":", res.address);
                 // const nodeListIdsdadsaa = this.nodeListId;
-                // const newNodelist2 = this.$refs.superFlow.graph;
+
                 const newNodelist = graph.nodeList;
                 const presentNode = newNodelist[newNodelist.length - 1];
                 presentNode.meta.name = res.addressId;
@@ -1302,8 +1609,8 @@ export default {
             },
             selected(graph, coordinate) {
               if (graph.nodeList.length > 0) {
-                openBlockCreate();
-                createNewBlock(null).then((res) => {
+                createNewBlock({ auth: getAuth() }).then((res) => {
+                  openBlockCreate(res.miner);
                   graph.addNode({
                     width: 100,
                     height: 30,
@@ -1328,6 +1635,7 @@ export default {
                   summaryMes[2].data = "1";
                   summaryMes[3].data = "GenesisBlock1";
                   summaryMes[4].data = "GenesisBlock1";
+                  summaryMes[6].data = 1;
                   // this.$refs.superFlow.addNode({
                   //   coordinate,
                   //   ...conf.info,
@@ -1380,7 +1688,7 @@ export default {
                 target.splice(index, 1);
               }
               this.removeNodes();
-              deleteNode({ addressId: node.meta.name }).then((res) => {
+              deleteNode({ addressId: node.meta.name, auth: getAuth() }).then((res) => {
                 if (res == true) {
                   node.remove();
                   LogEvent("delete : ", node.meta.name);
@@ -1392,26 +1700,31 @@ export default {
             label: "编辑",
             selected: (node) => {
               if (node.meta.prop == "node") {
-                findNodeByAddressId({ addressId: node.meta.name }).then((res) => {
-                  if (res == null) {
-                    ElMessage.error("无法编辑!");
-                  } else {
-                    drwaerDateNode.address = res.address;
-                    drwaerDateNode.addressId = res.addressId;
-                    drwaerDateNode.transactions = res.transactions;
-                    drwaerDateNode.totalReceived = res.totalReceived;
-                    drwaerDateNode.totalSent = res.totalSent;
-                    drwaerDateNode.balance = res.balance;
-                    drwaerDateNode.nodeType = res.nodeType;
-                    drwaerDateNode.walletId = res.walletId;
-                    drwaerDateNode.transactionId = res.transactionsId;
-                    let sue = drwaerDateNode;
-                    this.drawerTrue("dialog2");
-                    setPresentTypeNode(res.addressId);
+                findNodeByAddressId({ addressId: node.meta.name, auth: getAuth() }).then(
+                  (res) => {
+                    if (res == null) {
+                      ElMessage.error("无法编辑!");
+                    } else {
+                      drwaerDateNode.address = res.address;
+                      drwaerDateNode.addressId = res.addressId;
+                      drwaerDateNode.transactions = res.transactions;
+                      drwaerDateNode.totalReceived = res.totalReceived;
+                      drwaerDateNode.totalSent = res.totalSent;
+                      drwaerDateNode.balance = res.balance;
+                      drwaerDateNode.nodeType = res.nodeType;
+                      drwaerDateNode.walletId = res.walletId;
+                      drwaerDateNode.transactionId = res.transactionsId;
+                      let sue = drwaerDateNode;
+                      this.drawerTrue("dialog2");
+                      setPresentTypeNode(res.addressId);
+                    }
                   }
-                });
+                );
               } else if (node.meta.prop == "block") {
-                findBlockByBlockId({ blockId: node.meta.name }).then((res) => {
+                findBlockByBlockId({
+                  blockId: node.meta.name,
+                  auth: this.getAuth(),
+                }).then((res) => {
                   if (res == null) {
                     ElMessage.error("无法编辑!");
                   } else {
@@ -1501,6 +1814,24 @@ export default {
       openFullScreen,
       openBlockCreate,
       getAuth,
+      tableP2PNetData,
+      dialogP2PNetVisible,
+      getPresentP2PNetWork,
+      dialogUtxoVisible,
+      tableUtxoData,
+      getPresentUtxoData,
+      powFindHandleClose,
+      percentage,
+      customColors,
+      increase,
+      staus,
+      decrease,
+      powFindVisible,
+      stratPowFindHandleClose,
+      showBlockMes,
+      setShowBlockMes,
+      setStatus,
+      setPercentage,
     };
   },
   created() {
@@ -1610,7 +1941,7 @@ export default {
           bottom,
           left,
         } = this.$refs.flowContainer.getBoundingClientRect();
-
+        let graph = this.$refs.superFlow.graph;
         // 判断鼠标是否进入 flow container
         if (clientX > left && clientX < right && clientY > top && clientY < bottom) {
           // 获取拖动元素左上角相对 super flow 区域原点坐标
@@ -1618,10 +1949,14 @@ export default {
             clientX - conf.offsetLeft,
             clientY - conf.offsetTop
           );
-
+          lastBlockCoordinate.length = 0;
+          lastBlockCoordinate = coordinate;
           // 添加节点或区块
           if (conf.info.meta.prop == "node") {
-            createNewNode(null).then((res) => {
+            let params = {
+              auth: this.getAuth(),
+            };
+            createNewNode(params).then((res) => {
               const confInfo = conf.info;
               confInfo.meta.label = res.addressId;
               // confInfo.meta.name =
@@ -1635,6 +1970,28 @@ export default {
                   prop: "node",
                 },
               });
+              addP2pNet({ addressId: res.addressId, auth: this.getAuth() }).then(
+                (res) => {
+                  if (res.success == "true") {
+                    if (res.addressId == "Node1") {
+                      ElMessage({
+                        message: "节点网络初始化!",
+                        type: "success",
+                      });
+                    } else {
+                      ElMessage({
+                        message: "节点网络添加成功!",
+                        type: "success",
+                      });
+                    }
+                  } else {
+                    ElMessage({
+                      message: "节点网络异常!",
+                      type: "warning",
+                    });
+                  }
+                }
+              );
               this.LogEvent("create new " + res.addressId + ":", res.address);
               const nodeListIdsdadsaa = this.linkList;
               // const newNodelist2 = this.$refs.superFlow.graph;
@@ -1658,8 +2015,8 @@ export default {
             const nodeEx = this.haveNodeMe(this.$refs.superFlow.graph);
             if (nodeEx) {
               if (blockListId.length == 0) {
-                createNewBlock(null).then((res) => {
-                  this.openBlockCreate();
+                createNewBlock({ auth: this.getAuth() }).then((res) => {
+                  this.openBlockCreate(res.miner);
                   this.$refs.superFlow.addNode({
                     width: 100,
                     height: 30,
@@ -1709,16 +2066,17 @@ export default {
 
                   const data = blockListId.length;
                   this.summaryMes[2].data = data;
+                  this.summaryMes[6].data = 1;
                   // this.$refs.superFlow.addNode({
                   //   coordinate,
                   //   ...conf.info,
                   // });
                 });
               } else {
-                findMinExist(null).then((isExist) => {
+                findMinExist({ auth: this.getAuth() }).then((isExist) => {
                   if (isExist) {
-                    createNewBlock(null).then((res) => {
-                      this.openBlockCreate();
+                    createNewBlock({ auth: this.getAuth() }).then((res) => {
+                      this.openBlockCreate(res.miner);
                       this.$refs.superFlow.addNode({
                         width: 100,
                         height: 30,
@@ -1768,6 +2126,7 @@ export default {
 
                       const data = blockListId.length;
                       this.summaryMes[2].data = data;
+                      this.summaryMes[6].data = 1 + Number(this.summaryMes[6].data);
                       // this.$refs.superFlow.addNode({
                       //   coordinate,
                       //   ...conf.info,
@@ -1840,6 +2199,150 @@ export default {
       return false;
     },
     removeNodes(target, val) {},
+
+    //模拟挖矿行为；
+    blockCreate() {
+      if (blockListId.length > 0) {
+        let end = reactive([]);
+        findMinExist({ auth: this.getAuth() }).then((isExist) => {
+          if (isExist) {
+            const coordinate = lastBlockCoordinate;
+            coordinate[1] = coordinate[1] + 35;
+            createNewBlock({ auth: this.getAuth() }).then((res) => {
+              this.increase();
+              setTimeout(() => {
+                this.increase();
+                getAllMiner({ auth: this.getAuth() }).then((minerList) => {
+                  let str = "";
+                  for (let i = 0; i < minerList.length; i++) {
+                    str = str + " " + minerList[i];
+                  }
+                  this.setShowBlockMes("运行中的产块节点" + str);
+                  setTimeout(() => {
+                    this.increase();
+                    this.setShowBlockMes(
+                      "计算中-" + "nonce:0" + ",targetDifficulty:" + res.difficulty
+                    );
+                    setTimeout(() => {
+                      this.increase();
+                      for (let i = 0; i < res.nonce; i++) {
+                        setTimeout(() => {
+                          this.setShowBlockMes(
+                            "计算中-" +
+                              "nonce:" +
+                              i +
+                              ",targetDifficulty:" +
+                              res.difficulty
+                          );
+                        }, 1000);
+                      }
+                      setTimeout(() => {
+                        this.increase();
+                        this.setShowBlockMes("产块节点(" + res.miner + ")获取记账权!");
+                        setTimeout(() => {
+                          this.increase();
+                          this.setShowBlockMes(
+                            "产块节点(" + res.miner + ")开始处理未确定交易等事务!"
+                          );
+                          setTimeout(() => {
+                            this.increase();
+                            this.setShowBlockMes(
+                              res.miner + "处理的未确定交易等事务id:" + res.transactions
+                            );
+                            setTimeout(() => {
+                              this.increase();
+                              this.setShowBlockMes(res.miner + "处理完毕");
+                              setTimeout(() => {
+                                this.increase();
+                                this.setShowBlockMes("区块产生中!");
+                                setTimeout(() => {
+                                  this.increase();
+                                  this.setStatus("success");
+                                  this.setShowBlockMes("区块产生成功!");
+                                  this.$refs.superFlow.addNode({
+                                    width: 100,
+                                    height: 30,
+                                    coordinate,
+                                    meta: {
+                                      label: res.blockID,
+                                      name: res.blockID,
+                                      prop: "block",
+                                    },
+                                  });
+                                  this.LogEvent(
+                                    "create new " + res.blockID + ":",
+                                    res.hash
+                                  );
+                                  // const nodeListIdsdadsaa = blockListId;
+                                  const newBlocklist = this.$refs.superFlow.graph
+                                    .nodeList;
+                                  const presentBlock =
+                                    newBlocklist[newBlocklist.length - 1];
+                                  presentBlock.meta.name = res.blockID;
+                                  if (presentBlock.meta.prop == "block") {
+                                    // let presentNodsd=presentNode.id;
+                                    blockListId.push({
+                                      lable: presentBlock.meta.label,
+                                      id: presentBlock.id,
+                                    });
+                                  }
+                                  if (this.summaryMes[3].data == "0") {
+                                    this.summaryMes[3].data = presentBlock.meta.label;
+                                  }
+                                  this.summaryMes[4].data = presentBlock.meta.label;
+                                  const newId = uuid("link");
+                                  const lengthblockListId = blockListId.length;
+                                  if (lengthblockListId >= 2) {
+                                    const lengthLinklength = this.linkList.length;
+                                    const targetLinkList = [];
+                                    if (lengthLinklength > 0) {
+                                      for (var i = 0; i < lengthLinklength; i++) {
+                                        targetLinkList.push(this.linkList[i]);
+                                      }
+                                    }
+                                    targetLinkList.push({
+                                      id: newId,
+                                      startId: blockListId[lengthblockListId - 2].id,
+                                      endId: blockListId[lengthblockListId - 1].id,
+                                      startAt: [100, 24],
+                                      endAt: [0, 25],
+                                      meta: "block",
+                                    });
+                                    this.linkList = targetLinkList;
+                                  }
+                                  const data = blockListId.length;
+                                  this.summaryMes[2].data = data;
+                                  this.summaryMes[6].data =
+                                    1 + Number(this.summaryMes[6].data);
+                                  lastBlockcreate = res;
+                                  setTimeout(() => {
+                                    this.setPercentage(false);
+                                  }, 500);
+                                }, 1000);
+                              }, 1000);
+                            }, 1000);
+                          }, 1000);
+                        }, 1000);
+                      }, 2300);
+                    }, 500);
+                  }, 500);
+                });
+              }, 500);
+            });
+          } else {
+            ElMessage({
+              message: "创建非创世块时请先创建产块节点.",
+              type: "warning",
+            });
+          }
+        });
+      } else {
+        ElMessage({
+          message: "挖矿前请先创建产块节点或创世块.",
+          type: "warning",
+        });
+      }
+    },
   },
 };
 </script>
@@ -1995,5 +2498,15 @@ export default {
   margin-bottom: 10px;
   width: 70%;
   text-align: center;
+}
+.opButtontdrwaer {
+  margin-left: -15px;
+  margin-bottom: 10px;
+  width: 138%;
+  text-align: center;
+}
+.el-progress--line {
+  margin-bottom: 15px;
+  width: 350px;
 }
 </style>
