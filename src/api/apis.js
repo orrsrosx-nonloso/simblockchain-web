@@ -109,7 +109,7 @@ export const addP2pNet = function (data) {
 }
 
 
-// 每次创建节点后会进行区块链网络构建
+// 获取所有区块链网络结构
 export const getAllNetWork = function (data) {
     return http('post', 'http://localhost:8081/p2pNetwork/getAllNetWork', data)
 }
@@ -119,6 +119,10 @@ export const getAllMiner = function (data) {
     return http('post', 'http://localhost:8081/singleNode/getAllMiner', data)
 }
 
+//查询10个以内未确定交易
+export const getNewBlockDif = function (data) {
+    return http('post', 'http://localhost:8081/singleBlock/getNewBlockDif', data)
+}
 
 // 获取权限菜单
 export const getRolesApi = function (data) {

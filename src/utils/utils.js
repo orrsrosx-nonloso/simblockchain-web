@@ -47,3 +47,11 @@ export function zeroFill(i) {
         return i;
     }
 }
+
+/**
+配置获取ID
+*/
+export function getNodeId(i) {
+    const ids = i.split("e");
+    return ids[1];
+}
