@@ -124,6 +124,12 @@ export const getNewBlockDif = function (data) {
     return http('post', 'http://localhost:8081/singleBlock/getNewBlockDif', data)
 }
 
+//创建分叉区块
+export const createBifurcatedChain = function (data) {
+    return http('post', 'http://localhost:8081/singleBlock/createBifurcatedChain', data)
+}
+
+
 // 获取权限菜单
 export const getRolesApi = function (data) {
     return http('get', '/http/getTable', {

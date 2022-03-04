@@ -5,13 +5,31 @@
         ><div class="grid-content">
           <div class="base_title">节点操作</div>
           <div class="drag-box">
-            <el-button
+            <!-- <el-button
               class="opButton"
               type="primary"
               size="small"
               @click="startTransactionSimVis"
               >交易模拟
-            </el-button>
+            </el-button> -->
+            <el-dropdown>
+              <el-button class="opButtontdrwaer2" type="primary" size="small"
+                >交易模拟
+                <arrow-down />
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-tooltip content="模拟普通流程交易!" placement="top">
+                    <el-dropdown-item @click="startTransactionSimVis"
+                      >普通交易模拟</el-dropdown-item
+                    >
+                  </el-tooltip>
+                  <el-tooltip content="模拟双花问题情况下的交易!" placement="top">
+                    <el-dropdown-item @click="">双花问题模拟</el-dropdown-item>
+                  </el-tooltip>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
             <el-dialog
               v-model="transactionSimVis"
               title="模拟交易"
@@ -223,7 +241,11 @@
             </el-button>
           </div>
           <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small"
+            <el-button
+              class="opButton"
+              type="primary"
+              size="small"
+              @click="bifurcatedChain"
               >区块链分叉
             </el-button>
           </div>
@@ -657,6 +679,7 @@ import {
   getAllNetWork,
   getAllMiner,
   getNewBlockDif,
+  createBifurcatedChain,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -953,6 +976,26 @@ export default {
     };
   },
   data() {
+    //区块链分叉操作
+    const bifurcatedChain = () => {
+      if (blockListId.length > 1 && nodeListId.length > 1) {
+        getAllMiner({ auth: this.getAuth() }).then((minerList) => {
+          if (minerList.length > 1) {
+            createBifurcatedChain({ auth: getAuth() }).then((res) => {
+              this.BifurcatedChainCreate(res);
+            });
+          } else {
+            ElMessageBox.alert("当前产块节点数量小于2,请添加新产块节点!", "WARING", {
+              confirmButtonText: "OK",
+            });
+          }
+        });
+      } else {
+        ElMessageBox.alert("当前区块或节点数量小于2,请添加新区块和节点!", "WARING", {
+          confirmButtonText: "OK",
+        });
+      }
+    };
     //模拟区块传输
     const blockTranSim = (done: () => void) => {
       findpresentMin({ auth: getAuth() }).then((res) => {
@@ -1094,7 +1137,7 @@ export default {
       for (let i = 0; i < miner.length; i++) {
         setTimeout(() => {
           ElMessage({
-            message: `节点`+miner[i].nodeAddress+ `开始传输!`,
+            message: `节点` + miner[i].nodeAddress + `开始传输!`,
             type: "success",
           });
           if (miner[i].neighbourOne != null) {
@@ -1108,12 +1151,12 @@ export default {
           }
           setTimeout(() => {
             ElMessage({
-              message: `节点`+miner[i].nodeAddress+ `结束传输!`,
+              message: `节点` + miner[i].nodeAddress + `结束传输!`,
               type: "success",
             });
             this.removeAllNodeLink();
           }, 2000);
-          LogEvent("Node Transmit", miner[i].nodeAddress+ "开始区块传输!");
+          LogEvent("Node Transmit", miner[i].nodeAddress + "开始区块传输!");
         }, 3000 * i);
       }
     };
@@ -1142,6 +1185,10 @@ export default {
       this.blockCreate();
     };
     const percentage = ref(0);
+
+    const setPercentage = (value) => {
+      percentage.value = value;
+    };
     const setPowFindVisible = (value) => {
       powFindVisible.value = value;
     };
@@ -1294,10 +1341,59 @@ export default {
             summaryMes[6].data = Number(summaryMes[6].data) + 1;
           }
           setTimeout(() => {
-            ElMessageBox.alert(res.mes, "交易结果", {
-              confirmButtonText: "OK",
-            });
-          }, 500);
+            this.setShowBlockMes("正在开启交易!");
+            this.setPercentage(0);
+            this.setPowFindVisible(true);
+            this.increase();
+            setTimeout(() => {
+              this.setShowBlockMes("交易发起者" + res.inputAddressId + "确定交易内容");
+              this.increase();
+              setTimeout(() => { 
+                this.increase();
+                this.setShowBlockMes(res.inputAddressId + "利用私钥对交易进行签名");
+                setTimeout(() => {
+                  this.increase();
+                  this.setShowBlockMes(res.inputAddressId + "开始验证交易合法性!");
+                  setTimeout(() => {
+                    this.increase();
+                    this.setShowBlockMes(
+                      "交易合法!" +
+                        res.inputAddressId +
+                        "将交易广播至当前拥有记账权的节点和交易对象" +
+                        res.outputAddressId
+                    );
+                    setTimeout(() => {
+                      this.increase();
+                      this.setShowBlockMes(
+                        "当前拥有记账权的节点和交易对象" +
+                          res.outputAddressId +
+                          "开始验证交易合法性!"
+                      );
+                      setTimeout(() => {
+                        this.increase();
+                        this.setShowBlockMes("交易合法!");
+                        setTimeout(() => {
+                          this.increase();
+                          this.setShowBlockMes(
+                            "交易并入交易池中,等待记账节点产出区块时对交易进行验证!"
+                          );
+                          setTimeout(() => {
+                            this.increase();
+                            this.setShowBlockMes("交易结束!");
+                            this.setStatus("success");
+                            setTimeout(() => {
+                              this.setPowFindVisible(false);
+                            }, 500);
+                          }, 1600);
+                        }, 1600);
+                      }, 1600);
+                    }, 1600);
+                  }, 1600);
+                }, 1500);
+              }, 1600);
+            }, 1600);
+          }, 1600);
+
           changetransactionSimVis();
           LogEvent("TransactionSingle  :", valueTrans1.value + "T O" + valueTrans2.value);
         });
@@ -1433,7 +1529,7 @@ export default {
     ]);
 
     const LogEvent = (eventName, data) => {
-      eventMes.push({
+      eventMes.unshift({
         eventName: eventName,
         data: data,
       });
@@ -1975,6 +2071,8 @@ export default {
       setPowFindVisible,
       blockTranSim,
       getNewBlockDifficult,
+      bifurcatedChain,
+      setPercentage,
     };
   },
   created() {
@@ -2352,6 +2450,7 @@ export default {
             const coordinate = lastBlockCoordinate;
             coordinate[1] = coordinate[1] + 35;
             createNewBlock({ auth: this.getAuth() }).then((res) => {
+              this.setPercentage(0);
               this.increase();
               setTimeout(() => {
                 this.increase();
@@ -2381,7 +2480,9 @@ export default {
                       }
                       setTimeout(() => {
                         this.increase();
-                        this.setShowBlockMes("产块节点(" + res.miner + ")获取记账权!");
+                        this.setShowBlockMes(
+                          "产块节点(" + res.miner + ")最先获取到记账权!"
+                        );
                         setTimeout(() => {
                           this.increase();
                           this.setShowBlockMes(
@@ -2560,6 +2661,153 @@ export default {
       }
       this.linkList = targetLinkList;
     },
+    BifurcatedChainCreate(res) {
+      setTimeout(() => {
+        this.setShowBlockMes("全局查找正在进行挖矿的节点");
+        this.setPercentage(0);
+        this.setPowFindVisible(true);
+        this.increase();
+        setTimeout(() => {
+          this.increase();
+          getAllMiner({ auth: this.getAuth() }).then((minerList) => {
+            let str = "";
+            for (let i = 0; i < minerList.length; i++) {
+              str = str + " " + minerList[i];
+            }
+            this.setShowBlockMes("运行中的产块节点" + str);
+            setTimeout(() => {
+              this.increase();
+              this.setShowBlockMes(
+                "计算中-" + "nonce:0" + ",targetDifficulty:" + res[0].difficulty
+              );
+              setTimeout(() => {
+                this.increase();
+                for (let i = 0; i < res[0].nonce; i++) {
+                  setTimeout(() => {
+                    this.setShowBlockMes(
+                      "计算中-" + "nonce:" + i + ",targetDifficulty:" + res[0].difficulty
+                    );
+                  }, 1000);
+                }
+                setTimeout(() => {
+                  this.increase();
+                  this.setShowBlockMes(
+                    "产块节点(" +
+                      res[0].miner +
+                      "和" +
+                      res[1].miner +
+                      ")同时获取到记账权!"
+                  );
+                  setTimeout(() => {
+                    this.increase();
+                    this.setShowBlockMes("产块节点开始处理交易池内unconfirmed事务!");
+                    setTimeout(() => {
+                      this.increase();
+                      this.setShowBlockMes("unconfirmed事务id:" + res[0].transactions);
+                      setTimeout(() => {
+                        this.increase();
+                        this.setShowBlockMes("unconfirmed事务处理完毕");
+                        setTimeout(() => {
+                          this.increase();
+                          this.setShowBlockMes("分叉链产生中");
+                          setTimeout(() => {
+                            this.increase();
+                            this.setShowBlockMes("分叉链产生成功");
+                            this.setStatus("success");
+                            const coordinate = lastBlockCoordinate;
+                            coordinate[0] = coordinate[0] + 120;
+                            coordinate[1] = coordinate[1] + 40;
+                            const bifBlock1 = res[0];
+                            const bifBlock2 = res[1];
+                            const lengthblockListId = blockListId.length;
+                            const start = blockListId[lengthblockListId - 1].lable;
+                            this.addSuperNode(coordinate, bifBlock1, "block");
+                            const coordinate2 = coordinate;
+                            coordinate2[1] = coordinate2[1] - 60;
+                            this.addSuperNode(coordinate2, bifBlock2, "block");
+                            this.LogEvent(
+                              "create new " + res[0].blockID + ":",
+                              res[0].hash
+                            );
+                            this.addNewBlockLink(start, bifBlock1.blockID);
+                            this.addNewBlockLink(start, bifBlock2.blockID);
+                            const data = blockListId.length;
+                            this.summaryMes[4].data =
+                              bifBlock1.blockId + " or " + bifBlock2.blockId;
+                            this.summaryMes[2].data = data;
+                            this.summaryMes[6].data = 1 + Number(this.summaryMes[6].data);
+                            setTimeout(() => {
+                              this.setPowFindVisible(false);
+                            }, 500);
+                          }, 1000);
+                        }, 1000);
+                      }, 1000);
+                    }, 1000);
+                  }, 1000);
+                }, 2400);
+              }, 1000);
+            }, 1000);
+          });
+        }, 1000);
+      }, 500);
+    },
+    //添加画板节点
+    addSuperNode(coordinate, res, type) {
+      this.$refs.superFlow.addNode({
+        width: 100,
+        height: 30,
+        coordinate,
+        meta: {
+          label: res.blockID,
+          name: res.blockID,
+          prop: type,
+        },
+      });
+      const newBlocklist = this.$refs.superFlow.graph.nodeList;
+      const presentBlock = newBlocklist[newBlocklist.length - 1];
+      presentBlock.meta.name = res.blockID;
+      if (presentBlock.meta.prop == "block") {
+        // let presentNodsd=presentNode.id;
+        blockListId.push({
+          lable: presentBlock.meta.label,
+          id: presentBlock.id,
+        });
+      }
+      if (this.summaryMes[3].data == "0") {
+        this.summaryMes[3].data = presentBlock.meta.label;
+      }
+    },
+
+    //添加区块连线
+    addNewBlockLink(start, end) {
+      console.log("add:" + start + "-" + end);
+      let startuuid = "";
+      let enduuid = "";
+      for (let i = 0; i < blockListId.length; i++) {
+        if (blockListId[i].lable == start) {
+          startuuid = blockListId[i].id;
+        } else if (blockListId[i].lable == end) {
+          enduuid = blockListId[i].id;
+        }
+      }
+      const newId = uuid("block" + end);
+      const lengthLinklength = this.linkList.length;
+      const targetLinkList = [];
+      if (lengthLinklength > 0) {
+        for (var i = 0; i < lengthLinklength; i++) {
+          targetLinkList.push(this.linkList[i]);
+        }
+      }
+      targetLinkList.push({
+        id: newId,
+        startId: startuuid,
+        endId: enduuid,
+        startAt: [100, 24],
+        endAt: [0, 25],
+        meta: "block",
+      });
+      this.linkList = targetLinkList;
+    },
   },
 };
 </script>
@@ -2721,6 +2969,15 @@ export default {
   margin-bottom: 10px;
   width: 138%;
   text-align: center;
+}
+.opButtontdrwaer2 {
+  margin-left: -15px;
+  margin-bottom: 10px;
+  width: 138%;
+  text-align: center;
+}
+.el-dropdown {
+  width: 50%;
 }
 .el-progress--line {
   margin-bottom: 15px;
