@@ -1,36 +1,52 @@
 import axios from 'axios'
+import { getCookie } from '../utils/cookie'
+import router from '../router/index.js'
+import { ElMessageBox } from "element-plus";
+
+
+
+
 const base_url = import.meta.env.VITE_BASE_URL;
 
 //创建axios的一个实例 
 const http = axios.create({
-    baseURL:    base_url, //接口统一域名
-    timeout:    60000      //设置超时
+    baseURL: base_url, //接口统一域名
+    timeout: 60000      //设置超时
 })
- 
- 
+
+
 //------------------- 一、请求拦截器 忽略
 http.interceptors.request.use(function (config) {
- 
+
+    if (config.url.indexOf("route") == -1 && config.url.indexOf("getLogin") == -1 && config.url.indexOf("loginOut") == -1 && config.url.indexOf("checkLogin") == -1) {
+        config.data.token = getCookie('token');
+    }
     return config;
 }, function (error) {
     // 对请求错误做些什么
     return Promise.reject(error);
 });
- 
+
 //----------------- 二、响应拦截器 忽略
 http.interceptors.response.use(function (response) {
     const status = response.status
     const data = response.data;
-    if (status === 200) { // 接口请求成功
-        
+    if (data.status == 8) {
+        router.replace("/login");
+        ElMessageBox.alert("用户已经在其他机器登录！", "WARING", {
+            confirmButtonText: "OK",
+        });
     }
-    return data;
+    else {
+        return data;
+    }
+
 }, function (error) {
     // 对响应错误做点什么
     console.log('拦截器报错');
     return Promise.reject(error);
 });
- 
+
 /**
  * 使用es6的export default导出了一个函数，导出的函数代替axios去帮我们请求数据，
  * 函数的参数及返回值如下：
@@ -47,10 +63,10 @@ export default function (method, url, data = null) {
         return http.get(url, { params: data })
     } else if (method == 'delete') {
         return http.delete(url, { params: data })
-    }else if(method == 'put'){
-        return http.put(url,data)
-    }else{
-        console.error('未知的方法 : '+method)
+    } else if (method == 'put') {
+        return http.put(url, data)
+    } else {
+        console.error('未知的方法 : ' + method)
         return false
     }
 }

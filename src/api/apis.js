@@ -10,10 +10,6 @@ export const getLoginMes = function (data) {
     return http('post', 'http://localhost:8081/user/getLogin', data)
 }
 
-// 获取用户数据
-export const getUserData = function (data) {
-    return http('get', 'http://localhost:8081/user/findAll', data)
-}
 
 // // 获取用户数据
 // export const getMapData = function (data) {
@@ -89,10 +85,7 @@ export const FindTransListBYid = function (data) {
     return http('post', 'http://localhost:8081/transSingle/findTransListBYid', data)
 }
 
-//通过ID交易详情
-export const findTransCon = function (data) {
-    return http('post', 'http://localhost:8081/transSingle/findTransId', data)
-}
+
 
 //获取当前账本拥有者
 export const findpresentMin = function (data) {
@@ -129,6 +122,32 @@ export const createBifurcatedChain = function (data) {
     return http('post', 'http://localhost:8081/singleBlock/createBifurcatedChain', data)
 }
 
+
+//通过ID交易详情
+export const findTransCon = function (data) {
+    return http('post', 'http://localhost:8081/transSingle/findTransId', data)
+}
+//获取交易输入信息
+export const findTXInput = function (data) {
+    return http('post', 'http://localhost:8081/txInput/findTXInput', data)
+}
+
+//获取交易输出信息
+export const findTXOutput = function (data) {
+    return http('post', 'http://localhost:8081/txOutput/findTxOutput', data)
+}
+
+
+//登出
+export const loginOut = function (data) {
+    return http('post', 'http://localhost:8081/user/loginOut', data)
+}
+
+
+//检查登录状态
+export const checkLoginStatus = function (data) {
+    return http('post', 'http://localhost:8081/user/checkLogin', data)
+}
 
 // 获取权限菜单
 export const getRolesApi = function (data) {

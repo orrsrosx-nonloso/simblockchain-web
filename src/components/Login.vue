@@ -45,7 +45,8 @@ import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { getDate } from "../utils/utils";
 import { useRouter } from "vue-router";
-import { getLoginMes, getUserData, getLogin } from "../api/apis";
+import { getLoginMes} from "../api/apis";
+import { ElMessageBox } from "element-plus";
 
 defineProps({
   msg: String,
@@ -91,7 +92,6 @@ function changeType() {
 //   });
 // }
 function login() {
-
   const params = JSON.parse(JSON.stringify(state.formLabelAlign));
 
   // JSON.parse(JSON.stringify(state.formLabelAlign));
@@ -126,6 +126,9 @@ function login() {
       // console.log(store.dispatch('asyncGetRoutes'))
     } else {
       state.loginLoading = false;
+      ElMessageBox.alert(res.msg, "WARING", {
+        confirmButtonText: "OK",
+      });
     }
   });
   console.log(params);

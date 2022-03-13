@@ -101,8 +101,8 @@
             <el-dialog v-model="dialogUtxoVisible" width="840px">
               <el-table :data="tableUtxoData" height="300" style="width: 100%">
                 <el-table-column prop="TransId" label="交易Id" width="100" />
-                <el-table-column prop="inputId" label="交易输入" width="100" />
-                <el-table-column prop="outPutId" label="交易输出" width="100" />
+                <el-table-column prop="inputId" label="交易输入ID" width="100" />
+                <el-table-column prop="outPutId" label="交易输出ID" width="100" />
                 <el-table-column prop="totalInput" label="总交易输入" width="100" />
                 <el-table-column prop="totalOutput" label="总交易输出" width="100" />
                 <el-table-column prop="status" label="状态" width="100" />
@@ -164,7 +164,7 @@
                   content="股权证明/权益证明共识机制(Proof of Stake)"
                   placement="top"
                 >
-                  <el-radio v-model="consensusChoose" disabled label="2" size="large"
+                  <el-radio v-model="consensusChoose" label="2" size="large"
                     >POS</el-radio
                   ></el-tooltip
                 >
@@ -172,7 +172,7 @@
                   content="历史工作证明共识机制(Proof of History)"
                   placement="top"
                 >
-                  <el-radio v-model="consensusChoose" disabled label="2" size="large"
+                  <el-radio v-model="consensusChoose" disabled label="3" size="large"
                     >POH</el-radio
                   ></el-tooltip
                 >
@@ -497,8 +497,22 @@
                   <el-table :data="blockTableData" style="width: 100%">
                     <el-table-column prop="id" label="id" width="40" />
                     <el-table-column prop="hash" label="hash" width="200" />
-                    <el-table-column prop="inputsId" label="inputsId" width="100" />
-                    <el-table-column prop="outputsId" label="outputsId" width="100" />
+                    <el-table-column label="inputId" width="100">
+                      <template #default="scope">
+                        <el-button type="text" @click="getInputData(scope.row.inputId)">{{
+                          scope.row.inputId
+                        }}</el-button>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="outputsId" width="100">
+                      <template #default="scope">
+                        <el-button
+                          type="text"
+                          @click="getOutputData(scope.row.outputsId)"
+                          >{{ scope.row.outputsId }}</el-button
+                        >
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="totalInput" label="totalInput" width="100" />
                     <el-table-column prop="totalOutput" label="totalOutput" width="110" />
                     <el-table-column prop="createTime" label="createTime" width="200" />
@@ -608,8 +622,22 @@
                   <el-table :data="nodeTableData" style="width: 100%">
                     <el-table-column prop="id" label="id" width="40" />
                     <el-table-column prop="hash" label="hash" width="200" />
-                    <el-table-column prop="inputsId" label="inputsId" width="100" />
-                    <el-table-column prop="outputsId" label="outputsId" width="100" />
+                    <el-table-column label="inputId" width="100">
+                      <template #default="scope">
+                        <el-button type="text" @click="getInputData(scope.row.inputId)">{{
+                          scope.row.inputId
+                        }}</el-button>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="outputsId" width="100">
+                      <template #default="scope">
+                        <el-button
+                          type="text"
+                          @click="getOutputData(scope.row.outputsId)"
+                          >{{ scope.row.outputsId }}</el-button
+                        >
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="totalInput" label="totalInput" width="100" />
                     <el-table-column prop="totalOutput" label="totalOutput" width="110" />
                     <el-table-column prop="createTime" label="createTime" width="200" />
@@ -653,6 +681,110 @@
         ></c-scrollbar
       >
     </el-dialog>
+
+    <el-dialog v-model="dialogInputVisible" width="440px">
+      <c-scrollbar maxWidth="400" trigger="hover">
+        <el-form :model="inputData">
+          <el-descriptions title="交易输入ID" :column="1" border>
+            <el-descriptions-item
+              label="id"
+              label-align="left"
+              align="left"
+              min-width="100px"
+              ><el-tag size="small">{{ inputData.id }}</el-tag></el-descriptions-item
+            >
+            <el-descriptions-item label="address" label-align="left" align="left">{{
+              inputData.address
+            }}</el-descriptions-item>
+            <el-descriptions-item label="signature" label-align="left" align="left">
+              {{ inputData.signature }}
+            </el-descriptions-item>
+            <el-descriptions-item label="pubKey" label-align="left" align="left">
+              {{ inputData.pubKey }}
+            </el-descriptions-item>
+            <el-descriptions-item label="transId" label-align="left" align="left">
+              <el-button v-for="item in inputData.transId" type="text" @click="getTransData(item)">{{
+                item
+              }}</el-button>
+            </el-descriptions-item>
+            <el-descriptions-item label="tranValue" label-align="left" align="left">{{
+              inputData.tranValue
+            }}</el-descriptions-item>
+          </el-descriptions></el-form
+        ></c-scrollbar
+      >
+    </el-dialog>
+
+    <el-dialog v-model="dialogOutPutVisible" width="440px">
+      <c-scrollbar maxWidth="400" trigger="hover">
+        <el-form :model="outputData">
+          <el-descriptions title="交易输出" :column="1" border>
+            <el-descriptions-item
+              label="id"
+              label-align="left"
+              align="left"
+              min-width="100px"
+              ><el-tag size="small">{{ outputData.id }}</el-tag></el-descriptions-item
+            >
+            <el-descriptions-item label="address" label-align="left" align="left">{{
+              outputData.address
+            }}</el-descriptions-item>
+            <el-descriptions-item label="tranValue" label-align="left" align="left">{{
+              outputData.tranValue
+            }}</el-descriptions-item>
+            <el-descriptions-item label="transId" label-align="left" align="left">
+              <el-button v-for="item in outputData.transId" type="text" @click="getTransData(item)">{{
+                item
+              }}</el-button>
+            </el-descriptions-item>
+          </el-descriptions></el-form
+        ></c-scrollbar
+      >
+    </el-dialog>
+
+    <el-dialog v-model="dialogTransVisible" width="440px">
+      <c-scrollbar maxWidth="400" trigger="hover">
+        <el-form :model="transData">
+          <el-descriptions title="钱包结构" :column="1" border>
+            <el-descriptions-item
+              label="id"
+              label-align="left"
+              align="left"
+              min-width="100px"
+              ><el-tag size="small">{{ transData.id }}</el-tag></el-descriptions-item
+            >
+            <el-descriptions-item label="TransHash" label-align="left" align="left">{{
+              transData.hash
+            }}</el-descriptions-item>
+            <el-descriptions-item label="InputId" label-align="left" align="left">
+              <el-button type="text" @click="getInputData(transData.inputId)">{{
+                transData.inputId
+              }}</el-button>
+            </el-descriptions-item>
+            <el-descriptions-item label="OutputId" label-align="left" align="left">
+              <el-button type="text" @click="getOutputData(transData.outputId)">{{
+                transData.outputId
+              }}</el-button>
+            </el-descriptions-item>
+            <el-descriptions-item label="createTime" label-align="left" align="left">{{
+              transData.createTime
+            }}</el-descriptions-item>
+            <el-descriptions-item label="totalInput" label-align="left" align="left">{{
+              transData.totalInput
+            }}</el-descriptions-item>
+            <el-descriptions-item label="totalOutput" label-align="left" align="left">{{
+              transData.totalOutput
+            }}</el-descriptions-item>
+            <el-descriptions-item label="status" label-align="left" align="left">{{
+              transData.status
+            }}</el-descriptions-item>
+            <el-descriptions-item label="utxo" label-align="left" align="left">{{
+              transData.utxo
+            }}</el-descriptions-item>
+          </el-descriptions></el-form
+        ></c-scrollbar
+      >
+    </el-dialog>
   </el-scrollbar>
 </template>
 <script lang="ts">
@@ -680,6 +812,9 @@ import {
   getAllMiner,
   getNewBlockDif,
   createBifurcatedChain,
+  findTXInput,
+  findTXOutput,
+  findTransCon,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -708,6 +843,9 @@ let nodeTableData = reactive([]);
 //模拟挖矿时需要的数据
 let lastBlockcreate = reactive([]);
 
+// 全局的共识协议变量
+let globalConsensus = ref("POW");
+
 let lastBlockCoordinate = reactive([457.8750305175781, 185.0999984741211]);
 
 export default {
@@ -715,11 +853,6 @@ export default {
     Draggable,
   },
   setup() {
-    //区块共识选择
-    const consensusVisible = ref(false);
-
-    const consensusChoose = ref("1");
-
     //拖拽区块节点配置
     const disabled = ref(false);
     const node1 = reactive([]);
@@ -781,7 +914,8 @@ export default {
     //交易详情页
     const findTransList1 = (list) => {
       List.transListId = list;
-      FindTransListBYid(List).then((res) => {
+      FindTransListBYid(List).then((ress) => {
+        const res = ress.preData;
         blockTableData.length = 0;
         let lengths = res.length;
         for (let i = 0; i < lengths; i++) {
@@ -806,7 +940,8 @@ export default {
     const findTransList2 = (list) => {
       List.transListId = list;
       nodeTableData.length = 0;
-      FindTransListBYid(List).then((res) => {
+      FindTransListBYid(List).then((ress) => {
+        const res = ress.preData;
         let lengths = res.length;
         for (let i = 0; i < lengths; i++) {
           nodeTableData.push({
@@ -967,8 +1102,6 @@ export default {
       innerDrawer2,
       NodeDetailHandleClose,
       consensusHandleClose,
-      consensusVisible,
-      consensusChoose,
       blockTableData,
       nodeTableData,
       findTransList1,
@@ -976,12 +1109,28 @@ export default {
     };
   },
   data() {
+    //区块共识选择
+    const consensusVisible = ref(false);
+
+    const consensusChoose = ref("1");
+
+    const getConsensus = () => {
+      if (consensusChoose.value == "1") {
+        return "POW";
+      } else if (consensusChoose.value == "2") {
+        return "POS";
+      } else if (consensusChoose.value == "3") {
+        return "POH";
+      }
+    };
     //区块链分叉操作
     const bifurcatedChain = () => {
       if (blockListId.length > 1 && nodeListId.length > 1) {
-        getAllMiner({ auth: this.getAuth() }).then((minerList) => {
+        getAllMiner({ auth: this.getAuth() }).then((minerLists) => {
+          const minerList = minerLists.preData;
           if (minerList.length > 1) {
-            createBifurcatedChain({ auth: getAuth() }).then((res) => {
+            createBifurcatedChain({ auth: getAuth() }).then((ress) => {
+              const res = ress.preData;
               this.BifurcatedChainCreate(res);
             });
           } else {
@@ -998,7 +1147,8 @@ export default {
     };
     //模拟区块传输
     const blockTranSim = (done: () => void) => {
-      findpresentMin({ auth: getAuth() }).then((res) => {
+      findpresentMin({ auth: getAuth() }).then((ress) => {
+        const res = ress.preData;
         if (res == null || res == "") {
           ElMessageBox.alert("请创建新区块!", "WARING", {
             confirmButtonText: "OK",
@@ -1044,7 +1194,8 @@ export default {
 
     //模拟区块传输
     const SimBlockTrans = (miner) => {
-      getAllNetWork({ auth: getAuth() }).then((res) => {
+      getAllNetWork({ auth: getAuth() }).then((ress) => {
+        const res = ress.preData;
         summaryMes[1].data = "1s";
         //循环次数
         let length = res.length;
@@ -1163,7 +1314,8 @@ export default {
 
     //获取到新区块获取难度值
     const getNewBlockDifficult = () => {
-      getNewBlockDif({ auth: getAuth() }).then((res) => {
+      getNewBlockDif({ auth: getAuth() }).then((ress) => {
+        const res = ress.preData;
         ElNotification({
           title: "Difficulty",
           message: h("i", { style: "color: teal" }, "Value:" + res),
@@ -1341,6 +1493,7 @@ export default {
             summaryMes[6].data = Number(summaryMes[6].data) + 1;
           }
           setTimeout(() => {
+            this.setStatus("");
             this.setShowBlockMes("正在开启交易!");
             this.setPercentage(0);
             this.setPowFindVisible(true);
@@ -1348,7 +1501,7 @@ export default {
             setTimeout(() => {
               this.setShowBlockMes("交易发起者" + res.inputAddressId + "确定交易内容");
               this.increase();
-              setTimeout(() => { 
+              setTimeout(() => {
                 this.increase();
                 this.setShowBlockMes(res.inputAddressId + "利用私钥对交易进行签名");
                 setTimeout(() => {
@@ -1373,6 +1526,8 @@ export default {
                         this.increase();
                         this.setShowBlockMes("交易合法!");
                         setTimeout(() => {
+                          this.increase();
+                          this.increase();
                           this.increase();
                           this.setShowBlockMes(
                             "交易并入交易池中,等待记账节点产出区块时对交易进行验证!"
@@ -1454,6 +1609,130 @@ export default {
       });
     };
 
+    //交易溯源
+    //输入信息
+    const dialogInputVisible = ref(false);
+
+    //钱包结构查看
+    let inputData = reactive({
+      id: "1",
+      address: "",
+      signature: "/pFz6eRNr1UX+//==",
+      pubKey: "+++5fokY/OmB4c0ode67+Atc1CoBU",
+      transId: [],
+      tranValue: "+++5fokY/OmB4c0ode67+Atc1CoBU",
+    });
+
+    const getInputData = (Id) => {
+      if (Id != null) {
+        if (Id != "0") {
+          findTXInput({ auth: getAuth(), inputId: Id }).then((ress) => {
+            let res  = ress.preData;
+            if (res != null || res != "") {
+              inputData.id = res.inputId;
+              inputData.address = res.address;
+              inputData.signature = res.signature;
+              inputData.pubKey = res.pubKey;
+              inputData.transId = this.setStrToStrs(res.transactionId);
+              inputData.tranValue = res.value;
+              dialogInputVisible.value = true;
+              dialogTransVisible.value = false;
+            } else {
+              ElMessageBox.alert("查看失败", "WARN", {
+                confirmButtonText: "OK",
+              });
+            }
+          });
+        } else {
+          ElMessageBox.alert("输入ID未0时表示产生区块时的奖励输入!", "Message", {
+            confirmButtonText: "OK",
+          });
+        }
+      } else {
+        ElMessageBox.alert("信息不存在!", "Message", {
+          confirmButtonText: "OK",
+        });
+      }
+    };
+
+    //输出信息
+    const dialogOutPutVisible = ref(false);
+
+    let outputData = reactive({
+      id: "1",
+      address: "",
+      tranValue: "/pFz6eRNr1UX+//==",
+      transId: [],
+    });
+    const getOutputData = (Id) => {
+      if (Id != null) {
+        findTXOutput({ auth: getAuth(), outputId: Id }).then((ress) => {
+          const res = ress.preData;
+          if (res != null || res != "") {
+            outputData.id = res.outputId;
+            outputData.address = res.address;
+            outputData.tranValue = res.value;
+            outputData.transId = this.setStrToStrs(res.transactionId);
+            dialogOutPutVisible.value = true;
+            dialogTransVisible.value = false;
+            let i = outputData;
+            let j =1;
+          } else {
+            ElMessageBox.alert("查看失败", "WARN", {
+              confirmButtonText: "OK",
+            });
+          }
+        });
+      } else {
+        ElMessageBox.alert("信息不存在!", "Message", {
+          confirmButtonText: "OK",
+        });
+      }
+    };
+    //交易详情信息
+    const dialogTransVisible = ref(false);
+    let transData = reactive({
+      id: "1",
+      hash: "",
+      inputId: "/pFz6eRNr1UX+//==",
+      outputId: "+++5fokY/OmB4c0ode67+Atc1CoBU",
+      createTime: "/pFz6eRNr1UX+//==",
+      totalInput: "/pFz6eRNr1UX+//==",
+      totalOutput: "/pFz6eRNr1UX+//==",
+      status: "/pFz6eRNr1UX+//==",
+      utxo: "/pFz6eRNr1UX+//==",
+    });
+
+    const getTransData = (Id) => {
+      if (Id != null) {
+        findTransCon({ auth: getAuth(), transID: Id }).then((ress) => {
+          const res = ress.preData;
+          if (res != null || res != "") {
+            transData.id = res.transId;
+            transData.hash = res.txIdHash;
+            transData.inputId = res.inputsId;
+            transData.outputId = res.outputsId;
+            transData.createTime = res.createTime;
+            transData.totalInput = res.totalInput;
+            transData.totalOutput = res.totalOutput;
+            transData.status = res.status;
+            transData.utxo = res.utxo;
+            dialogTransVisible.value = true;
+            dialogInputVisible.value = false;
+            dialogOutPutVisible.value = false;
+          } else {
+            ElMessageBox.alert("查看失败", "WARN", {
+              confirmButtonText: "OK",
+            });
+          }
+        });
+      } else {
+        ElMessageBox.alert("信息不存在!", "Message", {
+          confirmButtonText: "OK",
+        });
+      }
+    };
+
     const nodeTypeChoose = ref("fullNode");
     //抽屉中的节点和区块数据
     let drwaerDateBlock = reactive({
@@ -1529,10 +1808,12 @@ export default {
     ]);
 
     const LogEvent = (eventName, data) => {
-      eventMes.unshift({
-        eventName: eventName,
-        data: data,
-      });
+      setTimeout(() => {
+        eventMes.unshift({
+          eventName: eventName,
+          data: data,
+        });
+      }, 100);
     };
 
     const setNodeType = () => {
@@ -1546,7 +1827,8 @@ export default {
         auth: getAuth(),
       };
       if (nowNodeType) {
-        updateNodeType(nodeTypeC).then((res) => {
+        updateNodeType(nodeTypeC).then((ress) => {
+          const res = ress.preData;
           if (res) {
             changeNodetype();
           } else {
@@ -1583,7 +1865,8 @@ export default {
     ]);
 
     const getPresentP2PNetWork = () => {
-      getAllNetWork({ auth: getAuth() }).then((res) => {
+      getAllNetWork({ auth: getAuth() }).then((ress) => {
+        const res = ress.preData;
         if (res.length == 0) {
           ElMessage({
             message: "节点网络未创建,请先创建节点!",
@@ -1622,7 +1905,8 @@ export default {
     ]);
 
     const getPresentUtxoData = (status) => {
-      getUnconfirmed({ auth: getAuth(), status: status }).then((res) => {
+      getUnconfirmed({ auth: getAuth(), status: status }).then((ress) => {
+        const res = ress.preData;
         if (res.length == 0) {
           ElMessage({
             message: "相关交易未创建,请先创建交易或区块!",
@@ -1712,7 +1996,8 @@ export default {
               };
               lastBlockCoordinate.length = 0;
               lastBlockCoordinate = coordinate;
-              createNewNode(params).then((res) => {
+              createNewNode(params).then((ress) => {
+                const res = ress.preData;
                 graph.addNode({
                   width: 100,
                   height: 30,
@@ -1723,7 +2008,8 @@ export default {
                     prop: "node",
                   },
                 });
-                addP2pNet({ addressId: res.addressId, auth: getAuth() }).then((res) => {
+                addP2pNet({ addressId: res.addressId, auth: getAuth() }).then((ress) => {
+                  const res = ress.preData;
                   if (res.success == "true") {
                     if (res.addressId == "Node1") {
                       ElMessage({
@@ -1846,7 +2132,8 @@ export default {
             },
             selected(graph, coordinate) {
               if (graph.nodeList.length > 0) {
-                createNewBlock({ auth: getAuth() }).then((res) => {
+                createNewBlock({ auth: getAuth() }).then((ress) => {
+                  const res = ress.preData;
                   openBlockCreate(res.miner);
                   graph.addNode({
                     width: 100,
@@ -1925,7 +2212,8 @@ export default {
                 target.splice(index, 1);
               }
               this.removeNodes();
-              deleteNode({ addressId: node.meta.name, auth: getAuth() }).then((res) => {
+              deleteNode({ addressId: node.meta.name, auth: getAuth() }).then((ress) => {
+                const res = ress.preData;
                 if (res == true) {
                   node.remove();
                   LogEvent("delete : ", node.meta.name);
@@ -1934,13 +2222,14 @@ export default {
             },
           },
           {
-            label: "编辑",
+            label: "查看",
             selected: (node) => {
               if (node.meta.prop == "node") {
                 findNodeByAddressId({ addressId: node.meta.name, auth: getAuth() }).then(
-                  (res) => {
+                  (ress) => {
+                    const res =  ress.preData;
                     if (res == null) {
-                      ElMessage.error("无法编辑!");
+                      ElMessage.error("无法查看!");
                     } else {
                       drwaerDateNode.address = res.address;
                       drwaerDateNode.addressId = res.addressId;
@@ -1961,9 +2250,10 @@ export default {
                 findBlockByBlockId({
                   blockId: node.meta.name,
                   auth: this.getAuth(),
-                }).then((res) => {
+                }).then((ress) => {
+                  const res = ress.preData;
                   if (res == null) {
-                    ElMessage.error("无法编辑!");
+                    ElMessage.error("无法查看!");
                   } else {
                     drwaerDateBlock.hash = res.hash;
                     drwaerDateBlock.confirmations = res.confirmations;
@@ -1989,7 +2279,6 @@ export default {
                   }
                 });
               }
-              console.log("关了吧");
             },
           },
         ],
@@ -2003,7 +2292,7 @@ export default {
             },
           },
           {
-            label: "编辑",
+            label: "查看",
             selected: (link) => {
               console.log("change");
             },
@@ -2073,12 +2362,26 @@ export default {
       getNewBlockDifficult,
       bifurcatedChain,
       setPercentage,
+      consensusVisible,
+      consensusChoose,
+      getConsensus,
+      inputData,
+      getTransData,
+      transData,
+      dialogInputVisible,
+      dialogTransVisible,
+      getOutputData,
+      outputData,
+      dialogOutPutVisible,
+      getInputData,
     };
   },
   created() {
     let params = {
       auth: this.getAuth(),
     };
+    //开始前先清除缓存
+    clearCache(params);
     // clearCache(params);
     const data = getDataString();
     this.summaryMes[0].data = data;
@@ -2142,7 +2445,8 @@ export default {
         let params = {
           auth: this.getAuth(),
         };
-        clearCache(params).then((res) => {
+        clearCache(params).then((ress) => {
+          const res = ress.preData;
           if (res == true) {
             ElMessage({
               message: "清除缓存成功!",
@@ -2197,7 +2501,8 @@ export default {
             let params = {
               auth: this.getAuth(),
             };
-            createNewNode(params).then((res) => {
+            createNewNode(params).then((ress) => {
+              const res = ress.preData;
               const confInfo = conf.info;
               confInfo.meta.label = res.addressId;
               // confInfo.meta.name =
@@ -2212,7 +2517,8 @@ export default {
                 },
               });
               addP2pNet({ addressId: res.addressId, auth: this.getAuth() }).then(
-                (res) => {
+                (ress) => {
+                  const res = ress.preData;
                   if (res.success == "true") {
                     if (res.addressId == "Node1") {
                       ElMessage({
@@ -2256,7 +2562,8 @@ export default {
             const nodeEx = this.haveNodeMe(this.$refs.superFlow.graph);
             if (nodeEx) {
               if (blockListId.length == 0) {
-                createNewBlock({ auth: this.getAuth() }).then((res) => {
+                createNewBlock({ auth: this.getAuth() }).then((ress) => {
+                  const res = ress.preData;
                   this.openBlockCreate(res.miner);
                   this.$refs.superFlow.addNode({
                     width: 100,
@@ -2316,7 +2623,8 @@ export default {
               } else {
                 findMinExist({ auth: this.getAuth() }).then((isExist) => {
                   if (isExist) {
-                    createNewBlock({ auth: this.getAuth() }).then((res) => {
+                    createNewBlock({ auth: this.getAuth() }).then((ress) => {
+                      const res = ress.preData;
                       this.openBlockCreate(res.miner);
                       this.$refs.superFlow.addNode({
                         width: 100,
@@ -2445,16 +2753,20 @@ export default {
     blockCreate() {
       if (blockListId.length > 0) {
         let end = reactive([]);
-        findMinExist({ auth: this.getAuth() }).then((isExist) => {
+        findMinExist({ auth: this.getAuth() }).then((isExists) => {
+          const isExist = isExists.preData;
           if (isExist) {
             const coordinate = lastBlockCoordinate;
             coordinate[1] = coordinate[1] + 35;
-            createNewBlock({ auth: this.getAuth() }).then((res) => {
+            createNewBlock({ auth: this.getAuth() }).then((ress) => {
+              const res = ress.preData;
+              this.setStatus("");
               this.setPercentage(0);
               this.increase();
               setTimeout(() => {
                 this.increase();
-                getAllMiner({ auth: this.getAuth() }).then((minerList) => {
+                getAllMiner({ auth: this.getAuth() }).then((minerLists) => {
+                  const minerList = minerLists.preData;
                   let str = "";
                   for (let i = 0; i < minerList.length; i++) {
                     str = str + " " + minerList[i];
@@ -2663,13 +2975,15 @@ export default {
     },
     BifurcatedChainCreate(res) {
       setTimeout(() => {
+        this.setStatus("");
         this.setShowBlockMes("全局查找正在进行挖矿的节点");
         this.setPercentage(0);
         this.setPowFindVisible(true);
         this.increase();
         setTimeout(() => {
           this.increase();
-          getAllMiner({ auth: this.getAuth() }).then((minerList) => {
+          getAllMiner({ auth: this.getAuth() }).then((minerLists) => {
+            const minerList = minerLists.preData;
             let str = "";
             for (let i = 0; i < minerList.length; i++) {
               str = str + " " + minerList[i];
@@ -2808,6 +3122,15 @@ export default {
       });
       this.linkList = targetLinkList;
     },
+    setStrToStrs(str){
+      if(str.indexOf(",") !=-1){
+        let strs = str.split(",");
+        return strs;
+      }
+      else{
+        return [str];
+      }
+    }
   },
 };
 </script>
