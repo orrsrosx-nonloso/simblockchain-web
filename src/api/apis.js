@@ -10,6 +10,27 @@ export const getLoginMes = function (data) {
     return http('post', 'http://localhost:8081/user/getLogin', data)
 }
 
+// 发现所有用户
+export const findAllUser = function (data) {
+    return http('get', 'http://localhost:8081/user/findAllUser', data)
+}
+
+// 分页查询用户
+export const findUserPage = function (data) {
+    return http('post', 'http://localhost:8081/user/findUserPage', data)
+}
+
+// 添加用户
+export const registerUser = function (data) {
+    return http('post', 'http://localhost:8081/user/registerUser', data)
+}
+
+// 删除用户
+export const deleteUser = function (data) {
+    return http('post', 'http://localhost:8081/user/deleteUser', data)
+}
+
+
 
 // // 获取用户数据
 // export const getMapData = function (data) {

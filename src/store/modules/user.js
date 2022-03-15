@@ -24,7 +24,7 @@ const user = {
             return state.token
         },
         authGetter(state) {
-            return state.userInfo.auth
+            return state.userInfo.username
         }
     }
 }

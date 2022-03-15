@@ -18,7 +18,10 @@ const http = axios.create({
 //------------------- 一、请求拦截器 忽略
 http.interceptors.request.use(function (config) {
 
-    if (config.url.indexOf("route") == -1 && config.url.indexOf("getLogin") == -1 && config.url.indexOf("loginOut") == -1 && config.url.indexOf("checkLogin") == -1) {
+    if (config.url.indexOf("route") == -1 && config.url.indexOf("getLogin") == -1 
+    && config.url.indexOf("loginOut") == -1 && config.url.indexOf("checkLogin") == -1 && config.url.indexOf("findAllUser") == -1
+    && config.url.indexOf("registerUser") == -1 && config.url.indexOf("findUserPage") == -1
+    && config.url.indexOf("deleteUser") == -1) {
         config.data.token = getCookie('token');
     }
     return config;

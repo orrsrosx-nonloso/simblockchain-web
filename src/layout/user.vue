@@ -28,8 +28,10 @@ const router = useRouter();
 
 const store = useStore();
 const userName = store.getters.authGetter;
+
 function logOut() {
-  loginOut({ auth: userName }).then((res) => {
+  let user = userName;
+  loginOut({ "auth": user }).then((res) => {
     if (res.status == 1) {
       ElMessageBox.alert(res.msg, "Success", {
         confirmButtonText: "OK",

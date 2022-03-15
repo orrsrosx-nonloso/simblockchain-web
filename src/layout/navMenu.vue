@@ -6,7 +6,7 @@
     @select="handleSelect"
     :collapse="props.isCollapse"
   >
-    <template
+   <template
       :index="'/layout/' + menu.path"
       v-for="(menu, index) in state.menu"
       :key="index"
@@ -16,27 +16,14 @@
       </template>
       <el-menu-item
         :index="'/layout/' + menu.path"
-        v-else 
+        v-else
       >
-        <i :class="menu.meta.icon ? menu.meta.icon: 'el-icon-menu'" ></i>
-        <template #title>
-          <div v-if="menu.path === 'wholeSim'" 
-          @click="setSingle2()"
-          >{{menu.title}}</div>
-          <div v-else >{{menu.title}}</div>
-        </template>
-        
+        <i :class="menu.meta.icon ? menu.meta.icon: 'el-icon-menu'"></i>
+        <template #title>{{menu.title}}</template>
       </el-menu-item>
     </template>
   </el-menu>
-    <el-menu class="menu" :default-openeds="['1', '3']" v-if="state.thisModelSim === '2'">
-    <div class="back"><i class="iconfont" @click="setSingle0()">&#xe679;返回</i></div>
-      <el-submenu index="1">
-        <el-menu-item>
-          <el-menu-item index="1-1">配置项目</el-menu-item>
-        </el-menu-item>
-      </el-submenu>
-    </el-menu>
+ 
 </template>
 
 <script setup>
