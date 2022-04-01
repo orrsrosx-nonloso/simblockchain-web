@@ -25,7 +25,7 @@
                     >
                   </el-tooltip>
                   <el-tooltip content="模拟双花问题情况下的交易!" placement="top">
-                    <el-dropdown-item @click="">双花问题模拟</el-dropdown-item>
+                    <el-dropdown-item @click="doubleSpent">双花问题模拟</el-dropdown-item>
                   </el-tooltip>
                 </el-dropdown-menu>
               </template>
@@ -63,7 +63,12 @@
                 </el-select>
               </div>
               <div style="padding-top: 20px">
-                交易金额 :<el-input-number v-model="numTrans" :min="1" />
+                交易金额 :<el-input-number
+                  v-model="numTrans"
+                  :precision="2"
+                  :step="0.01"
+                  :min="1"
+                />
               </div>
               <template #footer>
                 <span class="dialog-footer">
@@ -164,7 +169,7 @@
                   content="股权证明/权益证明共识机制(Proof of Stake)"
                   placement="top"
                 >
-                  <el-radio v-model="consensusChoose" label="2" size="large"
+                  <el-radio v-model="consensusChoose" label="2" disabled size="large"
                     >POS</el-radio
                   ></el-tooltip
                 >
@@ -181,7 +186,7 @@
                 <span class="dialog-footer">
                   <el-button @click="consensusVisible = false">关闭</el-button>
                   <el-button type="primary" @click="consensusVisible = false"
-                    >保存</el-button
+                    >设置</el-button
                   >
                 </span>
               </template>
@@ -259,14 +264,14 @@
                 <div class="card-header">
                   <span>节点与区块</span>
                   <div>
-                    <el-tooltip
+                    <!-- <el-tooltip
                       class="box-item"
                       effect="dark"
                       content="仿真开始前进行清除"
                       placement="top-start"
                     >
                       <el-button @click="clearCache" style="left: 0">清空缓存</el-button>
-                    </el-tooltip>
+                    </el-tooltip> -->
                     <span
                       class="node-item"
                       v-for="item in nodeItemList"
@@ -381,7 +386,16 @@
                 <span>SUMMARY</span>
               </div>
             </template>
-            <div v-for="o in summaryMes" class="text item">{{ o.tabName + o.data }}</div>
+            <div v-for="o in summaryMes" class="text item">
+              {{ o.tabName + o.data }}
+              <span
+                @click="rewardFindVisible = true"
+                class="feeEdit"
+                v-if="o.tabName == 'Transaction fee:  '"
+                type="text"
+                >Edit</span
+              >
+            </div>
           </el-card>
           <el-card class="box-card" :body-style="{ padding: '5px', height: '237px' }">
             <template #header>
@@ -703,9 +717,12 @@
               {{ inputData.pubKey }}
             </el-descriptions-item>
             <el-descriptions-item label="transId" label-align="left" align="left">
-              <el-button v-for="item in inputData.transId" type="text" @click="getTransData(item)">{{
-                item
-              }}</el-button>
+              <el-button
+                v-for="item in inputData.transId"
+                type="text"
+                @click="getTransData(item)"
+                >{{ item }}</el-button
+              >
             </el-descriptions-item>
             <el-descriptions-item label="tranValue" label-align="left" align="left">{{
               inputData.tranValue
@@ -733,9 +750,12 @@
               outputData.tranValue
             }}</el-descriptions-item>
             <el-descriptions-item label="transId" label-align="left" align="left">
-              <el-button v-for="item in outputData.transId" type="text" @click="getTransData(item)">{{
-                item
-              }}</el-button>
+              <el-button
+                v-for="item in outputData.transId"
+                type="text"
+                @click="getTransData(item)"
+                >{{ item }}</el-button
+              >
             </el-descriptions-item>
           </el-descriptions></el-form
         ></c-scrollbar
@@ -785,6 +805,48 @@
         ></c-scrollbar
       >
     </el-dialog>
+    <el-dialog
+      v-model="cacheFindVisible"
+      title="Notification!"
+      width="40%"
+      :before-close="cacheFindHandleClose"
+      :show-close="false"
+    >
+      <div style="padding-left: 20%; padding-right: 20%">
+        <!-- <el-progress :percentage="percentage" :color="customColors" /> -->
+
+        <div>当前用户存在缓存数据,系统将自动清除缓存！</div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="cacheAuthData">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    <el-dialog
+      v-model="rewardFindVisible"
+      title="您可以配置交易手续费费比例"
+      width="40%"
+      :before-close="rewardFindHandleClose"
+      :show-close="false"
+    >
+      <div style="padding-left: 20%; padding-right: 20%">
+        <!-- <el-progress :percentage="percentage" :color="customColors" /> -->
+
+        <el-input-number
+          v-model="rewardFee"
+          :min="0.1"
+          :precision="2"
+          :step="0.1"
+          :max="10"
+        />(%)
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="rewardAuthData">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </el-scrollbar>
 </template>
 <script lang="ts">
@@ -815,6 +877,8 @@ import {
   findTXInput,
   findTXOutput,
   findTransCon,
+  checkExistCache,
+  editRewardPre,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -1109,6 +1173,93 @@ export default {
     };
   },
   data() {
+    //缓存查看
+    const cacheFindVisible = ref(false);
+    //关闭处理
+    const cacheFindHandleClose = (done: () => void) => {
+      // ElMessageBox.confirm("程序运行中,无法退出当前界面!")
+      //   .then(() => {})
+      //   .catch(() => {
+      //     // catch error
+      //   });
+    };
+    //开始前先清除缓存
+    // clearCache(params);
+    function cacheAuthData(params) {
+      clearCaches();
+      cacheFindVisible.value = false;
+    }
+    const changecacheFindVisible = () => {
+      if (cacheFindVisible.value == true) {
+        cacheFindVisible.value = false;
+      } else {
+        cacheFindVisible.value = true;
+      }
+    };
+
+    //缓存查看
+    const rewardFindVisible = ref(false);
+    //默认交易中介费
+    const rewardFee = ref(0);
+    //关闭处理
+    const rewardFindHandleClose = (done: () => void) => {
+      ElMessageBox.confirm("确定放弃编辑退出吗？")
+        .then(() => {
+          done();
+        })
+        .catch(() => {
+          // catch error
+        });
+    };
+
+    //编辑中介费比例
+    function rewardAuthData() {
+      editRewardPre({ auth: getAuth(), rewardValue: rewardFee.value + "" }).then(
+        (ress) => {
+          let res = ress.preData;
+          if (res == true) {
+            ElMessage({
+              message: "设置成功!",
+              type: "success",
+            });
+            summaryMes[7].data = rewardFee.value + "%";
+          } else {
+            ElMessage.error("设置失败!");
+          }
+        }
+      );
+      rewardFindVisible.value = false;
+    }
+
+    const changerewardFindVisible = () => {
+      if (rewardFindVisible.value == true) {
+        rewardFindVisible.value = false;
+      } else {
+        rewardFindVisible.value = true;
+      }
+    };
+
+    const clearCaches = () => {
+      // let user = auth.value;
+      let params = {
+        auth: this.getAuth(),
+      };
+      clearCache(params).then((ress) => {
+        const res = ress.preData;
+        if (res == true) {
+          ElMessage({
+            message: "清除缓存成功!",
+            type: "success",
+          });
+        } else {
+          ElMessage.error("清除缓存失败!");
+        }
+      });
+      this.LogEvent("Clear cache! ", null);
+      const data = getDataString();
+      this.summaryMes[0].data = data;
+    };
+
     //区块共识选择
     const consensusVisible = ref(false);
 
@@ -1489,68 +1640,74 @@ export default {
         };
         TransactionSingle(transInputType).then((res) => {
           openFullScreen();
-          if (res.status) {
+          if (res.success) {
             summaryMes[6].data = Number(summaryMes[6].data) + 1;
-          }
-          setTimeout(() => {
-            this.setStatus("");
-            this.setShowBlockMes("正在开启交易!");
-            this.setPercentage(0);
-            this.setPowFindVisible(true);
-            this.increase();
             setTimeout(() => {
-              this.setShowBlockMes("交易发起者" + res.inputAddressId + "确定交易内容");
+              this.setStatus("");
+              this.setShowBlockMes("正在开启交易!");
+              this.setPercentage(0);
+              this.setPowFindVisible(true);
               this.increase();
               setTimeout(() => {
+                this.setShowBlockMes("交易发起者" + res.inputAddressId + "确定交易内容");
                 this.increase();
-                this.setShowBlockMes(res.inputAddressId + "利用私钥对交易进行签名");
                 setTimeout(() => {
                   this.increase();
-                  this.setShowBlockMes(res.inputAddressId + "开始验证交易合法性!");
+                  this.setShowBlockMes(res.inputAddressId + "利用私钥对交易进行签名");
                   setTimeout(() => {
                     this.increase();
-                    this.setShowBlockMes(
-                      "交易合法!" +
-                        res.inputAddressId +
-                        "将交易广播至当前拥有记账权的节点和交易对象" +
-                        res.outputAddressId
-                    );
+                    this.setShowBlockMes(res.inputAddressId + "开始验证交易合法性!");
                     setTimeout(() => {
                       this.increase();
                       this.setShowBlockMes(
-                        "当前拥有记账权的节点和交易对象" +
-                          res.outputAddressId +
-                          "开始验证交易合法性!"
+                        "交易合法!" +
+                          res.inputAddressId +
+                          "将交易广播至当前拥有记账权的节点和交易对象" +
+                          res.outputAddressId
                       );
                       setTimeout(() => {
                         this.increase();
-                        this.setShowBlockMes("交易合法!");
+                        this.setShowBlockMes(
+                          "当前拥有记账权的节点和交易对象" +
+                            res.outputAddressId +
+                            "开始验证交易合法性!"
+                        );
                         setTimeout(() => {
                           this.increase();
-                          this.increase();
-                          this.increase();
-                          this.setShowBlockMes(
-                            "交易并入交易池中,等待记账节点产出区块时对交易进行验证!"
-                          );
+                          this.setShowBlockMes("交易合法!");
                           setTimeout(() => {
                             this.increase();
-                            this.setShowBlockMes("交易结束!");
-                            this.setStatus("success");
+                            this.increase();
+                            this.increase();
+                            this.setShowBlockMes(
+                              "交易并入交易池中,等待记账节点产出区块时对交易进行验证!"
+                            );
                             setTimeout(() => {
-                              this.setPowFindVisible(false);
-                            }, 500);
+                              this.increase();
+                              this.setShowBlockMes("交易结束!");
+                              this.setStatus("success");
+                              setTimeout(() => {
+                                this.setPowFindVisible(false);
+                              }, 500);
+                            }, 1600);
                           }, 1600);
                         }, 1600);
                       }, 1600);
                     }, 1600);
-                  }, 1600);
-                }, 1500);
+                  }, 1500);
+                }, 1600);
               }, 1600);
             }, 1600);
-          }, 1600);
-
+            LogEvent(
+              "TransactionSingle  :",
+              valueTrans1.value + "T O" + valueTrans2.value
+            );
+          } else {
+            ElMessageBox.alert(res.mes, "WARN", {
+              confirmButtonText: "OK",
+            });
+          }
           changetransactionSimVis();
-          LogEvent("TransactionSingle  :", valueTrans1.value + "T O" + valueTrans2.value);
         });
       }
     };
@@ -1594,7 +1751,8 @@ export default {
     const dialogWalletVisible = ref(false);
 
     const checkWallet = (walletId) => {
-      findWalletCon({ walletId: walletId + "", auth: getAuth() }).then((res) => {
+      findWalletCon({ walletId: walletId + "", auth: getAuth() }).then((ress) => {
+        let res = ress.preData;
         if (res != null || res != "") {
           walletData.id = res.walletId;
           walletData.publicKkey = res.publicKey;
@@ -1627,7 +1785,7 @@ export default {
       if (Id != null) {
         if (Id != "0") {
           findTXInput({ auth: getAuth(), inputId: Id }).then((ress) => {
-            let res  = ress.preData;
+            let res = ress.preData;
             if (res != null || res != "") {
               inputData.id = res.inputId;
               inputData.address = res.address;
@@ -1676,7 +1834,7 @@ export default {
             dialogOutPutVisible.value = true;
             dialogTransVisible.value = false;
             let i = outputData;
-            let j =1;
+            let j = 1;
           } else {
             ElMessageBox.alert("查看失败", "WARN", {
               confirmButtonText: "OK",
@@ -1733,6 +1891,13 @@ export default {
       }
     };
 
+    //双花问题
+
+    const doubleSpent = () => {
+      ElMessageBox.alert("功能开发中!", "Message", {
+        confirmButtonText: "OK",
+      });
+    };
     const nodeTypeChoose = ref("fullNode");
     //抽屉中的节点和区块数据
     let drwaerDateBlock = reactive({
@@ -1782,6 +1947,7 @@ export default {
         tabName: "区块数量:  ",
         data: "0",
       },
+
       {
         tabName: "First block:  ",
         data: "0",
@@ -1797,6 +1963,10 @@ export default {
       {
         tabName: "交易发生次数:  ",
         data: 0,
+      },
+      {
+        tabName: "Transaction fee:  ",
+        data: "0%",
       },
     ]);
     //详情信息
@@ -1975,7 +2145,7 @@ export default {
             width: 100,
             height: 30,
             meta: {
-              label: "block2",
+              label: "block1",
               prop: "block",
               name: "区块",
             },
@@ -2160,6 +2330,9 @@ export default {
                   summaryMes[3].data = "GenesisBlock1";
                   summaryMes[4].data = "GenesisBlock1";
                   summaryMes[6].data = 1;
+                  setTimeout(() => {
+                    rewardFindVisible.value = true;
+                  }, 3800);
                   // this.$refs.superFlow.addNode({
                   //   coordinate,
                   //   ...conf.info,
@@ -2181,12 +2354,12 @@ export default {
               graph.selectAll();
             },
           },
-          {
-            label: "保存",
-            selected: (graph) => {
-              console.log("josn", graph.toJSON());
-            },
-          },
+          // {
+          //   label: "保存",
+          //   selected: (graph) => {
+          //     console.log("josn", graph.toJSON());
+          //   },
+          // },
         ],
       ],
       nodeMenu: [
@@ -2227,7 +2400,7 @@ export default {
               if (node.meta.prop == "node") {
                 findNodeByAddressId({ addressId: node.meta.name, auth: getAuth() }).then(
                   (ress) => {
-                    const res =  ress.preData;
+                    const res = ress.preData;
                     if (res == null) {
                       ElMessage.error("无法查看!");
                     } else {
@@ -2374,15 +2547,30 @@ export default {
       outputData,
       dialogOutPutVisible,
       getInputData,
+      cacheFindVisible,
+      cacheFindHandleClose,
+      cacheAuthData,
+      changecacheFindVisible,
+      rewardFindVisible,
+      rewardFindHandleClose,
+      rewardAuthData,
+      changerewardFindVisible,
+      rewardFee,
+      doubleSpent
     };
   },
   created() {
     let params = {
       auth: this.getAuth(),
     };
-    //开始前先清除缓存
-    clearCache(params);
-    // clearCache(params);
+    checkExistCache(params).then((ress) => {
+      let res = ress.preData;
+      if (res == true) {
+        this.changecacheFindVisible();
+      } else {
+        clearCache(params);
+      }
+    });
     const data = getDataString();
     this.summaryMes[0].data = data;
   },
@@ -2615,6 +2803,9 @@ export default {
                   const data = blockListId.length;
                   this.summaryMes[2].data = data;
                   this.summaryMes[6].data = 1;
+                  setTimeout(() => {
+                    this.changerewardFindVisible();
+                  }, 3800);
                   // this.$refs.superFlow.addNode({
                   //   coordinate,
                   //   ...conf.info,
@@ -3122,15 +3313,18 @@ export default {
       });
       this.linkList = targetLinkList;
     },
-    setStrToStrs(str){
-      if(str.indexOf(",") !=-1){
-        let strs = str.split(",");
-        return strs;
+    setStrToStrs(str) {
+      if (str == null) {
+        return null;
+      } else {
+        if (str.indexOf(",") != -1) {
+          let strs = str.split(",");
+          return strs;
+        } else {
+          return [str];
+        }
       }
-      else{
-        return [str];
-      }
-    }
+    },
   },
 };
 </script>
@@ -3309,5 +3503,10 @@ export default {
 .super-flow {
   width: 1400px;
   height: 1400px;
+}
+.feeEdit {
+  color: rgb(0, 119, 255);
+  cursor: pointer;
+  padding-left: 100px;
 }
 </style>

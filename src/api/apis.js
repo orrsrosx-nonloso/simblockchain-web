@@ -170,6 +170,16 @@ export const checkLoginStatus = function (data) {
     return http('post', 'http://localhost:8081/user/checkLogin', data)
 }
 
+//检查登录状态
+export const checkExistCache = function (data) {
+    return http('post', 'http://localhost:8081/singleNode/isExistCache', data)
+}
+
+//调整当前仿真交易费比例
+export const editRewardPre = function (data) {
+    return http('post', 'http://localhost:8081/singleReward/editReward', data)
+}
+
 // 获取权限菜单
 export const getRolesApi = function (data) {
     return http('get', '/http/getTable', {
