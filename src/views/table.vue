@@ -55,22 +55,34 @@
 import retrieval from "../components/retrieval.vue";
 import tableBox from "../components/table.vue";
 import pagination from "../components/pagination.vue";
-import { reactive, getCurrentInstance,ref } from "vue";
+import { reactive, getCurrentInstance, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import { ElMessage, ElLoading, ElNotification } from "element-plus";
 const store = useStore();
 const auth = store.getters.authGetter;
 
-
-import { findAllUser, findUserPage, deleteUser ,registerUser} from "../api/apis";
+import {
+  findAllUser,
+  findUserPage,
+  deleteUser,
+  registerUser,
+  findSearchUserPage,
+  resetPasswords
+} from "../api/apis";
 const message = getCurrentInstance()?.appContext.config.globalProperties.$message;
 const confirm = getCurrentInstance()?.appContext.config.globalProperties.$confirm;
 
 let useAdd = reactive({
-  username:"",
-  password:"",
-  auth:auth,
-})
+  username: "",
+  password: "",
+  auth: auth,
+});
+
+let searchData = reactive({
+  username: "",
+  auth: "",
+});
 
 const route = useRoute();
 
@@ -99,24 +111,57 @@ const retrievalList = [
     type: "input",
   },
   {
-    props: "select",
+    props: "auth",
     label: "创建者",
-    type: "select",
-    options: options,
+    type: "input",
+    // options: options,
   },
-  {
-    props: "daterange",
-    label: "时间搜索",
-    type: "date",
-    dateType: "daterange",
-    default: [new Date(), new Date().getTime() - 3600 * 1000 * 24 * 7],
-  },
+  // {
+  //   props: "daterange",
+  //   label: "时间搜索",
+  //   type: "date",
+  //   dateType: "daterange",
+  //   default: [new Date(), new Date().getTime() - 3600 * 1000 * 24 * 7],
+  // },
 ];
 // add新增 retrieval查询 reset重置 download导出, "retrieval"
-const retrievalActionBtn = ["add"];
+const retrievalActionBtn = ["retrieval", "add"];
 
 function retrievalAction(e) {
-  dialogVisible.value = true;
+  if (e.type == "retrieval") {
+    searchData.username = e.form.username;
+    searchData.auth = e.form.auth;
+    findSearchUserPage({
+      auth: e.form.auth,
+      username: e.form.username,
+      page: 1,
+    }).then((res) => {
+      state.page = 1;
+      state.total = res.totalElements;
+      let content = res.content;
+      let length2 = content.length;
+      state.tableData.length = 0;
+      if (length2 > 0) {
+        for (let i = 0; i < length2; i++) {
+          if (content[i].username != "admin") {
+            let data = {
+              id: content[i].id,
+              date: content[i].createData,
+              username: content[i].username,
+              auth: content[i].auth,
+              status: "true",
+            };
+            state.tableData.push(data);
+            // let sad = state.tableData;
+            // let das = 1;
+          }
+        }
+      }
+    });
+    console.log("查询中");
+  } else if (e.type == "add") {
+    dialogVisible.value = true;
+  }
   console.log(e);
 }
 
@@ -167,11 +212,11 @@ const tableColumn = [
       //   funName: "detail",
       //   title: "详情",
       // },
-      // {
-      //   funName: "edit",
-      //   color: "orange",
-      //   title: "编辑",
-      // },
+      {
+        funName: "edit",
+        color: "orange",
+        title: "重置",
+      },
       {
         funName: "del",
         color: "red",
@@ -220,20 +265,25 @@ findAllUser(null).then((reas) => {
 });
 
 function handleCurrentChange(e) {
-  findAllUser(null).then((reas) => {
-    let length = reas.length - 1;
-    state.total = length;
-    findUserPage({ page: e }).then((res) => {
-      let length2 = res.length;
+  if (searchData.username != "" || searchData.auth != "") {
+    findSearchUserPage({
+      auth: searchData.auth,
+      username: searchData.username,
+      page: e,
+    }).then((res) => {
+      state.page = e;
+      state.total = res.totalElements;
+      let content = res.content;
+      let length2 = content.length;
+      state.tableData.length = 0;
       if (length2 > 0) {
-        state.tableData.length = 0;
         for (let i = 0; i < length2; i++) {
-          if (res[i].username != "admin") {
+          if (content[i].username != "admin") {
             let data = {
-              id: res[i].id,
-              date: res[i].createData,
-              username: res[i].username,
-              auth: res[i].auth,
+              id: content[i].id,
+              date: content[i].createData,
+              username: content[i].username,
+              auth: content[i].auth,
               status: "true",
             };
             state.tableData.push(data);
@@ -242,9 +292,34 @@ function handleCurrentChange(e) {
           }
         }
       }
-      state.page = e;
     });
-  });
+  } else {
+    findAllUser(null).then((reas) => {
+      let length = reas.length - 1;
+      state.total = length;
+      findUserPage({ page: e }).then((res) => {
+        let length2 = res.length;
+        if (length2 > 0) {
+          state.tableData.length = 0;
+          for (let i = 0; i < length2; i++) {
+            if (res[i].username != "admin") {
+              let data = {
+                id: res[i].id,
+                date: res[i].createData,
+                username: res[i].username,
+                auth: res[i].auth,
+                status: "true",
+              };
+              state.tableData.push(data);
+              // let sad = state.tableData;
+              // let das = 1;
+            }
+          }
+        }
+        state.page = e;
+      });
+    });
+  }
 
   console.log(e);
 }
@@ -257,40 +332,63 @@ function actionClick(e) {
       type: "warning",
     })
       .then(() => {
-        deleteUsers(state.page);
-        message({
-          type: "success",
-          message: "删除成功!",
-        });
+        deleteUsers(e);
       })
-      .catch(() => {
-        message({
-          type: "info",
-          message: "已取消删除",
-        });
-      });
+  }
+  else if (e.funName === "edit") {
+    confirm("是否重置该用户的密码(重置密码为：用户名+123456)!", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    })
+      .then(() => {
+        resetPassword(e);
+      })
   }
 }
 
 function deleteUsers(e) {
   deleteUser({ username: e.data.username, auth: e.data.auth }).then((res) => {
     if (res.status == 1) {
-      message({
+      ElMessage({
         type: "success",
         message: "删除成功!",
       });
       handleCurrentChange(1);
     } else {
-      message({
+      ElMessage({
         type: "warning",
         message: res.msg,
       });
     }
   });
 }
+
+function resetPassword(e){
+  resetPasswords({ username: e.data.username, auth: e.data.auth }).then((res) => {
+    if(res === true){
+    ElMessage({
+        type: "success",
+        message: "重置成功!",
+      });
+      handleCurrentChange(1);
+    }
+    else{
+      ElMessage({
+        type: "warning",
+        message: "重置失败！",
+      });
+    }
+
+  });
+}
 //登录用户改为用户名（原为auth）
 function addUsers() {
-  registerUser({ username:useAdd.username ,password:useAdd.password, auth: useAdd.auth }).then((res) => {
+  registerUser({
+    username: useAdd.username,
+    password: useAdd.password,
+    auth: useAdd.auth,
+  }).then((res) => {
     if (res.status == 1) {
       message({
         type: "success",
@@ -303,20 +401,20 @@ function addUsers() {
         message: res.msg,
       });
     }
-    dialogVisible.value=false;
+    dialogVisible.value = false;
   });
 }
 
-const dialogVisible = ref(false)
+const dialogVisible = ref(false);
 
 const handleClose = () => {
-  ElMessageBox.confirm('Are you sure to close this dialog?')
+  ElMessageBox.confirm("Are you sure to close this dialog?")
     .then(() => {
-      done()
+      done();
     })
     .catch(() => {
       // catch error
-    })
-}
+    });
+};
 </script>
 <style lang="scss" scoped></style>

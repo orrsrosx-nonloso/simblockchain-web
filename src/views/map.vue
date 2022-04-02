@@ -18,6 +18,9 @@ import china from "../assets/mapRow/china.json";
 import nameMap from "../utils/nameMap.js";
 
 import echarts from "echarts";
+
+import { ElMessageBox } from "element-plus";
+
 export default {
   name: "mapContent",
   data() {
@@ -48,6 +51,7 @@ export default {
     for (let index in this.jsonMap) {
       echarts.registerMap(index, this.jsonMap[index]);
     }
+
   },
   mounted() {
     //    初始化地图

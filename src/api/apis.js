@@ -170,6 +170,16 @@ export const checkLoginStatus = function (data) {
     return http('post', 'http://localhost:8081/user/checkLogin', data)
 }
 
+//查询 数据
+export const findSearchUserPage = function (data) {
+    return http('post', 'http://localhost:8081/user/findSearchUserPage', data)
+}
+
+//重置用户
+export const resetPasswords = function (data) {
+    return http('post', 'http://localhost:8081/user/resetPasswords', data)
+}
+
 //检查登录状态
 export const checkExistCache = function (data) {
     return http('post', 'http://localhost:8081/singleNode/isExistCache', data)
