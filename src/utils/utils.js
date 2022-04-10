@@ -55,3 +55,17 @@ export function getNodeId(i) {
     const ids = i.split("e");
     return ids[1];
 }
+
+/**
+手机号判断
+*/
+export function judgePhone(i) {
+    const length = i.length;
+    let first = i.substr(0,1);
+    if(length===11 && first==="1"){
+        return true;
+    }
+    else{
+        return false;
+    }
+}

@@ -326,19 +326,61 @@
                   当前节点: {{ presentTypeNode }}
                 </div>
                 <div>
-                  <el-radio v-model="nodeTypeChoose" label="fullNode" size="large"
-                    >全节点</el-radio
+                  <el-tooltip
+                    content="包含完整的区块链数据（默认包含完整的网络路由功能）!"
+                    placement="top"
                   >
-                  <el-radio v-model="nodeTypeChoose" label="lightNode" size="large"
-                    >轻节点</el-radio
+                    <el-radio v-model="nodeTypeChoose" label="fullNode" size="large"
+                      >全节点</el-radio
+                    ></el-tooltip
                   >
-                  <el-radio v-model="nodeTypeChoose" label="miningNode" size="large"
-                    >产块节点</el-radio
+                  <el-tooltip
+                    content="仅包含区块头数据,移动端使用较多（默认包含完整的网络路由功能）!"
+                    placement="top"
+                  >
+                    <el-radio v-model="nodeTypeChoose" label="lightNode" size="large"
+                      >轻节点</el-radio
+                    ></el-tooltip
+                  >
+                  <el-tooltip
+                    content="负责产生区块的节点（默认包含完整的网络路由功能和区块链数据）!"
+                    placement="top"
+                  >
+                    <el-radio v-model="nodeTypeChoose" label="miningNode" size="large"
+                      >产块节点</el-radio
+                    ></el-tooltip
                   >
                 </div>
                 <template #footer>
                   <span class="dialog-footer">
                     <el-button type="primary" @click="setNodeType">保存</el-button>
+                  </span>
+                </template>
+              </el-dialog>
+
+              <!-- 算力设置界面，无法关闭，必须设置 <-->
+
+              <el-dialog
+                v-model="hashRateVis"
+                title="配置矿工节点算力(HashRate)"
+                width="30%"
+                :show-close="false"
+                :before-close="nodetypeHandleClose"
+              >
+                <div :model="presentTypeNode" style="left: 0">
+                  当前节点: {{ presentTypeNode }}
+                </div>
+                <div>
+                  <el-tooltip
+                    content="最低算力为10,不设上线,算力跨度为10!"
+                    placement="bottom"
+                  >
+                    <el-input-number v-model="numHashRate" :step="10" :min="10"
+                  /></el-tooltip>
+                </div>
+                <template #footer>
+                  <span class="dialog-footer">
+                    <el-button type="primary" @click="setHashRate">设置</el-button>
                   </span>
                 </template>
               </el-dialog>
@@ -538,9 +580,9 @@
             </el-form>
             <div class="demo-drawer__footer">
               <el-button @click="cancelForm">Cancel</el-button>
-              <el-button type="primary" :loading="loading" @click="onClick">{{
+              <!-- <el-button type="primary" :loading="loading" @click="onClick">{{
                 loading ? "Submitting ..." : "Submit"
-              }}</el-button>
+              }}</el-button> -->
             </div>
           </div>
         </el-drawer>
@@ -603,6 +645,13 @@
                   >{{ drwaerDateNode.nodeType }}</el-descriptions-item
                 >
                 <el-descriptions-item
+                  v-if="drwaerDateNode.nodeType == `miningNode`"
+                  label="HashRate"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.hashRate }} kH/s</el-descriptions-item
+                >
+                <el-descriptions-item
                   label="Wallet Id"
                   label-align="center"
                   align="center"
@@ -616,12 +665,25 @@
                   label-align="center"
                   align="center"
                 >
+                  <el-tooltip
+                    v-if="drwaerDateNode.nodeType == `lightNode`"
+                    content="轻节点的交易信息需要通过其他全节点查询!"
+                    placement="top"
+                    ><el-button
+                      size="small"
+                      @click="findLightListTransList2(drwaerDateNode.transactionId)"
+                      round
+                      >查询交易
+                    </el-button>
+                  </el-tooltip>
+
                   <el-button
+                    v-if="drwaerDateNode.nodeType != `lightNode`"
                     type="text"
                     @click="findTransList2(drwaerDateNode.transactionId)"
                     >{{ drwaerDateNode.transactionId }}</el-button
-                  ></el-descriptions-item
-                >
+                  >
+                </el-descriptions-item>
               </el-descriptions>
 
               <el-drawer
@@ -663,9 +725,9 @@
             </el-form>
             <div class="demo-drawer__footer">
               <el-button @click="cancelForm2">Cancel</el-button>
-              <el-button type="primary" :loading="loading" @click="onClick2">{{
+              <!-- <el-button type="primary" :loading="loading" @click="onClick2">{{
                 loading ? "Submitting ..." : "Submit"
-              }}</el-button>
+              }}</el-button> -->
             </div>
           </div>
         </el-drawer>
@@ -879,6 +941,8 @@ import {
   findTransCon,
   checkExistCache,
   editRewardPre,
+  findFullNodeToEnquire,
+  setMinerHashRate,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -1025,6 +1089,42 @@ export default {
         innerDrawer2.value = true;
       });
     };
+    //
+    const findLightListTransList2 = (list) => {
+      findFullNodeToEnquire({ auth: getAuth(), nodeType: "fullNode" }).then((ress) => {
+        let resdata = ress.preData;
+        if (resdata != null) {
+          ElMessageBox.alert("该轻节点通过全节点(" + resdata + ")查询交易信息", "Mes", {
+            confirmButtonText: "OK",
+          });
+          List.transListId = list;
+          nodeTableData.length = 0;
+          FindTransListBYid(List).then((ress) => {
+            const res = ress.preData;
+            let lengths = res.length;
+            for (let i = 0; i < lengths; i++) {
+              nodeTableData.push({
+                id: res[i].transId,
+                hash: res[i].txIdHash,
+                inputId: res[i].inputsId,
+                outputsId: res[i].outputsId,
+                totalInput: res[i].totalInput,
+                totalOutput: res[i].totalOutput,
+                createTime: res[i].createTime,
+                status: res[i].status,
+                utxo: res[i].utxo,
+              });
+            }
+            let aasa = nodeTableData;
+            innerDrawer2.value = true;
+          });
+        } else {
+          ElMessageBox.alert("无可用的全节点用来查询交易信息！", "Mes", {
+            confirmButtonText: "OK",
+          });
+        }
+      });
+    };
 
     const NodeDetailHandleClose = (done: () => void) => {
       ElMessageBox.confirm("close?")
@@ -1054,7 +1154,7 @@ export default {
     };
     const drawerRef = ref<InstanceType<typeof ElDrawer>>();
     const onClick = () => {
-      ElMessageBox.confirm("Do you want to submit?")
+      ElMessageBox.confirm("Do you want to quit?")
         .then(() => {
           loading.value = true;
           timer = setTimeout(() => {
@@ -1071,7 +1171,7 @@ export default {
       clearTimeout(timer);
     };
     const onClick2 = () => {
-      ElMessageBox.confirm("Do you want to submit?")
+      ElMessageBox.confirm("Do you want to quit?")
         .then(() => {
           loading.value = true;
           timer = setTimeout(() => {
@@ -1091,7 +1191,7 @@ export default {
       if (loading.value) {
         return;
       }
-      ElMessageBox.confirm("Do you want to submit?")
+      ElMessageBox.confirm("Do you want to quit?")
         .then(() => {
           loading.value = true;
           timer = setTimeout(() => {
@@ -1170,6 +1270,7 @@ export default {
       nodeTableData,
       findTransList1,
       findTransList2,
+      findLightListTransList2,
     };
   },
   data() {
@@ -1436,6 +1537,14 @@ export default {
 
     //开始模拟传输
     const analogueTransmission = (miner) => {
+      const loading = ElLoading.service({
+        lock: true,
+        text: "Simulation",
+        background: "rgba(255, 255, 255,0.4)",
+      });
+      setTimeout(() => {
+        loading.close();
+      }, 3000 * miner.length);
       for (let i = 0; i < miner.length; i++) {
         setTimeout(() => {
           ElMessage({
@@ -1603,6 +1712,8 @@ export default {
           transactionSimVis.value = false;
         }, 200);
       } else {
+        //图中是否存在连接预设值
+
         if (NodeTrans != null) {
           NodeTrans.length = 0;
         }
@@ -1612,9 +1723,16 @@ export default {
             label: nodeListId[i].lable,
           });
         }
-        const graphsss2 = nodeListId;
-        const dadsasdad = NodeTrans;
-        const graphsss = nodeListId;
+        setTimeout(() => {
+          let targetlist = this.getNearTransNode(graph.linkList);
+          if (targetlist.valueTrans1 != "" && targetlist.valueTrans2 != "") {
+            ElMessageBox.alert("画布中存在预设交易值！("+targetlist.valueTrans1+"=>"+targetlist.valueTrans2+")", "通知", {
+              confirmButtonText: "OK",
+            });
+            valueTrans1.value = targetlist.valueTrans1;
+            valueTrans2.value = targetlist.valueTrans2;
+          }
+        }, 100);
       }
     };
 
@@ -1735,6 +1853,34 @@ export default {
       },
     ]);
 
+    //节点类型设置
+    const hashRateVis = ref(false);
+    //预设hashrate值
+    const numHashRate = ref(10);
+
+    const setHashRate = () => {
+      let nowNodeType = nodeTypeChoose;
+      setMinerHashRate({
+        addressId: presentTypeNode.value,
+        nodeType: nowNodeType.value,
+        auth: getAuth(),
+        hashRate: numHashRate.value,
+      }).then((ress) => {
+        let res = ress.preData;
+        if (res === true) {
+          ElMessage({
+            message: "HashRate设置成功!",
+            type: "success",
+          });
+        } else {
+          ElMessage({
+            message: "HashRate设置失败!",
+            type: "warning",
+          });
+        }
+        hashRateVis.value = false;
+      });
+    };
     //节点类型设置
     const nodeType = ref(false);
 
@@ -1924,6 +2070,7 @@ export default {
       nodeType: "fullNode",
       transactions: 0,
       totalReceived: 0,
+      hashRate: 0,
       totalSent: 0,
       balance: 0,
       walletId: 0,
@@ -1990,7 +2137,9 @@ export default {
       let nowNodeType = nodeTypeChoose;
       let nowNodeType1 = presentTypeNode;
       let nowNodeType2 = nowNodeType.value;
-
+      if (nowNodeType.value == "miningNode") {
+        hashRateVis.value = true;
+      }
       const nodeTypeC = {
         addressId: presentTypeNode.value,
         nodeType: nowNodeType.value,
@@ -2413,6 +2562,7 @@ export default {
                       drwaerDateNode.nodeType = res.nodeType;
                       drwaerDateNode.walletId = res.walletId;
                       drwaerDateNode.transactionId = res.transactionsId;
+                      drwaerDateNode.hashRate = res.hashRate;
                       let sue = drwaerDateNode;
                       this.drawerTrue("dialog2");
                       setPresentTypeNode(res.addressId);
@@ -2556,7 +2706,10 @@ export default {
       rewardAuthData,
       changerewardFindVisible,
       rewardFee,
-      doubleSpent
+      doubleSpent,
+      hashRateVis,
+      numHashRate,
+      setHashRate,
     };
   },
   created() {
@@ -2812,8 +2965,9 @@ export default {
                   // });
                 });
               } else {
-                findMinExist({ auth: this.getAuth() }).then((isExist) => {
-                  if (isExist) {
+                findMinExist({ auth: this.getAuth() }).then((isExists) => {
+                  let isExist = isExists.preData;
+                  if (isExist === true) {
                     createNewBlock({ auth: this.getAuth() }).then((ress) => {
                       const res = ress.preData;
                       this.openBlockCreate(res.miner);
@@ -2946,7 +3100,7 @@ export default {
         let end = reactive([]);
         findMinExist({ auth: this.getAuth() }).then((isExists) => {
           const isExist = isExists.preData;
-          if (isExist) {
+          if (isExist === true) {
             const coordinate = lastBlockCoordinate;
             coordinate[1] = coordinate[1] + 35;
             createNewBlock({ auth: this.getAuth() }).then((ress) => {
@@ -3325,6 +3479,21 @@ export default {
         }
       }
     },
+    //获取画中已经连线的节点用于交易
+    getNearTransNode(linkList) {
+      let end = {
+        valueTrans1: "",
+        valueTrans2: "",
+      };
+      let length = linkList.length;
+      for (let i = length - 1; i >= 0; i--) {
+        if (linkList[i].start.meta.prop === "node" && linkList[i]._end.meta.prop) {
+          end.valueTrans1 = linkList[i].start.meta.label;
+          end.valueTrans2 = linkList[i]._end.meta.label;
+        }
+      }
+      return end;
+    },
   },
 };
 </script>
@@ -3505,7 +3674,7 @@ export default {
   height: 1400px;
 }
 .feeEdit {
-  color: rgb(0, 119, 255);
+  color: rgba(255, 255, 255, 0);
   cursor: pointer;
   padding-left: 100px;
 }

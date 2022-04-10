@@ -30,7 +30,7 @@ export const deleteUser = function (data) {
     return http('post', 'http://localhost:8081/user/deleteUser', data)
 }
 
-
+ 
 
 // // 获取用户数据
 // export const getMapData = function (data) {
@@ -39,7 +39,7 @@ export const deleteUser = function (data) {
 
 // 获取路由菜单
 export const getRoutesApi = function (data) {
-    return http('get', 'http://localhost:8081/route/findAll', {
+    return http('post', 'http://localhost:8081/route/findAll', {
         tablename: 'routes',
         ...data
     })
@@ -184,6 +184,17 @@ export const resetPasswords = function (data) {
 export const checkExistCache = function (data) {
     return http('post', 'http://localhost:8081/singleNode/isExistCache', data)
 }
+
+//查找可以全节点
+export const findFullNodeToEnquire = function (data) {
+    return http('post', 'http://localhost:8081/singleNode/findFullNodeToEnquire', data)
+}
+
+//设置矿工节点算力
+export const setMinerHashRate = function (data) {
+    return http('post', 'http://localhost:8081/singleNode/setHashRates', data)
+}
+
 
 //调整当前仿真交易费比例
 export const editRewardPre = function (data) {

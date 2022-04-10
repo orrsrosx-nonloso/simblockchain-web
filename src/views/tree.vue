@@ -37,12 +37,6 @@
 .el-col {
   border-radius: 4px;
 }
-.bg-purple-dark {
-}
-.bg-purple {
-}
-.bg-purple-light {
-}
 .grid-content {
   border-radius: 4px;
   min-height: 36px;

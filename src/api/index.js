@@ -36,7 +36,7 @@ http.interceptors.response.use(function (response) {
     const data = response.data;
     if (data.status == 8) {
         router.replace("/login");
-        ElMessageBox.alert("用户已经在其他机器登录！", "WARING", {
+        ElMessageBox.alert("当前用户已登出！", "WARING", {
             confirmButtonText: "OK",
         });
     }

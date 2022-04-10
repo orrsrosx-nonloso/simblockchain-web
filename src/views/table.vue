@@ -41,6 +41,7 @@
     >
       <el-input v-model="useAdd.username" placeholder="输入用户名" />
       <el-input v-model="useAdd.password" placeholder="输入预设密码" />
+      <el-input v-model="useAdd.phone" placeholder="输入手机号" />
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">关闭</el-button>
@@ -76,6 +77,7 @@ const confirm = getCurrentInstance()?.appContext.config.globalProperties.$confir
 let useAdd = reactive({
   username: "",
   password: "",
+  phone:"",
   auth: auth,
 });
 
@@ -85,7 +87,7 @@ let searchData = reactive({
 });
 
 const route = useRoute();
-
+const routes = 123;
 // ----------------------------------------------------检索配置
 
 const options = [
@@ -125,7 +127,7 @@ const retrievalList = [
   // },
 ];
 // add新增 retrieval查询 reset重置 download导出, "retrieval"
-const retrievalActionBtn = ["retrieval", "add"];
+const retrievalActionBtn = ["add","retrieval"];
 
 function retrievalAction(e) {
   if (e.type == "retrieval") {
@@ -149,7 +151,7 @@ function retrievalAction(e) {
               date: content[i].createData,
               username: content[i].username,
               auth: content[i].auth,
-              status: "true",
+              phone: content[i].phone,
             };
             state.tableData.push(data);
             // let sad = state.tableData;
@@ -199,15 +201,15 @@ const tableColumn = [
     label: "日期",
   },
   {
-    prop: "status",
-    label: "状态",
+    prop: "phone",
+    label: "手机号",
   },
   {
     type: "action",
     label: "操作列",
     width: "150",
     actionBtn: [
-      // 如果要做权限，这里的funName需要和路由菜单中fmeta的auth一致
+      // 如果要做权限，这里的funName需要和路由菜单中meta的auth一致
       // {
       //   funName: "detail",
       //   title: "详情",
@@ -247,13 +249,13 @@ findAllUser(null).then((reas) => {
     let length2 = res.length;
     if (length2 > 0) {
       for (let i = 0; i < length2; i++) {
-        if (res[i].username != "admin") {
+        if (res[i].username != "admin" ) {
           let data = {
             id: res[i].id,
             date: res[i].createData,
             username: res[i].username,
             auth: res[i].auth,
-            status: "true",
+            phone: res[i].phone,
           };
           state.tableData.push(data);
           // let sad = state.tableData;
@@ -284,7 +286,7 @@ function handleCurrentChange(e) {
               date: content[i].createData,
               username: content[i].username,
               auth: content[i].auth,
-              status: "true",
+              phone: content[i].phone,
             };
             state.tableData.push(data);
             // let sad = state.tableData;
@@ -308,7 +310,7 @@ function handleCurrentChange(e) {
                 date: res[i].createData,
                 username: res[i].username,
                 auth: res[i].auth,
-                status: "true",
+                phone: res[i].phone,
               };
               state.tableData.push(data);
               // let sad = state.tableData;
@@ -387,6 +389,7 @@ function addUsers() {
   registerUser({
     username: useAdd.username,
     password: useAdd.password,
+    phone:useAdd.phone,
     auth: useAdd.auth,
   }).then((res) => {
     if (res.status == 1) {

@@ -3,9 +3,9 @@
     <div id="bgd">
       <canvas id="myCanvas" :width="width" :height="height"> </canvas>
     </div>
-    <div id="loginBox">
+    <div v-if="status == 1" id="loginBox">
       <h4>SIMBLOCKCHAIN</h4>
-      <el-form  label-width="0px" :model="state.formLabelAlign">
+      <el-form label-width="0px" :model="state.formLabelAlign">
         <el-form-item label="" prop="userName" style="margin-top: 40px">
           <el-row>
             <el-col :span="2">
@@ -39,38 +39,118 @@
             </el-col>
           </el-row>
         </el-form-item>
+
         <el-form-item style="margin-top: 55px">
-          <el-button type="primary" round class="submitBtn" 
-          :loading="state.loginLoading"
-          @click="login"
+          <el-button
+            type="primary"
+            round
+            class="submitBtn"
+            :loading="state.loginLoading"
+            @click="login"
             >登录</el-button
           >
         </el-form-item>
         <el-form-item label="">
-            <div class="regist" @click="regist">注册</div>
+          <div class="regist">
+            <span style="cursor: pointer" @click="toRegist">注册</span>
+          </div>
+          <div class="forget">
+            <span style="cursor: pointer" @click="forgetPas">忘记密码</span>
+          </div>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div v-else-if="status == 2" id="registBox">
+      <h4>用户注册</h4>
+      <el-form label-width="0px" :model="state.formLabelAlign">
+        <el-form-item label="" prop="userName" style="margin-top: 40px">
+          <el-row>
+            <el-col :span="2">
+              <el-icon :size="18" class="iconfont">
+                <User />
+              </el-icon>
+            </el-col>
+            <el-col :span="22">
+              <el-input
+                class="inps"
+                placeholder="用户名"
+                v-model="registState.formLabelAlign.username"
+              ></el-input>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item label="" prop="passWord">
+          <el-row>
+            <el-col :span="2">
+              <el-icon :size="18" class="iconfont">
+                <Edit />
+              </el-icon>
+            </el-col>
+            <el-col :span="22">
+              <el-input
+                class="inps"
+                placeholder="密码"
+                v-model="registState.formLabelAlign.password"
+                :type="registState.passwordType"
+              ></el-input>
+            </el-col>
+          </el-row>
+        </el-form-item>
+
+        <el-form-item label="" prop="Phone">
+          <el-row>
+            <el-col :span="2">
+              <el-icon :size="18" class="iconfont">
+                <Phone />
+              </el-icon>
+            </el-col>
+            <el-col :span="22">
+              <el-input
+                class="inps"
+                placeholder="手机号"
+                v-model="registState.formLabelAlign.phone"
+                :type="registState.phoneType"
+              ></el-input>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item style="margin-top: 55px">
+          <el-button
+            type="primary"
+            round
+            class="submitBtn"
+            :loading="registState.loginLoading"
+            @click="regist"
+            >注册</el-button
+          >
+        </el-form-item>
+        <el-form-item label="">
+          <div class="regist" @click="backLogin">返回</div>
         </el-form-item>
       </el-form>
     </div>
   </div>
 </template>
 
-<script >
-import { User, Edit } from "@element-plus/icons";
-import { onMounted, reactive, computed,ref } from "vue";
+<script>
+import { User, Edit, Phone } from "@element-plus/icons";
+import { onMounted, reactive, computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
 import { getDate } from "../utils/utils";
 import { useRouter } from "vue-router";
-import { getLoginMes } from "../api/apis";
-import { ElMessageBox } from "element-plus";
+import { getLoginMes, registerUser } from "../api/apis";
+import { ElMessageBox, ElMessage } from "element-plus";
+import { judgePhone } from "../utils/utils";
 
 export default {
   components: {
     User,
     Edit,
+    Phone,
   },
   data() {
-    const status = ref(1);//状态，1为登录，2为注册，3为忘记密码，4为忘记密码之后重置密码
+    const status = ref(1); //状态，1为登录，2为注册，3为忘记密码，4为忘记密码之后重置密码
 
     const router = useRouter();
     const store = useStore();
@@ -87,8 +167,24 @@ export default {
       formLabelAlign: {
         username: "",
         password: "",
+        phone: "",
       },
       passwordType: "password",
+      phoneType: "Phone",
+    });
+
+    const registState = reactive({
+      count: 0,
+      loginLoading: false,
+      localTime: getDate(),
+      labelPosition: "right",
+      formLabelAlign: {
+        username: "",
+        password: "",
+        phone: "",
+      },
+      passwordType: "password",
+      phoneType: "Phone",
     });
 
     const { t } = useI18n();
@@ -98,9 +194,50 @@ export default {
     }
 
     function regist() {
-      ElMessageBox.alert("功能未开放！", "WARING", {
+      let params = registState.formLabelAlign;
+      if (params.username != "" || params.password != "") {
+        if (judgePhone(params.phone)) {
+          registerUser({
+            username: params.username,
+            password: params.password,
+            phone: params.phone,
+          }).then((res) => {
+            if (res.status == 1) {
+              ElMessage({
+                message: "用户注册成功！",
+                type: "success",
+              });
+              status.value = 1;
+            } else {
+              ElMessage({
+                message: res.msg,
+                type: "warning",
+              });
+            }
+          });
+        } else {
+          ElMessageBox.alert("请输入正确的手机号！", "WARING", {
             confirmButtonText: "OK",
           });
+        }
+      } else {
+        ElMessageBox.alert("请输入账号密码！", "WARING", {
+          confirmButtonText: "OK",
+        });
+      }
+    }
+
+    function toRegist() {
+      status.value = 2;
+    }
+
+    function forgetPas() {
+      ElMessageBox.alert("忘记密码请联系管理员！", "WARING", {
+        confirmButtonText: "OK",
+      });
+    }
+    function backLogin() {
+      status.value = 1;
     }
     // function getLoginMesss(){
     //   const params = {
@@ -134,7 +271,7 @@ export default {
           store.commit("getUser", { token: res.data._id, ...res.data });
           console.log("store", store);
           store
-            .dispatch("asyncGetRoutes", res.data.auth)
+            .dispatch("asyncGetRoutes", res.data.username)
             .then((path) => {
               console.log("path", path);
               state.loginLoading = false;
@@ -210,12 +347,21 @@ export default {
         userName: [{ required: true, message: "请输入用户名", trigger: "blur" }],
         passWord: [{ required: true, message: "请输入密码", trigger: "blur" }],
       },
-      router,store,isPhone,state,changeType,login
+      router,
+      store,
+      isPhone,
+      state,
+      changeType,
+      login,
+      status,
+      backLogin,
+      toRegist,
+      forgetPas,
+      registState,
     };
   },
   methods: {
     //提交登录
-    submitForm() {},
   },
   mounted() {
     this.canvas = document.getElementById("myCanvas");
@@ -226,10 +372,20 @@ export default {
 
 <style lang="less" scoped>
 .regist {
-        font-size: 12px;
-        cursor: pointer;
-        color: #409eff;
-      }
+  position: absolute;
+  width: 50%;
+  font-size: 12px;
+  color: #409eff;
+}
+
+.forget {
+  position: absolute;
+  margin-left: 45%;
+  width: 50%;
+  font-size: 12px;
+
+  color: #409eff;
+}
 #login {
   width: 100vw;
   padding: 0;
@@ -252,6 +408,36 @@ export default {
   #loginBox {
     width: 240px;
     height: 280px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    padding: 50px 40px 40px 40px;
+    box-shadow: -15px 15px 15px rgba(6, 17, 47, 0.7);
+    opacity: 1;
+    background: linear-gradient(230deg, rgba(53, 57, 74, 0) 0%, rgb(0, 0, 0) 100%);
+    .inps input {
+      border: none;
+      color: #fff;
+      background-color: transparent;
+      font-size: 12px;
+    }
+    .submitBtn {
+      background-color: transparent;
+      color: #39f;
+      width: 200px;
+    }
+    .iconfont {
+      color: #fff;
+      top: 5px;
+      right: 10px;
+    }
+  }
+  #registBox {
+    width: 240px;
+    height: 340px;
     position: absolute;
     top: 0;
     left: 0;

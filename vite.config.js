@@ -1,10 +1,17 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import {styleImport,createStyleImportPlugin,VantResolve} from 'vite-plugin-style-import'
 
 // @Built by JustTwo
 // author: "JustTwo"
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    createStyleImportPlugin({
+      resolves: [VantResolve()],
+    }),
+
+  ],
   // 在文件中添加以下内容
   server: {
     host: '0.0.0.0'
@@ -34,7 +41,10 @@ export default defineConfig({
           }
         }
       }
+    },
+    commonjsOptions:{
+      requireReturnsDefault:'namespace'
     }
   },
-  chunkSizeWarningLimit:1800,
+  chunkSizeWarningLimit: 1800,
 })
