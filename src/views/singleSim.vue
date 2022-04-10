@@ -1806,6 +1806,7 @@ export default {
                               this.setStatus("success");
                               setTimeout(() => {
                                 this.setPowFindVisible(false);
+                                this.setShowBlockMes(" ");
                               }, 500);
                             }, 1600);
                           }, 1600);
@@ -3218,6 +3219,7 @@ export default {
                                   lastBlockcreate = res;
                                   setTimeout(() => {
                                     this.setPowFindVisible(false);
+                                    this.setShowBlockMes(" ");
                                   }, 500);
                                 }, 1000);
                               }, 1000);
@@ -3397,6 +3399,7 @@ export default {
                             this.summaryMes[6].data = 1 + Number(this.summaryMes[6].data);
                             setTimeout(() => {
                               this.setPowFindVisible(false);
+                              this.setShowBlockMes(" ");
                             }, 500);
                           }, 1000);
                         }, 1000);
