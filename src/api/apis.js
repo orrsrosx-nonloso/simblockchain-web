@@ -165,6 +165,12 @@ export const loginOut = function (data) {
 }
 
 
+//判断用户是否需要引导，默认每个用户只需要引导一次
+export const needGuide = function (data) {
+    return http('post', 'http://localhost:8081/user/needGuide', data)
+}
+
+
 //检查登录状态
 export const checkLoginStatus = function (data) {
     return http('post', 'http://localhost:8081/user/checkLogin', data)

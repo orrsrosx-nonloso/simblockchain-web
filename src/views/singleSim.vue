@@ -2,7 +2,7 @@
   <el-scrollbar height="110%">
     <el-row :gutter="3">
       <el-col :span="3"
-        ><div class="grid-content">
+        ><div class="grid-content" id ="leftMenuGuide">
           <div class="base_title">节点操作</div>
           <div class="drag-box">
             <!-- <el-button
@@ -82,14 +82,14 @@
           <div class="drag-box">
             <el-dropdown>
               <el-button class="opButtontdrwaer" type="primary" size="small">
-                交易池查看
+                交易信息
                 <arrow-down />
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-tooltip content="查看所以经过记账节点确定的交易!" placement="top">
                     <el-dropdown-item @click="getPresentUtxoData('confirmed')"
-                      >Confirmed</el-dropdown-item
+                      >已确定交易</el-dropdown-item
                     >
                   </el-tooltip>
                   <el-tooltip
@@ -97,7 +97,7 @@
                     placement="top"
                   >
                     <el-dropdown-item @click="getPresentUtxoData('unconfirmed')"
-                      >Unconfirmed</el-dropdown-item
+                      >交易池</el-dropdown-item
                     >
                   </el-tooltip>
                 </el-dropdown-menu>
@@ -121,7 +121,7 @@
               class="opButton"
               type="primary"
               size="small"
-              @click="dialogWalletVisible = true"
+              @click="dialogConWalletVisible = true"
               >钱包结构
             </el-button>
           </div>
@@ -229,6 +229,35 @@
                 <div></div>
               </div>
             </el-dialog>
+            <!-- 所有挖矿节点竞争挖矿行为界面 -->
+            <el-dialog
+              v-model="powMinFindVisible"
+              title="所有挖矿节点同步计算中!"
+              width="40%"
+              :before-close="powFindHandleClose"
+              :show-close="false"
+            >
+              <div class="demo-progress" style="padding-left: 20%; padding-right: 20%">
+                <el-form :model="showFindBlockMes">
+                  <el-descriptions title="">
+                    <el-descriptions-item label="">
+                      <span style="font-size: 15px; font-weight: bold"
+                        >所有挖矿节点挖矿中。目标nonce:
+                        {{ showFindBlockMes[0] }} 目标difficulty:
+                        {{ showFindBlockMes[1] }}</span
+                      >
+                    </el-descriptions-item></el-descriptions
+                  ></el-form
+                >
+                <el-progress
+                  v-for="item in miningList"
+                  :color="customColors"
+                  :percentage="item.minPercentage"
+                >
+                  <el-button type="text">{{ item.name }}</el-button>
+                </el-progress>
+              </div>
+            </el-dialog>
           </div>
           <div class="drag-box">
             <el-button class="opButton" type="primary" size="small" @click="blockTranSim"
@@ -242,7 +271,7 @@
               @click="getNewBlockDifficult"
               type="primary"
               size="small"
-              >新区块获取难度
+              >区块获取难度
             </el-button>
           </div>
           <div class="drag-box">
@@ -264,17 +293,37 @@
                 <div class="card-header">
                   <span>节点与区块</span>
                   <div>
-                    <!-- <el-tooltip
+                    <el-tooltip
                       class="box-item"
                       effect="dark"
-                      content="仿真开始前进行清除"
+                      content="清除当前仿真所有数据"
                       placement="top-start"
                     >
-                      <el-button @click="clearCache" style="left: 0">清空缓存</el-button>
-                    </el-tooltip> -->
+                      <el-button id="clearDataGuide" @click="clearDatabaseVisible = true" style="left: 0"
+                        >清空数据</el-button
+                      >
+                    </el-tooltip>
+                    <el-dialog
+                      v-model="clearDatabaseVisible"
+                      title="清空数据"
+                      width="30%"
+                    >
+                      <span>您确定要清空所有仿真数据吗？</span>
+                      <template #footer>
+                        <span class="dialog-footer">
+                          <el-button @click="clearDatabaseVisible = false"
+                            >取消</el-button
+                          >
+                          <el-button type="primary" @click="clearDatabase"
+                            >确定</el-button
+                          >
+                        </span>
+                      </template>
+                    </el-dialog>
                     <span
                       class="node-item"
                       v-for="item in nodeItemList"
+                      :id="item.value.meta.label"
                       @mousedown="(evt) => nodeItemMouseDown(evt, item.value)"
                     >
                       <el-tooltip
@@ -289,7 +338,7 @@
                   </div>
                 </div>
               </template>
-              <div class="flow-container" ref="flowContainer">
+              <div class="flow-container" id = "flowMenuGuide" ref="flowContainer">
                 <c-scrollbar maxHeight="538px" trigger="hover">
                   <super-flow
                     ref="superFlow"
@@ -301,15 +350,23 @@
                     :link-base-style="linkBaseStyle"
                     :link-style="linkStyle"
                     :link-desc="linkDesc"
+                    :link-addable="false"
                   >
                     <template v-slot:node="{ meta }">
+                      <!-- 全节点 -->
                       <div
                         @mouseup="nodeMouseUp"
                         @click="nodeClick"
-                        class="flow-node ellipsis"
+                        :class="`flow-node ellipsis ${meta.type}`"
                       >
-                        {{ meta.name }}
+                        <i v-if="meta.prop == `node`" class="iconfont"
+                          >&#xe63e;<span class="icon-text">{{ meta.name }}</span></i
+                        >
+                        <i v-if="meta.prop == `block`" class="iconfont"
+                          >&#xea18;<span class="icon-text">{{ meta.name }}</span></i
+                        >
                       </div>
+                      <!-- 轻节点 -->
                     </template>
                   </super-flow>
                 </c-scrollbar>
@@ -322,9 +379,7 @@
                 :show-close="false"
                 :before-close="nodetypeHandleClose"
               >
-                <div :model="presentTypeNode" style="left: 0">
-                  当前节点: {{ presentTypeNode }}
-                </div>
+                <div :model="presentTypeNode" style="left: 0">请选择节点类型</div>
                 <div>
                   <el-tooltip
                     content="包含完整的区块链数据（默认包含完整的网络路由功能）!"
@@ -347,7 +402,7 @@
                     placement="top"
                   >
                     <el-radio v-model="nodeTypeChoose" label="miningNode" size="large"
-                      >产块节点</el-radio
+                      >挖矿节点</el-radio
                     ></el-tooltip
                   >
                 </div>
@@ -367,9 +422,7 @@
                 :show-close="false"
                 :before-close="nodetypeHandleClose"
               >
-                <div :model="presentTypeNode" style="left: 0">
-                  当前节点: {{ presentTypeNode }}
-                </div>
+                <div :model="presentTypeNode" style="left: 0">请设置挖矿节点算力</div>
                 <div>
                   <el-tooltip
                     content="最低算力为10,不设上线,算力跨度为10!"
@@ -422,7 +475,7 @@
       ></el-col>
       <el-col :span="6"
         ><div class="grid-content bg-purple-light">
-          <el-card class="box-card" :body-style="{ padding: '5px', height: '236px' }">
+          <el-card id="summaryGuide" class="box-card" :body-style="{ padding: '5px', height: '236px' }">
             <template #header>
               <div class="card-header" style="font-weight: bold">
                 <span>SUMMARY</span>
@@ -439,17 +492,21 @@
               >
             </div>
           </el-card>
-          <el-card class="box-card" :body-style="{ padding: '5px', height: '237px' }">
+          <el-card  id="eventMenuGuide" class="box-card" :body-style="{ padding: '5px', height: '237px' }">
             <template #header>
               <div class="card-header" style="font-weight: bold">
                 <span>EVENT</span>
               </div>
             </template>
             <c-scrollbar maxHeight="237px" maxWidth="280px" trigger="hover">
-              <div v-for="e in eventMes" class="text item">
-                {{ e.eventName }}
-                {{ e.data }}
-              </div>
+              <el-collapse height="110%" v-model="activeName" accordion>
+                <el-collapse-item v-for="item in eventMes" :name="item.name">
+                  <template #title>
+                    <div style="margin-left = 10px">{{ item.eventName }}</div>
+                  </template>
+                  <p class="textEvent">{{ item.data }}</p>
+                </el-collapse-item>
+              </el-collapse>
             </c-scrollbar>
           </el-card>
         </div>
@@ -599,14 +656,45 @@
             <el-form :model="drwaerDateNode">
               <el-descriptions :column="1" border>
                 <el-descriptions-item
-                  label="Address"
+                  label="节点编号"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.addressId }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="节点描述"
                   label-align="center"
                   align="center"
                   label-class-name="my-label"
                   class-name="my-content"
-                  >{{ drwaerDateNode.address }}</el-descriptions-item
+                  ><span v-if="drwaerDateNode.nodeType == `fullNode`"
+                    >包含完整的区块链数据（默认包含完整的网络路由功能）</span
+                  >
+                  <span v-if="drwaerDateNode.nodeType == `lightNode`"
+                    >仅包含区块头数据,移动端使用较多（默认包含完整的网络路由功能）</span
+                  >
+                  <span v-if="drwaerDateNode.nodeType == `miningNode`"
+                    >负责产生区块的节点（默认包含完整的网络路由功能和区块链数据）</span
+                  >
+                </el-descriptions-item>
+                <el-descriptions-item
+                  label="NodeType"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.nodeType }}</el-descriptions-item
                 >
                 <el-descriptions-item
+                  v-if="drwaerDateNode.nodeType == `miningNode`"
+                  label="HashRate"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.hashRate }} kH/s</el-descriptions-item
+                >
+              </el-descriptions>
+              <div class="textNode">节点内默认账户详情</div>
+              <el-descriptions :column="1" border width="50px">
+                <el-descriptions-item
+                  width="50px"
                   label="AddressID"
                   label-align="center"
                   align="center"
@@ -637,19 +725,6 @@
                   label-align="center"
                   align="center"
                   >{{ drwaerDateNode.balance }}</el-descriptions-item
-                >
-                <el-descriptions-item
-                  label="NodeType"
-                  label-align="center"
-                  align="center"
-                  >{{ drwaerDateNode.nodeType }}</el-descriptions-item
-                >
-                <el-descriptions-item
-                  v-if="drwaerDateNode.nodeType == `miningNode`"
-                  label="HashRate"
-                  label-align="center"
-                  align="center"
-                  >{{ drwaerDateNode.hashRate }} kH/s</el-descriptions-item
                 >
                 <el-descriptions-item
                   label="Wallet Id"
@@ -736,9 +811,9 @@
     <el-dialog v-model="dialogWalletVisible" width="440px">
       <c-scrollbar maxWidth="400" trigger="hover">
         <el-form :model="walletData">
-          <el-descriptions title="钱包结构" :column="1" border>
+          <el-descriptions title="钱包结构信息" :column="1" border>
             <el-descriptions-item
-              label="id"
+              label="wallet_id"
               label-align="left"
               align="left"
               min-width="100px"
@@ -752,6 +827,31 @@
             }}</el-descriptions-item>
             <el-descriptions-item label="privateKey" label-align="left" align="left">
               {{ walletData.privateKey }}
+            </el-descriptions-item>
+          </el-descriptions></el-form
+        ></c-scrollbar
+      >
+    </el-dialog>
+
+    <el-dialog v-model="dialogConWalletVisible" width="440px">
+      <c-scrollbar maxWidth="400" trigger="hover">
+        <el-form :model="walletData">
+          <el-descriptions title="钱包结构" :column="1" border>
+            <el-descriptions-item
+              label="wallet_id"
+              label-align="left"
+              align="left"
+              min-width="100px"
+              ><el-tag size="small">钱包唯一标识ID</el-tag></el-descriptions-item
+            >
+            <el-descriptions-item label="publickey" label-align="left" align="left"
+              >公钥用于接收交易虚拟货币</el-descriptions-item
+            >
+            <el-descriptions-item label="Address" label-align="left" align="left"
+              >钱包对应的账户地址</el-descriptions-item
+            >
+            <el-descriptions-item label="privateKey" label-align="left" align="left">
+              私钥用于虚拟货币交易时的交易签名
             </el-descriptions-item>
           </el-descriptions></el-form
         ></c-scrollbar
@@ -913,7 +1013,6 @@
 </template>
 <script lang="ts">
 import { ref, reactive } from "vue";
-import Draggable from "vuedraggable";
 import { ElMessageBox } from "element-plus";
 import { ElMessage, ElLoading, ElNotification } from "element-plus";
 import type { ElDrawer, Action } from "element-plus";
@@ -943,19 +1042,60 @@ import {
   editRewardPre,
   findFullNodeToEnquire,
   setMinerHashRate,
+  needGuide
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
 import { t } from "element-plus/es/locale";
 import { useStore } from "vuex";
 import { computed, h } from "vue";
+import { Box, Edit, Phone } from "@element-plus/icons";
+import { useRouter } from "vue-router";
+import Driver from "driver.js";
+import "driver.js/dist/driver.min.css";
 
 const drawerType = {
   node: 0,
   link: 1,
 };
 
-//连线数据存储集合
-const linkListId = reactive([]);
+let summaryMesUpdata = reactive([
+  {
+    tabName: "仿真时间:  ",
+    data: getDataString(),
+  },
+  {
+    tabName: "节点数量:  ",
+    data: "0",
+  },
+  {
+    tabName: "区块数量:  ",
+    data: "0",
+  },
+
+  {
+    tabName: "First block:  ",
+    data: "0",
+  },
+  {
+    tabName: "Last block:  ",
+    data: "0",
+  },
+  {
+    tabName: "传播延迟:  ",
+    data: "0",
+  },
+  {
+    tabName: "交易发生次数:  ",
+    data: 0,
+  },
+  {
+    tabName: "Transaction fee:  ",
+    data: "0%",
+  },
+]);
+
+//节点连线数据存储集合
+const nodeLinkListId = reactive([]);
 //节点数据存储
 const nodeListId = reactive([]);
 //区块数据存储
@@ -971,16 +1111,22 @@ let nodeTableData = reactive([]);
 //模拟挖矿时需要的数据
 let lastBlockcreate = reactive([]);
 
+//节点创建信息
+let nodeCreateMes = reactive({
+  graph: null,
+  coordinate: null,
+});
+
 // 全局的共识协议变量
 let globalConsensus = ref("POW");
 
 let lastBlockCoordinate = reactive([457.8750305175781, 185.0999984741211]);
 
 export default {
-  components: {
-    Draggable,
-  },
+  components: {},
   setup() {
+    //折叠面板配置
+    const activeName = ref(0);
     //拖拽区块节点配置
     const disabled = ref(false);
     const node1 = reactive([]);
@@ -1274,6 +1420,16 @@ export default {
     };
   },
   data() {
+    const clearDatabaseVisible = ref(false);
+
+    const changeclearDatabaseVisible = () => {
+      if (clearDatabaseVisible.value == true) {
+        clearDatabaseVisible.value = false;
+      } else {
+        clearDatabaseVisible.value = true;
+      }
+    };
+
     //缓存查看
     const cacheFindVisible = ref(false);
     //关闭处理
@@ -1386,7 +1542,7 @@ export default {
               this.BifurcatedChainCreate(res);
             });
           } else {
-            ElMessageBox.alert("当前产块节点数量小于2,请添加新产块节点!", "WARING", {
+            ElMessageBox.alert("当前挖矿节点数量小于2,请添加新挖矿节点!", "WARING", {
               confirmButtonText: "OK",
             });
           }
@@ -1399,6 +1555,7 @@ export default {
     };
     //模拟区块传输
     const blockTranSim = (done: () => void) => {
+      this.removeAllNodeLink();
       findpresentMin({ auth: getAuth() }).then((ress) => {
         const res = ress.preData;
         if (res == null || res == "") {
@@ -1570,6 +1727,13 @@ export default {
           LogEvent("Node Transmit", miner[i].nodeAddress + "开始区块传输!");
         }, 3000 * i);
       }
+      setTimeout(() => {
+        ElMessage({
+          message: `区块传输模拟结束!`,
+          type: "success",
+        });
+        this.makeNodelistVis();
+      }, 3000 * miner.length + 500);
     };
 
     //获取到新区块获取难度值
@@ -1592,6 +1756,41 @@ export default {
         });
     };
 
+    const powFindVisible = ref(false);
+
+    //挖矿争夺模拟界面
+    const powMinFindVisible = ref(false);
+    const setPowMinFindVisible = (value) => {
+      powMinFindVisible.value = value;
+    };
+
+    //所有挖矿节点集合
+    const miningList = reactive([{ minPercentage: 0, name: "", perAddNum: 0 }]);
+    //设0
+    const miningListSetEm = () => {
+      miningList.length = 0;
+    };
+
+    const miningListAdd = (val) => {
+      miningList.push(val);
+    };
+
+    const perAddNumAdd = (val, index) => {
+      if (val > 0) {
+        miningList[index].perAddNum = val;
+      } else {
+        miningList[index].perAddNum = 0.5;
+      }
+    };
+
+    const perAddNumIns = () => {
+      let i = miningList;
+      for (let index = 0; index < miningList.length; index++) {
+        miningList[index].minPercentage =
+          miningList[index].minPercentage + miningList[index].perAddNum;
+      }
+    };
+
     const stratPowFindHandleClose = () => {
       powFindVisible.value = true;
       this.blockCreate();
@@ -1605,7 +1804,6 @@ export default {
       powFindVisible.value = value;
     };
 
-    const powFindVisible = ref(false);
     const staus = ref("");
     const setStatus = (value) => {
       staus.value = value;
@@ -1640,6 +1838,12 @@ export default {
 
     const setShowBlockMes = (value) => {
       showBlockMes[0] = value;
+    };
+    const showFindBlockMes = reactive(["0", "0"]);
+
+    const setShowFindBlockMes = (nonce, difficulty) => {
+      showFindBlockMes[0] = nonce;
+      showFindBlockMes[1] = difficulty;
     };
 
     //获取当前用户
@@ -1726,9 +1930,17 @@ export default {
         setTimeout(() => {
           let targetlist = this.getNearTransNode(graph.linkList);
           if (targetlist.valueTrans1 != "" && targetlist.valueTrans2 != "") {
-            ElMessageBox.alert("画布中存在预设交易值！("+targetlist.valueTrans1+"=>"+targetlist.valueTrans2+")", "通知", {
-              confirmButtonText: "OK",
-            });
+            ElMessageBox.alert(
+              "画布中存在预设交易值！(" +
+                targetlist.valueTrans1 +
+                "=>" +
+                targetlist.valueTrans2 +
+                ")",
+              "通知",
+              {
+                confirmButtonText: "OK",
+              }
+            );
             valueTrans1.value = targetlist.valueTrans1;
             valueTrans2.value = targetlist.valueTrans2;
           }
@@ -1808,15 +2020,15 @@ export default {
                                 this.setPowFindVisible(false);
                                 this.setShowBlockMes(" ");
                               }, 500);
-                            }, 1600);
-                          }, 1600);
-                        }, 1600);
-                      }, 1600);
-                    }, 1600);
-                  }, 1500);
-                }, 1600);
-              }, 1600);
-            }, 1600);
+                            }, 2000);
+                          }, 2000);
+                        }, 2000);
+                      }, 2000);
+                    }, 2000);
+                  }, 2000);
+                }, 2000);
+              }, 2000);
+            }, 2000);
             LogEvent(
               "TransactionSingle  :",
               valueTrans1.value + "T O" + valueTrans2.value
@@ -1896,6 +2108,8 @@ export default {
         "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgVdVHyHHTZXHuL2wRbXhKseA+edBkwxhnkyh8ZUopXeOgCgYIKoZIzj0DAQehRANCAAQIUa2Fnn+kXPp5E2vVRf4e6oT0Br9uzIU7GeW9oksgIgDOWuoVF1DdOsaQN+5fokY/OmB4c0ode67+Atc1CoBU",
     });
     const dialogWalletVisible = ref(false);
+
+    const dialogConWalletVisible = ref(false);
 
     const checkWallet = (walletId) => {
       findWalletCon({ walletId: walletId + "", auth: getAuth() }).then((ress) => {
@@ -2122,17 +2336,22 @@ export default {
       {
         eventName: "仿真准备:  ",
         data: "START!",
+        name: 1,
       },
     ]);
 
     const LogEvent = (eventName, data) => {
+      let lenght = eventMes[0].name + 1;
       setTimeout(() => {
         eventMes.unshift({
           eventName: eventName,
           data: data,
+          name: lenght,
         });
       }, 100);
     };
+
+    //node创建流程
 
     const setNodeType = () => {
       let nowNodeType = nodeTypeChoose;
@@ -2141,21 +2360,95 @@ export default {
       if (nowNodeType.value == "miningNode") {
         hashRateVis.value = true;
       }
-      const nodeTypeC = {
-        addressId: presentTypeNode.value,
-        nodeType: nowNodeType.value,
+
+      let params = {
         auth: getAuth(),
+        nodeType: nowNodeType.value,
       };
-      if (nowNodeType) {
-        updateNodeType(nodeTypeC).then((ress) => {
-          const res = ress.preData;
-          if (res) {
-            changeNodetype();
+      createNewNode(params).then((ress) => {
+        let graph = nodeCreateMes.graph;
+        let coordinate = nodeCreateMes.coordinate;
+        const res = ress.preData;
+        graph.addNode({
+          width: 100,
+          height: 30,
+          coordinate,
+          meta: {
+            label: res.addressId,
+            name: res.addressId,
+            prop: "node",
+            type: res.nodeType,
+          },
+        });
+        addP2pNet({ addressId: res.addressId, auth: getAuth() }).then((ress) => {
+          const res = ress.preData[0];
+          const localNetWork = ress.preData[1];
+          if (res.success == "true") {
+            if (res.addressId == "Node1") {
+              ElMessage({
+                message: "节点网络初始化!",
+                type: "success",
+              });
+            } else {
+              ElMessage({
+                message: "节点网络添加成功!",
+                type: "success",
+              });
+              //可视化网络节点添加
+              this.localNetWorkAdd(localNetWork);
+              this.setNodeLists();
+            }
           } else {
-            changeNodetype();
+            ElMessage({
+              message: "节点网络异常!",
+              type: "warning",
+            });
           }
         });
-      }
+        LogEvent("create new " + res.addressId + ":", res.address);
+        // const nodeListIdsdadsaa = this.nodeListId;
+
+        const newNodelist = graph.nodeList;
+        const presentNode = newNodelist[newNodelist.length - 1];
+        presentNode.meta.name = res.addressId;
+        // let presentNodsd=presentNode.id;
+        presentNode.meta.name = res.addressId;
+        nodeListId.push({
+          lable: presentNode.meta.label,
+          id: presentNode.id,
+        });
+        // if (presentNode.meta.prop == "node") {
+        //         // let presentNodsd=presentNode.id;
+        //         nodeListId.push({
+        //           lable: presentNode.meta.label,
+        //           id: presentNode.id,
+        //         });
+        //         const data = nodeListId.length;
+        //         this.summaryMes[1].data = data;
+        //       }
+        const data = nodeListId.length;
+        summaryMes[1].data = data + "";
+        presentTypeNode.value = res.addressId;
+
+        // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
+      });
+
+      // const nodeTypeC = {
+      //   addressId: presentTypeNode.value,
+      //   nodeType: nowNodeType.value,
+      //   auth: getAuth(),
+      // };
+      // if (nowNodeType) {
+      //   updateNodeType(nodeTypeC).then((ress) => {
+      //     const res = ress.preData;
+      //     if (res) {
+      //       changeNodetype();
+      //     } else {
+      //       changeNodetype();
+      //     }
+      //   });
+      // }
+      changeNodetype();
       nodeTypeChoose.value = "fullNode";
     };
 
@@ -2256,6 +2549,7 @@ export default {
         presentTypeNode.value = presentTypeNodes;
       }
     };
+
     return {
       drawerType,
       linkSetting: {
@@ -2286,6 +2580,7 @@ export default {
               label: "node1",
               prop: "node",
               name: "节点",
+              type: "fullNode",
             },
           },
         },
@@ -2298,6 +2593,7 @@ export default {
               label: "block1",
               prop: "block",
               name: "区块",
+              type: "block",
             },
           },
         },
@@ -2307,65 +2603,13 @@ export default {
         [
           {
             // 选项 label
-            label: "新键节点",
+            label: "新建节点",
             // 选项是否禁用
             // 选项选中后回调函数
             selected(graph, coordinate) {
-              let params = {
-                auth: getAuth(),
-              };
-              lastBlockCoordinate.length = 0;
-              lastBlockCoordinate = coordinate;
-              createNewNode(params).then((ress) => {
-                const res = ress.preData;
-                graph.addNode({
-                  width: 100,
-                  height: 30,
-                  coordinate,
-                  meta: {
-                    label: res.addressId,
-                    name: res.addressId,
-                    prop: "node",
-                  },
-                });
-                addP2pNet({ addressId: res.addressId, auth: getAuth() }).then((ress) => {
-                  const res = ress.preData;
-                  if (res.success == "true") {
-                    if (res.addressId == "Node1") {
-                      ElMessage({
-                        message: "节点网络初始化!",
-                        type: "success",
-                      });
-                    } else {
-                      ElMessage({
-                        message: "节点网络添加成功!",
-                        type: "success",
-                      });
-                    }
-                  } else {
-                    ElMessage({
-                      message: "节点网络异常!",
-                      type: "warning",
-                    });
-                  }
-                });
-                LogEvent("create new " + res.addressId + ":", res.address);
-                // const nodeListIdsdadsaa = this.nodeListId;
-
-                const newNodelist = graph.nodeList;
-                const presentNode = newNodelist[newNodelist.length - 1];
-                presentNode.meta.name = res.addressId;
-                // let presentNodsd=presentNode.id;
-                nodeListId.push({
-                  lable: presentNode.meta.label,
-                  id: presentNode.id,
-                });
-                const data = nodeListId.length;
-                summaryMes[1].data = data + "";
-                presentTypeNode.value = res.addressId;
-                nodeType.value = true;
-                // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
-              });
+              nodeCreateMes.graph = graph;
+              nodeCreateMes.coordinate = coordinate;
+              nodeType.value = true;
             },
           },
           // {
@@ -2463,6 +2707,7 @@ export default {
                       label: res.blockID,
                       name: res.blockID,
                       prop: "block",
+                      type: "block",
                     },
                   });
                   LogEvent("create new " + res.blockID + ":", res.hash);
@@ -2635,6 +2880,7 @@ export default {
         background: "rgba(255,255,255,0.6)", // 描述文字背景色
       },
       fontList: ["14px Arial", "italic small-caps bold 12px arial"],
+      driver: null,
       summaryMes,
       eventMes,
       linkList,
@@ -2651,6 +2897,7 @@ export default {
       setPresentTypeNode,
       walletData,
       dialogWalletVisible,
+      dialogConWalletVisible,
       checkWallet,
       changetransactionSimVis,
       transSimVisHandleClose,
@@ -2711,6 +2958,17 @@ export default {
       hashRateVis,
       numHashRate,
       setHashRate,
+      setPowMinFindVisible,
+      miningListAdd,
+      miningListSetEm,
+      powMinFindVisible,
+      miningList,
+      perAddNumAdd,
+      setShowFindBlockMes,
+      showFindBlockMes,
+      perAddNumIns,
+      clearDatabaseVisible,
+      changeclearDatabaseVisible,
     };
   },
   created() {
@@ -2729,6 +2987,17 @@ export default {
     this.summaryMes[0].data = data;
   },
   mounted() {
+    //s标识表示simblock页面
+    let params = {
+      auth: this.getAuth(),
+      guide:"s"
+    };
+    needGuide(params).then((res) => {
+      if(res == true){
+        console.log("start guide!!");
+        this.guide();
+      }
+    });
     document.addEventListener("mousemove", this.docMousemove);
     document.addEventListener("mouseup", this.docMouseup);
   },
@@ -2772,7 +3041,7 @@ export default {
     },
 
     nodeClick() {
-      console.log(arguments);
+      console.log("点击了节点 ");
     },
 
     clearCache() {
@@ -2802,6 +3071,33 @@ export default {
       }
       const data = getDataString();
       this.summaryMes[0].data = data;
+    },
+
+    clearDatabase() {
+      const nodegraph = this.$refs.superFlow.graph;
+      // let user = auth.value;
+      let params = {
+        auth: this.getAuth(),
+      };
+      clearCache(params).then((ress) => {
+        const res = ress.preData;
+        if (res == true) {
+          ElMessage({
+            message: "清除数据成功!",
+            type: "success",
+          });
+          nodegraph.nodeList.length = 0;
+          nodegraph.linkList.length = 0;
+          nodeListId.length = 0;
+          blockListId.length = 0;
+          this.summaryMes = summaryMesUpdata;
+          this.LogEvent("清除数据成功 ", null);
+          const router = useRouter();
+        } else {
+          ElMessage.error("清除数据失败!");
+        }
+      });
+      this.changeclearDatabaseVisible();
     },
     //拖拽过程动作
     docMousemove({ clientX, clientY }) {
@@ -2836,71 +3132,16 @@ export default {
             clientX - conf.offsetLeft,
             clientY - conf.offsetTop
           );
-          lastBlockCoordinate.length = 0;
-          lastBlockCoordinate = coordinate;
+
           // 添加节点或区块
           if (conf.info.meta.prop == "node") {
-            let params = {
-              auth: this.getAuth(),
-            };
-            createNewNode(params).then((ress) => {
-              const res = ress.preData;
-              const confInfo = conf.info;
-              confInfo.meta.label = res.addressId;
-              // confInfo.meta.name =
-              this.$refs.superFlow.addNode({
-                width: 100,
-                height: 30,
-                coordinate,
-                meta: {
-                  label: res.addressId,
-                  name: res.addressId,
-                  prop: "node",
-                },
-              });
-              addP2pNet({ addressId: res.addressId, auth: this.getAuth() }).then(
-                (ress) => {
-                  const res = ress.preData;
-                  if (res.success == "true") {
-                    if (res.addressId == "Node1") {
-                      ElMessage({
-                        message: "节点网络初始化!",
-                        type: "success",
-                      });
-                    } else {
-                      ElMessage({
-                        message: "节点网络添加成功!",
-                        type: "success",
-                      });
-                    }
-                  } else {
-                    ElMessage({
-                      message: "节点网络异常!",
-                      type: "warning",
-                    });
-                  }
-                }
-              );
-              this.LogEvent("create new " + res.addressId + ":", res.address);
-              const nodeListIdsdadsaa = this.linkList;
-              // const newNodelist2 = this.$refs.superFlow.graph;
-              const newNodelist = this.$refs.superFlow.graph.nodeList;
-              const presentNode = newNodelist[newNodelist.length - 1];
-              presentNode.meta.name = res.addressId;
-              if (presentNode.meta.prop == "node") {
-                // let presentNodsd=presentNode.id;
-                nodeListId.push({
-                  lable: presentNode.meta.label,
-                  id: presentNode.id,
-                });
-                const data = nodeListId.length;
-                this.summaryMes[1].data = data;
-              }
-              this.setPresentTypeNode(res.addressId);
-              this.changeNodetype();
-              // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
-            });
+            nodeCreateMes.graph = graph;
+            nodeCreateMes.coordinate = coordinate;
+            let dci = nodeCreateMes;
+            this.changeNodetype();
           } else {
+            lastBlockCoordinate.length = 0;
+            lastBlockCoordinate = coordinate;
             const nodeEx = this.haveNodeMe(this.$refs.superFlow.graph);
             if (nodeEx) {
               if (blockListId.length == 0) {
@@ -2915,6 +3156,7 @@ export default {
                       label: res.blockID,
                       name: res.blockID,
                       prop: "block",
+                      type: "block",
                     },
                   });
                   this.LogEvent("create new " + res.blockID + ":", res.hash);
@@ -2949,7 +3191,10 @@ export default {
                       endId: blockListId[lengthblockListId - 1].id,
                       startAt: [100, 24],
                       endAt: [0, 25],
-                      meta: "block",
+                      meta: {
+                        start: blockListId[lengthblockListId - 2].label,
+                        end: blockListId[lengthblockListId - 1].label,
+                      },
                     });
                     this.linkList = targetLinkList;
                   }
@@ -2980,6 +3225,7 @@ export default {
                           label: res.blockID,
                           name: res.blockID,
                           prop: "block",
+                          type: "block",
                         },
                       });
                       this.LogEvent("create new " + res.blockID + ":", res.hash);
@@ -3014,7 +3260,10 @@ export default {
                           endId: blockListId[lengthblockListId - 1].id,
                           startAt: [100, 24],
                           endAt: [0, 25],
-                          meta: "block",
+                          meta: {
+                            start: blockListId[lengthblockListId - 2].label,
+                            end: blockListId[lengthblockListId - 1].label,
+                          },
                         });
                         this.linkList = targetLinkList;
                       }
@@ -3029,7 +3278,7 @@ export default {
                     });
                   } else {
                     ElMessage({
-                      message: "创建非创世块时请先创建产块节点.",
+                      message: "创建非创世块时请先创建挖矿节点.",
                       type: "warning",
                     });
                   }
@@ -3112,39 +3361,53 @@ export default {
               setTimeout(() => {
                 this.increase();
                 getAllMiner({ auth: this.getAuth() }).then((minerLists) => {
-                  const minerList = minerLists.preData;
+                  //提前设置竞争挖矿界面
+                  this.setShowFindBlockMes(res.nonce, res.difficulty);
+                  this.miningListSetEm();
+                  const minerList = minerLists.preData[0];
+                  //算力排序
+                  const powList = minerLists.preData[1];
+                  this.minerNodeSort(powList, res.miner);
                   let str = "";
                   for (let i = 0; i < minerList.length; i++) {
+                    this.miningListAdd({
+                      minPercentage: 0.5,
+                      name: minerList[i],
+                      perAddNum: 2.5,
+                    });
                     str = str + " " + minerList[i];
                   }
-                  this.setShowBlockMes("运行中的产块节点" + str);
-                  setTimeout(() => {
-                    this.increase();
-                    this.setShowBlockMes(
-                      "计算中-" + "nonce:0" + ",targetDifficulty:" + res.difficulty
-                    );
-                    setTimeout(() => {
-                      this.increase();
-                      for (let i = 0; i < res.nonce; i++) {
-                        setTimeout(() => {
-                          this.setShowBlockMes(
-                            "计算中-" +
-                              "nonce:" +
-                              i +
-                              ",targetDifficulty:" +
-                              res.difficulty
-                          );
-                        }, 1000);
+                  for (let i = 0; i < powList.length; i++) {
+                    for (let j = 0; j < minerList.length; j++) {
+                      if (powList[i] == minerList[j]) {
+                        this.perAddNumAdd(2.5 - i * 0.25, j);
                       }
+                    }
+                  }
+                  this.setShowBlockMes("运行中的挖矿节点" + str);
+                  setTimeout(() => {
+                    //模拟竞争挖矿
+                    this.setPowMinFindVisible(true);
+                    this.increase();
+                    this.setShowBlockMes("即将进入所有节点竞争挖矿模拟界面......");
+                    setTimeout(() => {
+                      //挖矿竞争界面处理perAddNumIns
+                      for (let k = 1; k <= 40; k++) {
+                        setTimeout(() => {
+                          this.perAddNumIns();
+                        }, k * 250);
+                      }
+                      this.increase();
                       setTimeout(() => {
+                        this.setPowMinFindVisible(false);
                         this.increase();
                         this.setShowBlockMes(
-                          "产块节点(" + res.miner + ")最先获取到记账权!"
+                          "挖矿节点(" + res.miner + ")最先获取到记账权!"
                         );
                         setTimeout(() => {
                           this.increase();
                           this.setShowBlockMes(
-                            "产块节点(" + res.miner + ")开始处理未确定交易等事务!"
+                            "挖矿节点(" + res.miner + ")开始处理未确定交易等事务!"
                           );
                           setTimeout(() => {
                             this.increase();
@@ -3169,6 +3432,7 @@ export default {
                                       label: res.blockID,
                                       name: res.blockID,
                                       prop: "block",
+                                      type: "block",
                                     },
                                   });
                                   this.LogEvent(
@@ -3208,7 +3472,10 @@ export default {
                                       endId: blockListId[lengthblockListId - 1].id,
                                       startAt: [100, 24],
                                       endAt: [0, 25],
-                                      meta: "block",
+                                      meta: {
+                                        start: blockListId[lengthblockListId - 2].label,
+                                        end: blockListId[lengthblockListId - 1].label,
+                                      },
                                     });
                                     this.linkList = targetLinkList;
                                   }
@@ -3220,22 +3487,22 @@ export default {
                                   setTimeout(() => {
                                     this.setPowFindVisible(false);
                                     this.setShowBlockMes(" ");
-                                  }, 500);
-                                }, 1000);
-                              }, 1000);
-                            }, 1000);
-                          }, 1000);
-                        }, 1000);
-                      }, 2300);
-                    }, 500);
-                  }, 500);
+                                  }, 2000);
+                                }, 2000);
+                              }, 2000);
+                            }, 2000);
+                          }, 2000);
+                        }, 2000);
+                      }, 11000);
+                    }, 2000);
+                  }, 2000);
                 });
-              }, 500);
+              }, 2000);
             });
           } else {
             this.setPowFindVisible(false);
             ElMessage({
-              message: "创建非创世块时请先创建产块节点.",
+              message: "创建非创世块时请先创建挖矿节点.",
               type: "warning",
             });
           }
@@ -3243,7 +3510,7 @@ export default {
       } else {
         this.setPowFindVisible(false);
         ElMessage({
-          message: "挖矿前请先创建产块节点或创世块.",
+          message: "挖矿前请先创建挖矿节点或创世块.",
           type: "warning",
         });
       }
@@ -3251,7 +3518,6 @@ export default {
 
     //模拟区块传输和交易传输时连线添加
     addNewNodeLink(start, end) {
-      console.log("add:" + start + "-" + end);
       let startuuid = "";
       let enduuid = "";
       for (let i = 0; i < nodeListId.length; i++) {
@@ -3273,9 +3539,9 @@ export default {
         id: newId,
         startId: startuuid,
         endId: enduuid,
-        startAt: [100, 24],
-        endAt: [0, 25],
-        meta: "node",
+        startAt: [100, 15],
+        endAt: [0, 15],
+        meta: { start: start, end: end },
       });
       this.linkList = targetLinkList;
     },
@@ -3306,10 +3572,11 @@ export default {
     //删除当前存在的所有节点连线
     removeAllNodeLink() {
       const lengthLinklength = this.linkList.length;
+      let sdada = this.linkList;
       const targetLinkList = [];
       if (lengthLinklength > 0) {
         for (var i = 0; i < lengthLinklength; i++) {
-          if (this.linkList[i].meta != "node") {
+          if (this.linkList[i].meta.start.indexOf("Node") == -1) {
             targetLinkList.push(this.linkList[i]);
           } else {
             console.log(
@@ -3320,6 +3587,7 @@ export default {
       }
       this.linkList = targetLinkList;
     },
+    //分叉链
     BifurcatedChainCreate(res) {
       setTimeout(() => {
         this.setStatus("");
@@ -3330,30 +3598,47 @@ export default {
         setTimeout(() => {
           this.increase();
           getAllMiner({ auth: this.getAuth() }).then((minerLists) => {
-            const minerList = minerLists.preData;
+            this.setShowFindBlockMes(res[0].nonce, res[0].difficulty);
+            this.miningListSetEm();
+            const minerList = minerLists.preData[0];
+            const powList = minerLists.preData[1];
+            this.minerNodeSort(powList, res[0].miner);
+            this.minerNodeSort(powList, res[1].miner);
             let str = "";
             for (let i = 0; i < minerList.length; i++) {
+              this.miningListAdd({
+                minPercentage: 0.5,
+                name: minerList[i],
+                perAddNum: 2.5,
+              });
               str = str + " " + minerList[i];
             }
-            this.setShowBlockMes("运行中的产块节点" + str);
+            for (let i = 2; i < powList.length; i++) {
+              for (let j = 0; j < minerList.length; j++) {
+                if (powList[i] == minerList[j]) {
+                  this.perAddNumAdd(2.5 - i * 0.25, j);
+                }
+              }
+            }
+            this.setShowBlockMes("运行中的挖矿 节点" + str);
             setTimeout(() => {
               this.increase();
-              this.setShowBlockMes(
-                "计算中-" + "nonce:0" + ",targetDifficulty:" + res[0].difficulty
-              );
+              //模拟竞争挖矿
+              this.setPowMinFindVisible(true);
+              this.setShowBlockMes("即将进入所有节点竞争挖矿模拟界面......");
               setTimeout(() => {
-                this.increase();
-                for (let i = 0; i < res[0].nonce; i++) {
+                //挖矿竞争界面处理perAddNumIns
+                for (let k = 1; k <= 40; k++) {
                   setTimeout(() => {
-                    this.setShowBlockMes(
-                      "计算中-" + "nonce:" + i + ",targetDifficulty:" + res[0].difficulty
-                    );
-                  }, 1000);
+                    this.perAddNumIns();
+                  }, k * 250);
                 }
+                this.increase();
                 setTimeout(() => {
+                  this.setPowMinFindVisible(false);
                   this.increase();
                   this.setShowBlockMes(
-                    "产块节点(" +
+                    "挖矿节点(" +
                       res[0].miner +
                       "和" +
                       res[1].miner +
@@ -3361,10 +3646,15 @@ export default {
                   );
                   setTimeout(() => {
                     this.increase();
-                    this.setShowBlockMes("产块节点开始处理交易池内unconfirmed事务!");
+                    this.setShowBlockMes("挖矿节点开始处理交易池内unconfirmed事务!");
                     setTimeout(() => {
                       this.increase();
-                      this.setShowBlockMes("unconfirmed事务id:" + res[0].transactions);
+                      this.setShowBlockMes(
+                        "unconfirmed事务id:" +
+                          res[0].transactions +
+                          "," +
+                          res[1].transactions
+                      );
                       setTimeout(() => {
                         this.increase();
                         this.setShowBlockMes("unconfirmed事务处理完毕");
@@ -3400,18 +3690,18 @@ export default {
                             setTimeout(() => {
                               this.setPowFindVisible(false);
                               this.setShowBlockMes(" ");
-                            }, 500);
-                          }, 1000);
-                        }, 1000);
-                      }, 1000);
-                    }, 1000);
-                  }, 1000);
-                }, 2400);
-              }, 1000);
-            }, 1000);
+                            }, 2000);
+                          }, 2000);
+                        }, 2000);
+                      }, 2000);
+                    }, 2000);
+                  }, 2000);
+                }, 11000);
+              }, 2000);
+            }, 2000);
           });
-        }, 1000);
-      }, 500);
+        }, 2000);
+      }, 300);
     },
     //添加画板节点
     addSuperNode(coordinate, res, type) {
@@ -3423,6 +3713,7 @@ export default {
           label: res.blockID,
           name: res.blockID,
           prop: type,
+          type: "block",
         },
       });
       const newBlocklist = this.$refs.superFlow.graph.nodeList;
@@ -3466,7 +3757,7 @@ export default {
         endId: enduuid,
         startAt: [100, 24],
         endAt: [0, 25],
-        meta: "block",
+        meta: { start: start, end: end },
       });
       this.linkList = targetLinkList;
     },
@@ -3496,6 +3787,228 @@ export default {
         }
       }
       return end;
+    },
+    minerNodeSort(list, miner) {
+      list.unshift(miner);
+      for (let i = 1; i < list.length; i++) {
+        if (list[i] === miner) {
+          list.splice(i, 1);
+        }
+      }
+      let i = list;
+      let g = list;
+    },
+    //网络节点连线添加
+    localNetWorkAdd(list) {
+      if (list.length == 1) {
+        return;
+      } else {
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].neighbourOne != null) {
+            if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourOne)) {
+              this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourOne);
+            }
+            if (list[i].neighbourTwo != null) {
+              if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourTwo)) {
+                this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourTwo);
+              }
+            }
+            if (list[i].neighbourThree != null) {
+              if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourThree)) {
+                this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourThree);
+              }
+            }
+          }
+        }
+      }
+    },
+    isLinkExist(start, end) {
+      let localLinkList = this.$refs.superFlow.graph.linkList;
+      for (let i = 0; i < localLinkList.length; i++) {
+        let rqw = start === localLinkList[i].meta.start;
+        let sdas = end === localLinkList[i].meta.end;
+        if (start === localLinkList[i].meta.start && end === localLinkList[i].meta.end) {
+          return false;
+        } else if (
+          end === localLinkList[i].meta.start &&
+          start === localLinkList[i].meta.end
+        ) {
+          return false;
+        }
+      }
+      return true;
+    },
+    bothWayLinkAdd(start, end) {
+      let needBoth = false;
+      if (start > end == true) {
+        needBoth = true;
+      }
+      this.addNewBothNodeLink(start, end, needBoth);
+    },
+    addNewBothNodeLink(start, end, neddBoth?) {
+      let startuuid = "";
+      let enduuid = "";
+      for (let i = 0; i < nodeListId.length; i++) {
+        if (nodeListId[i].lable == start) {
+          startuuid = nodeListId[i].id;
+        } else if (nodeListId[i].lable == end) {
+          enduuid = nodeListId[i].id;
+        }
+      }
+      const newId = uuid("node" + end);
+      const lengthLinklength = this.linkList.length;
+      const difDist = [
+        [100, 15],
+        [50, 0],
+        [50, 30],
+      ];
+      const targetLinkList = [];
+      if (lengthLinklength > 0) {
+        for (var i = 0; i < lengthLinklength; i++) {
+          targetLinkList.push(this.linkList[i]);
+          if (start == this.linkList[i].meta.start) {
+            for (let j = 0; j < difDist.length; j++) {
+              if (
+                difDist[j][0] == this.linkList[i].startAt[0] &&
+                difDist[j][1] == this.linkList[i].startAt[1]
+              ) {
+                difDist.splice(j, 1);
+              }
+            }
+          }
+        }
+      }
+      if (neddBoth == false) {
+        targetLinkList.push({
+          id: newId,
+          startId: startuuid,
+          endId: enduuid,
+          startAt: difDist[0],
+          endAt: [0, 15],
+          meta: { start: start, end: end },
+        });
+      } else {
+        for (var i = 0; i < lengthLinklength; i++) {
+          if (
+            start == targetLinkList[i].meta.end &&
+            targetLinkList[i].endAt[0] == 0 &&
+            targetLinkList[i].endAt[1] == 15
+          ) {
+            targetLinkList.push({
+              id: newId,
+              startId: startuuid,
+              endId: enduuid,
+              startAt: [0, 15],
+              endAt: targetLinkList[i].startAt,
+              meta: { start: start, end: end },
+            });
+          }
+        }
+      }
+
+      this.linkList = targetLinkList;
+    },
+    setNodeLists() {
+      const lengthLinklength = this.linkList.length;
+      nodeLinkListId.length = 0;
+      if (lengthLinklength > 0) {
+        for (var i = 0; i < lengthLinklength; i++) {
+          if (this.linkList[i].meta.start.indexOf("Node") != -1) {
+            nodeLinkListId.push(this.linkList[i]);
+          }
+        }
+      }
+    },
+    makeNodelistVis() {
+      const lengthLinklength = this.linkList.length;
+      const lengthnodeLinklength = nodeLinkListId.length;
+      const targetLinkList = [];
+      if (lengthLinklength > 0) {
+        for (var i = 0; i < lengthLinklength; i++) {
+          targetLinkList.push(this.linkList[i]);
+        }
+      }
+      if (lengthnodeLinklength > 0) {
+        for (var i = 0; i < lengthnodeLinklength; i++) {
+          targetLinkList.push(nodeLinkListId[i]);
+        }
+      }
+      this.linkList = targetLinkList;
+    },
+    guide() {
+// leftMenuGuide
+// flowMenuGuide
+// summaryGuide
+// eventMenuGuide
+      this.$nextTick(function () {
+        const steps = [
+          {
+            element: "#node1",
+            popover: {
+              title: "Tip",
+              description: "仿真的开始需要先创建节点。",
+              position: "bottom",//top
+            }
+          },
+          {
+            element: "#block1",
+            popover: {
+              title: "Tip",
+              description: "节点的相应操作需要创建区块。",
+              position: "bottom",//top
+            }
+          },
+          {
+            element: "#leftMenuGuide",
+            popover: {
+              title: "Tip",
+              description: "节点和区块相应的操作栏。",
+              position: "top",//top
+            }
+          },
+          {
+            element: "#clearDataGuide",
+            popover: {
+              title: "Tip",
+              description: "清空所有缓存数据的功能按钮",
+              position: "bottom",//top
+            }
+          },
+          {
+            element: "#flowMenuGuide",
+            popover: {
+              title: "Tip",
+              description: "仿真主要容纳处,节点和区块创建可拖拽至此处。",
+              position: "top",//top
+            }
+          },{
+            element: "#summaryGuide",
+            popover: {
+              title: "Tip",
+              description: "仿真过程中的概要信息显示在此处！",
+              position: "bottom",//top
+            }
+          },{
+            element: "#eventMenuGuide",
+            popover: {
+              title: "Tip",
+              description: "仿真过程中的详情信息显示在此处！",
+              position: "top",//top
+            }
+          },
+        ];
+        this.driver = new Driver({
+          doneBtnText: "完成", // 结束按钮的文字
+          animate: true, // 动画
+          opacity: 0.55,  // 遮罩层不透明度（0表示仅弹出且不覆盖）
+          stageBackground: "#ffffff", // 突出显示元素的背景颜色
+          nextBtnText: "下一步", // 下一步按钮的文字
+          prevBtnText: "上一步", // 上一步按钮的文字
+          closeBtnText: "关闭", // 关闭按钮的文字
+        });
+        this.driver.defineSteps(steps);
+        this.driver.start();
+      });
     },
   },
 };
@@ -3600,10 +4113,10 @@ export default {
 }
 @font-face {
   font-family: "iconfont"; /* Project id 3114720 */
-  src: url("//at.alicdn.com/t/font_3114720_6un57zlzj6s.woff2?t=1642514768733")
+  src: url("//at.alicdn.com/t/font_3114720_53ytv0qyp8e.woff2?t=1650037385345")
       format("woff2"),
-    url("//at.alicdn.com/t/font_3114720_6un57zlzj6s.woff?t=1642514768733") format("woff"),
-    url("//at.alicdn.com/t/font_3114720_6un57zlzj6s.ttf?t=1642514768733")
+    url("//at.alicdn.com/t/font_3114720_53ytv0qyp8e.woff?t=1650037385345") format("woff"),
+    url("//at.alicdn.com/t/font_3114720_53ytv0qyp8e.ttf?t=1650037385345")
       format("truetype");
 }
 .iconfont {
@@ -3680,5 +4193,47 @@ export default {
   color: rgba(255, 255, 255, 0);
   cursor: pointer;
   padding-left: 100px;
+}
+.icon-text {
+  font-size: 13.5px;
+  line-height: 100%;
+  text-align: center;
+}
+.fullNode {
+  background-color: rgb(205, 254, 156);
+}
+
+.block {
+  background-color: rgb(187, 187, 187);
+}
+.lightNode {
+  background-color: aquamarine;
+}
+.miningNode {
+  background-color: rgb(255, 153, 127);
+}
+.textEvent {
+  width: 260px;
+  height: auto;
+  white-space: pre-line;
+  overflow-wrap: break-word;
+  /*就是下面这一句，好像网上没有这一个的说明，但是浏览器都支持*/
+  word-break: break-word;
+  word-wrap: break-word;
+}
+.textNode {
+  padding-top: 20px;
+  height: 30px;
+  width: 100%;
+  text-align: center;
+  line-height: 30px;
+  font-weight: bold;
+}
+.demo-progress .el-progress--line {
+  margin-bottom: 1px;
+  width: 350px;
+}
+[class*="driver-close-btn"] {
+    visibility: hidden;
 }
 </style>

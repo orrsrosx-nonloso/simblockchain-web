@@ -71,12 +71,6 @@ onMounted(() => {
 
 function handleSelect(route) {
   state.activeIndex = route;
-  if (route.indexOf("singleSim") != -1 || route.indexOf("wholeSim") != -1) {
-    props.isCollapse = true;
-    emit("changeCollapse", {
-      isCollapse: props.isCollapse,
-    });
-  }
   router.push(route);
 }
 

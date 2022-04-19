@@ -19,6 +19,7 @@
           </el-descriptions-item>
           
           <el-descriptions-item label="基本描述" label-align="left" align="left">本项目主要为区块链的仿真实验平台,仿真内容包括单流程仿真和全流程仿真</el-descriptions-item>
+          <el-descriptions-item label="推荐浏览器" label-align="left" align="left">Google Chrome/Microsoft Edge</el-descriptions-item>
          
         </el-descriptions></el-form
       >
