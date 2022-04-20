@@ -206,7 +206,7 @@ const tableColumn = [
   },
   {
     type: "action",
-    label: "操作列",
+    label: "操作",
     width: "150",
     actionBtn: [
       // 如果要做权限，这里的funName需要和路由菜单中meta的auth一致
@@ -217,12 +217,12 @@ const tableColumn = [
       {
         funName: "edit",
         color: "orange",
-        title: "重置",
+        title: "重置密码",
       },
       {
         funName: "del",
         color: "red",
-        title: "删除",
+        title: "删除用户",
       },
     ],
   },
