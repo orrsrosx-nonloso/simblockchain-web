@@ -1927,24 +1927,6 @@ export default {
             label: nodeListId[i].lable,
           });
         }
-        setTimeout(() => {
-          let targetlist = this.getNearTransNode(graph.linkList);
-          if (targetlist.valueTrans1 != "" && targetlist.valueTrans2 != "") {
-            ElMessageBox.alert(
-              "画布中存在预设交易值！(" +
-                targetlist.valueTrans1 +
-                "=>" +
-                targetlist.valueTrans2 +
-                ")",
-              "通知",
-              {
-                confirmButtonText: "OK",
-              }
-            );
-            valueTrans1.value = targetlist.valueTrans1;
-            valueTrans2.value = targetlist.valueTrans2;
-          }
-        }, 100);
       }
     };
 
