@@ -14,7 +14,7 @@
       <template v-if="menu.children">
         <submenu :menu="menu" :parentRoute="'/layout/' + menu.path + '/'" />
       </template>
-      <el-menu-item :index="'/layout/' + menu.path" v-else>
+      <el-menu-item  @click='toParentRes' :index="'/layout/' + menu.path" v-else>
         <template #title>
           <el-icon v-if="menu.title == `主界面`"><icon-menu /></el-icon>
           <el-icon v-if="menu.title == `用户权限`"><UserFilled /></el-icon>
@@ -49,13 +49,22 @@ const props = defineProps({
   isCollapse: Boolean,
 });
 
-const emit = defineEmits(["changeCollapse"]);
 
 function setCollapse(bol) {
   props.isCollapse = bol;
   emit("changeCollapse", {
     isCollapse: props.isCollapse,
   });
+}
+const emits = defineEmits(["emitToParent"]);
+function toParentRes() {
+  let screenWidth = document.body.clientWidth;
+  let minSize = 1366;
+  if (screenWidth < minSize) {
+    emits('emitToParent', false)
+  } else {
+    console.log('setIsPhone', false)
+  }
 }
 
 const routes = router.getRoutes();

@@ -19,7 +19,7 @@
     </div>
     <!-- 手机导航栏 -->
     <el-drawer v-model="state.drawer" direction="ltr" size="20%" title="SBC MENU">
-      <navMenu mode="vertical"></navMenu>
+      <navMenu :optionsData='state.drawer' @emitToParent='getBRes' mode="vertical"></navMenu>
     </el-drawer>
   </div>
 </template>
@@ -42,9 +42,12 @@ const state = reactive({
 });
 
 function openDrawer() {
-  console.log(state.drawer);
   state.drawer = true;
-  console.log(state.drawer);
+}
+
+//返回设置zhi
+function getBRes(data) {
+  state.drawer = data;
 }
 let driver = null;
 function guides() {
