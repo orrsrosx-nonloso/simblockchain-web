@@ -2,7 +2,7 @@
   <el-scrollbar height="110%">
     <el-row :gutter="3">
       <el-col :span="3"
-        ><div class="grid-content" id ="leftMenuGuide">
+        ><div class="grid-content" id="leftMenuGuide">
           <div class="base_title">节点操作</div>
           <div class="drag-box">
             <!-- <el-button
@@ -32,7 +32,7 @@
             </el-dropdown>
             <el-dialog
               v-model="transactionSimVis"
-              title="模拟交易"
+              title="模拟交易(交易账户为节点内默认账户)"
               width="50%"
               :before-close="transSimVisHandleClose"
             >
@@ -299,7 +299,10 @@
                       content="清除当前仿真所有数据"
                       placement="top-start"
                     >
-                      <el-button id="clearDataGuide" @click="clearDatabaseVisible = true" style="left: 0"
+                      <el-button
+                        id="clearDataGuide"
+                        @click="clearDatabaseVisible = true"
+                        style="left: 0"
                         >清空数据</el-button
                       >
                     </el-tooltip>
@@ -338,7 +341,7 @@
                   </div>
                 </div>
               </template>
-              <div class="flow-container" id = "flowMenuGuide" ref="flowContainer">
+              <div class="flow-container" id="flowMenuGuide" ref="flowContainer">
                 <c-scrollbar maxHeight="538px" trigger="hover">
                   <super-flow
                     ref="superFlow"
@@ -475,7 +478,11 @@
       ></el-col>
       <el-col :span="6"
         ><div class="grid-content bg-purple-light">
-          <el-card id="summaryGuide" class="box-card" :body-style="{ padding: '5px', height: '236px' }">
+          <el-card
+            id="summaryGuide"
+            class="box-card"
+            :body-style="{ padding: '5px', height: '236px' }"
+          >
             <template #header>
               <div class="card-header" style="font-weight: bold">
                 <span>SUMMARY</span>
@@ -492,7 +499,11 @@
               >
             </div>
           </el-card>
-          <el-card  id="eventMenuGuide" class="box-card" :body-style="{ padding: '5px', height: '237px' }">
+          <el-card
+            id="eventMenuGuide"
+            class="box-card"
+            :body-style="{ padding: '5px', height: '237px' }"
+          >
             <template #header>
               <div class="card-header" style="font-weight: bold">
                 <span>EVENT</span>
@@ -1042,7 +1053,7 @@ import {
   editRewardPre,
   findFullNodeToEnquire,
   setMinerHashRate,
-  needGuide
+  needGuide,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -2972,14 +2983,21 @@ export default {
     //s标识表示simblock页面
     let params = {
       auth: this.getAuth(),
-      guide:"s"
+      guide: "s",
     };
-    needGuide(params).then((res) => {
-      if(res == true){
-        console.log("start guide!!");
-        this.guide();
-      }
-    });
+    let screenWidth = document.body.clientWidth;
+    let minSize = 1366;
+    //手机端暂时不进行引导
+    if (screenWidth < minSize) {
+    } else {
+      needGuide(params).then((res) => {
+        if (res == true) {
+          console.log("start guide!!");
+          this.guide();
+        }
+      });
+    }
+
     document.addEventListener("mousemove", this.docMousemove);
     document.addEventListener("mouseup", this.docMouseup);
   },
@@ -3918,10 +3936,10 @@ export default {
       this.linkList = targetLinkList;
     },
     guide() {
-// leftMenuGuide
-// flowMenuGuide
-// summaryGuide
-// eventMenuGuide
+      // leftMenuGuide
+      // flowMenuGuide
+      // summaryGuide
+      // eventMenuGuide
       this.$nextTick(function () {
         const steps = [
           {
@@ -3929,60 +3947,62 @@ export default {
             popover: {
               title: "Tip",
               description: "仿真的开始需要先创建节点。",
-              position: "bottom",//top
-            }
+              position: "bottom", //top
+            },
           },
           {
             element: "#block1",
             popover: {
               title: "Tip",
               description: "节点的相应操作需要创建区块。",
-              position: "bottom",//top
-            }
+              position: "bottom", //top
+            },
           },
           {
             element: "#leftMenuGuide",
             popover: {
               title: "Tip",
               description: "节点和区块相应的操作栏。",
-              position: "top",//top
-            }
+              position: "top", //top
+            },
           },
           {
             element: "#clearDataGuide",
             popover: {
               title: "Tip",
               description: "清空所有缓存数据的功能按钮",
-              position: "bottom",//top
-            }
+              position: "bottom", //top
+            },
           },
           {
             element: "#flowMenuGuide",
             popover: {
               title: "Tip",
               description: "仿真主要容纳处,节点和区块创建可拖拽至此处。",
-              position: "top",//top
-            }
-          },{
+              position: "top", //top
+            },
+          },
+          {
             element: "#summaryGuide",
             popover: {
               title: "Tip",
               description: "仿真过程中的概要信息显示在此处！",
-              position: "bottom",//top
-            }
-          },{
+              position: "bottom", //top
+            },
+          },
+          {
             element: "#eventMenuGuide",
             popover: {
               title: "Tip",
               description: "仿真过程中的详情信息显示在此处！",
-              position: "top",//top
-            }
+              position: "top", //top
+            },
           },
         ];
         this.driver = new Driver({
           doneBtnText: "完成", // 结束按钮的文字
           animate: true, // 动画
-          opacity: 0.55,  // 遮罩层不透明度（0表示仅弹出且不覆盖）
+          opacity: 0.55, // 遮罩层不透明度（0表示仅弹出且不覆盖）
           stageBackground: "#ffffff", // 突出显示元素的背景颜色
           nextBtnText: "下一步", // 下一步按钮的文字
           prevBtnText: "上一步", // 上一步按钮的文字
@@ -4216,6 +4236,6 @@ export default {
   width: 350px;
 }
 [class*="driver-close-btn"] {
-    visibility: hidden;
+  visibility: hidden;
 }
 </style>
