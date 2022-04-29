@@ -4,7 +4,7 @@
       <canvas id="myCanvas" :width="width" :height="height"> </canvas>
     </div>
     <div v-if="status == 1" id="loginBox">
-      <h4>SIMBLOCKCHAIN</h4>
+      <h4>SBC</h4>
       <el-form label-width="0px" :model="state.formLabelAlign">
         <el-form-item label="" prop="userName" style="margin-top: 40px">
           <el-row>
