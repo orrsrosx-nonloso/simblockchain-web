@@ -2,3 +2,5 @@
 ## Folders                  ##
 ##############################
 node_modules
+.VSCodeCounter
+dist

@@ -5,6 +5,65 @@
         ><div class="grid-content" id="leftMenuGuide">
           <div class="base_title">节点操作</div>
           <div class="drag-box">
+            <el-dropdown>
+              <el-button class="opButtontdrwaer2" type="primary" size="small"
+                >账户操作
+                <arrow-down />
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    @click="createAccountVis(drwaerDateNode.addressId, null)"
+                    >创建账户</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="findAllAccount"
+                    >查看所有账户</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-dialog v-model="accountCreateVis" title="账户创建" width="30%">
+              <div>
+                <!-- <span
+                  >账户名:<el-input
+                    v-model="accountNameC"
+                    placeholder="输入为空时会随机生成账户名"
+                /></span> -->
+                <el-form :inline="true" :model="accountNameC" class="demo-form-inline">
+                  <el-form-item label="目标节点:">
+                    <el-input
+                      v-model="localeNode"
+                      disabled
+                      placeholder="无目标时生成空账户"
+                    />
+                  </el-form-item>
+                  <el-form-item label="账户名称:">
+                    <el-input
+                      v-model="accountNameC"
+                      placeholder="输入为空时会生成随机账户"
+                    />
+                  </el-form-item>
+                </el-form>
+              </div>
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="accountCreateVis = false">关闭</el-button>
+                  <el-button type="primary" @click="startCreateAccount()">创建</el-button>
+                </span>
+              </template>
+            </el-dialog>
+            <el-dialog v-model="dialogAllAccountVisible" width="840px">
+              <el-table :data="AllAccountData" height="300" style="width: 100%">
+                <el-table-column prop="accountName" label="账户名称" width="200" />
+                <el-table-column prop="address" label="账户地址" width="200" />
+                <el-table-column prop="transactions" label="交易数量" width="100" />
+                <el-table-column prop="totalReceived" label="接收总量" width="100" />
+                <el-table-column prop="totalSent" label="发送总量" width="100" />
+                <el-table-column prop="balance" label="账户余额" width="100" />
+              </el-table>
+            </el-dialog>
+          </div>
+          <div class="drag-box">
             <!-- <el-button
               class="opButton"
               type="primary"
@@ -377,35 +436,53 @@
 
               <el-dialog
                 v-model="nodeType"
-                title="节点类型选择"
+                title="节点类型"
                 width="30%"
                 :show-close="false"
                 :before-close="nodetypeHandleClose"
               >
-                <div :model="presentTypeNode" style="left: 0">请选择节点类型</div>
-                <div>
+                <div :model="presentTypeNode" style="left: 0; padding-bottom: 20px">
+                  请选择节点类型
+                </div>
+                <div class="nodeCreateD">
                   <el-tooltip
                     content="包含完整的区块链数据（默认包含完整的网络路由功能）!"
                     placement="top"
                   >
                     <el-radio v-model="nodeTypeChoose" label="fullNode" size="large"
-                      >全节点</el-radio
+                      ><div class="fullCreateNode">
+                        <i class="iconfont"
+                          >&#xe63e;<span class="icon-text">全节点</span></i
+                        >
+                      </div></el-radio
                     ></el-tooltip
                   >
+                </div>
+                <div>
                   <el-tooltip
                     content="仅包含区块头数据,移动端使用较多（默认包含完整的网络路由功能）!"
                     placement="top"
                   >
                     <el-radio v-model="nodeTypeChoose" label="lightNode" size="large"
-                      >轻节点</el-radio
+                      ><div class="lightCreateNode">
+                        <i class="iconfont"
+                          >&#xe63e;<span class="icon-text">轻节点</span></i
+                        >
+                      </div></el-radio
                     ></el-tooltip
                   >
+                </div>
+                <div>
                   <el-tooltip
                     content="负责产生区块的节点（默认包含完整的网络路由功能和区块链数据）!"
                     placement="top"
                   >
                     <el-radio v-model="nodeTypeChoose" label="miningNode" size="large"
-                      >挖矿节点</el-radio
+                      ><div class="miningCreateNode">
+                        <i class="iconfont"
+                          >&#xe63e;<span class="icon-text">挖矿节点</span></i
+                        >
+                      </div></el-radio
                     ></el-tooltip
                   >
                 </div>
@@ -702,8 +779,120 @@
                   >{{ drwaerDateNode.hashRate }} kH/s</el-descriptions-item
                 >
               </el-descriptions>
-              <div class="textNode">节点内默认账户详情</div>
-              <el-descriptions :column="1" border width="50px">
+              <div class="textNode">节点内账户详情</div>
+              <div v-if="drwaerDateNode.accountList == null" class="textStatusNode">
+                当前节点不包含任何账户<el-button
+                  @click="createAccountVis(drwaerDateNode.addressId, 'dialog2')"
+                  type="text"
+                  >创建账户</el-button
+                >
+              </div>
+              <div
+                v-if="drwaerDateNode.accountList != null"
+                class="textStatusNode"
+                style="padding-left: 30%"
+              >
+                <el-button
+                  type="text"
+                  @click="createAccountVis(drwaerDateNode.addressId, 'dialog2')"
+                  >添加账户</el-button
+                >
+              </div>
+              <div style="width: 100%; height: 350px">
+                <c-scrollbar maxHeight="350px">
+                  <el-collapse
+                    v-if="drwaerDateNode.accountList != null"
+                    height="100%"
+                    v-model="activeName"
+                    accordion
+                  >
+                    <el-collapse-item
+                      v-for="item in drwaerDateNodeAccount"
+                      :name="item.id"
+                    >
+                      <!-- 自定义标题 -->
+                      <template #title>
+                        <div style="margin-left = 10px">{{ item.accountName }}</div>
+                      </template>
+                      <el-descriptions :column="1" border width="50px">
+                        <el-descriptions-item
+                          width="250px"
+                          label="AccountID"
+                          label-align="center"
+                          align="center"
+                          >{{ item.accountId }}</el-descriptions-item
+                        >
+                        <el-descriptions-item
+                          label="Transactions"
+                          label-align="center"
+                          align="center"
+                          width="250px"
+                          >{{ item.transactions }}</el-descriptions-item
+                        >
+                        <el-descriptions-item
+                          label="Total Received"
+                          label-align="center"
+                          align="center"
+                          width="250px"
+                        >
+                          {{ item.totalReceived }}</el-descriptions-item
+                        >
+                        <el-descriptions-item
+                          label="Total Sent"
+                          label-align="center"
+                          align="center"
+                          width="250px"
+                        >
+                          {{ item.totalSent }}
+                        </el-descriptions-item>
+                        <el-descriptions-item
+                          label="Final Balance"
+                          label-align="center"
+                          align="center"
+                          width="250px"
+                          >{{ item.balance }}</el-descriptions-item
+                        >
+                        <el-descriptions-item
+                          label="Wallet Id"
+                          label-align="center"
+                          align="center"
+                          width="250px"
+                          >{{ item.walletId
+                          }}<el-button type="text" @click="checkWallet(item.walletId)"
+                            >查看</el-button
+                          ></el-descriptions-item
+                        >
+                        <el-descriptions-item
+                          label="交易列表ID"
+                          label-align="center"
+                          align="center"
+                          width="250px"
+                        >
+                          <el-tooltip
+                            v-if="drwaerDateNode.nodeType == `lightNode`"
+                            content="轻节点内账户的交易信息需要通过其他全节点查询!"
+                            placement="top"
+                            ><el-button
+                              size="small"
+                              @click="findLightListTransList2(item.transactionId)"
+                              round
+                              >查询交易
+                            </el-button>
+                          </el-tooltip>
+
+                          <el-button
+                            v-if="drwaerDateNode.nodeType != `lightNode`"
+                            type="text"
+                            @click="findTransList2(item.transactionId)"
+                            >{{ item.transactionId }}</el-button
+                          >
+                        </el-descriptions-item>
+                      </el-descriptions>
+                    </el-collapse-item>
+                  </el-collapse>
+                </c-scrollbar>
+              </div>
+              <!-- <el-descriptions :column="1" border width="50px">
                 <el-descriptions-item
                   width="50px"
                   label="AddressID"
@@ -770,7 +959,7 @@
                     >{{ drwaerDateNode.transactionId }}</el-button
                   >
                 </el-descriptions-item>
-              </el-descriptions>
+              </el-descriptions> -->
 
               <el-drawer
                 v-model="innerDrawer2"
@@ -809,12 +998,12 @@
                 </c-scrollbar>
               </el-drawer>
             </el-form>
-            <div class="demo-drawer__footer">
+            <!-- <div class="demo-drawer__footer">
               <el-button @click="cancelForm2">Cancel</el-button>
-              <!-- <el-button type="primary" :loading="loading" @click="onClick2">{{
+              <el-button type="primary" :loading="loading" @click="onClick2">{{
                 loading ? "Submitting ..." : "Submit"
-              }}</el-button> -->
-            </div>
+              }}</el-button>
+            </div> -->
           </div>
         </el-drawer>
       </el-col>
@@ -1054,6 +1243,10 @@ import {
   findFullNodeToEnquire,
   setMinerHashRate,
   needGuide,
+  createAccount,
+  deleteAccount,
+  findAllAccount,
+  findAccountList,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -1111,6 +1304,9 @@ const nodeLinkListId = reactive([]);
 const nodeListId = reactive([]);
 //区块数据存储
 const blockListId = reactive([]);
+
+//账户数据存储
+const accountListId = reactive([]);
 
 //总连线集合
 const totalLinkList = reactive([]);
@@ -1356,8 +1552,8 @@ export default {
             // 动画关闭需要一定的时间
             setTimeout(() => {
               loading.value = false;
-            }, 400);
-          }, 2000);
+            }, 200);
+          }, 200);
         })
         .catch(() => {
           // catch error
@@ -1393,6 +1589,14 @@ export default {
       }
     };
 
+    const drawerFalse = (name) => {
+      if (name == "dialog") {
+        dialog.value = false;
+      } else if (name == "dialog2") {
+        dialog2.value = false;
+      }
+    };
+
     return {
       disabled,
       node1,
@@ -1410,6 +1614,7 @@ export default {
       dialog,
       dialog2,
       drawerTrue,
+      drawerFalse,
       loading,
       form,
       onClick,
@@ -1431,6 +1636,15 @@ export default {
     };
   },
   data() {
+    //获取当前用户
+    const store = useStore();
+
+    const auth = computed(() => {
+      return store.getters.authGetter;
+    });
+    const getAuth = () => {
+      return auth.value;
+    };
     const clearDatabaseVisible = ref(false);
 
     const changeclearDatabaseVisible = () => {
@@ -1528,6 +1742,107 @@ export default {
       this.summaryMes[0].data = data;
     };
 
+    //用户详情类
+    const accountSttus = ref(false);
+    //创建界面
+    const accountCreateVis = ref(false);
+    const changeAccountVis = () => {
+      if (accountCreateVis.value == true) {
+        accountCreateVis.value = false;
+      } else {
+        accountCreateVis.value = true;
+      }
+    };
+    //创建用户界面显示
+    let localeNode = ref(null); //每次创建结束之后置空
+    let accountNameC = ref("");
+    const createAccountVis = (value?, drawer?) => {
+      if (value != null) {
+        localeNode.value = value;
+      }
+      changeAccountVis();
+      if (drawer != null) {
+        this.drawerFalse(drawer);
+      }
+    };
+    //账户接口参数
+    let accountInput = reactive({
+      accountName: "",
+      auth: getAuth(),
+      nodeId: null,
+      account: null,
+    });
+
+    const startCreateAccount = () => {
+      if (accountNameC.value == "" || accountNameC.value == null) {
+        accountInput.accountName = uuid("account");
+      } else {
+        accountInput.accountName = accountNameC.value;
+      }
+      accountInput.nodeId = localeNode.value;
+      createAccount(accountInput).then((res) => {
+        if (res.staus == 0) {
+          ElMessageBox.alert(res.mes, "WARING", {
+            confirmButtonText: "OK",
+          });
+        } else {
+          ElMessage({
+            message: res.mes,
+            type: "success",
+          });
+        }
+        changeAccountVis();
+      });
+    };
+    //节点下用户列表
+    let drwaerDateNodeAccount = reactive([
+      {
+        id: 1,
+        address: "1CVrnHbS5qu6kSXFoCpwnCW1sqPQuaHhoJ",
+        accountId: "Node1",
+        transactions: 0,
+        totalReceived: 0,
+        totalSent: 0,
+        balance: 0,
+        walletId: 0,
+        transactionId: "",
+        nodeId: "",
+        accountName: "sada",
+      },
+    ]);
+
+    const AllAccountData = reactive([
+      {
+        accountName: "accountZPFt5g9U1iSlnJZj",
+        address: "1E8KmeoiPD2jf6UHbcu9kbNE91jLCwn4bT",
+        transactions: "1",
+        totalReceived: "10",
+        totalSent: "0",
+        balance: "10",
+      },
+      {
+        accountName: "accountZPFt5safasdiSlnJZj",
+        address: "1E8KmeoiPD2jashgjfjsaE91jLCwn4bT",
+        transactions: "1",
+        totalReceived: "10",
+        totalSent: "0",
+        balance: "10",
+      },
+      {
+        accountName: "accountZPFgwgsdfgU1iSlnJZj",
+        address: "1E8KmeoiPD2jfasdgthfgd9kbNE91jLCwn4bT",
+        transactions: "1",
+        totalReceived: "10",
+        totalSent: "0",
+        balance: "10",
+      },
+    ]);
+
+    const dialogAllAccountVisible = ref(false);
+
+    const findAllAccount = () => {
+      dialogAllAccountVisible.value = true;
+    };
     //区块共识选择
     const consensusVisible = ref(false);
 
@@ -1857,15 +2172,6 @@ export default {
       showFindBlockMes[1] = difficulty;
     };
 
-    //获取当前用户
-    const store = useStore();
-
-    const auth = computed(() => {
-      return store.getters.authGetter;
-    });
-    const getAuth = () => {
-      return auth.value;
-    };
     //页面加载
     const openFullScreen = () => {
       const loading = ElLoading.service({
@@ -2079,10 +2385,10 @@ export default {
             type: "success",
           });
         } else {
-          ElMessage({
-            message: "HashRate设置失败!",
-            type: "warning",
-          });
+          // ElMessage({
+          //   message: "HashRate设置失败!",
+          //   type: "warning",
+          // });
         }
         hashRateVis.value = false;
       });
@@ -2274,7 +2580,7 @@ export default {
     let drwaerDateNode = reactive({
       id: 1,
       address: "1CVrnHbS5qu6kSXFoCpwnCW1sqPQuaHhoJ",
-      addressId: "Node1",
+      addressId: null,
       nodeType: "fullNode",
       transactions: 0,
       totalReceived: 0,
@@ -2283,6 +2589,7 @@ export default {
       balance: 0,
       walletId: 0,
       transactionId: "",
+      accountList: null,
     });
     //连线集合
     let linkList = reactive([]);
@@ -2802,6 +3109,16 @@ export default {
                       drwaerDateNode.walletId = res.walletId;
                       drwaerDateNode.transactionId = res.transactionsId;
                       drwaerDateNode.hashRate = res.hashRate;
+                      drwaerDateNode.accountList = res.accountList;
+                      if (res.accountList != null && res.accountList != "") {
+                        accountInput.accountName = res.accountList;
+                        findAccountList(accountInput).then((res) => {
+                          drwaerDateNodeAccount.length = 0;
+                          for (let i = 0; i < res.length; i++) {
+                            drwaerDateNodeAccount.push(res[i]);
+                          }
+                        });
+                      }
                       let sue = drwaerDateNode;
                       this.drawerTrue("dialog2");
                       setPresentTypeNode(res.addressId);
@@ -2962,6 +3279,17 @@ export default {
       perAddNumIns,
       clearDatabaseVisible,
       changeclearDatabaseVisible,
+      accountSttus,
+      drwaerDateNodeAccount,
+      accountNameC,
+      createAccountVis,
+      accountInput,
+      startCreateAccount,
+      accountCreateVis,
+      localeNode,
+      AllAccountData,
+      dialogAllAccountVisible,
+      findAllAccount,
     };
   },
   created() {
@@ -4201,17 +4529,41 @@ export default {
   line-height: 100%;
   text-align: center;
 }
+.nodeCreateD {
+  width: 60%;
+  padding-left: 20%;
+}
 .fullNode {
   background-color: rgb(205, 254, 156);
 }
-
+.fullCreateNode {
+  width: 100px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  background-color: rgb(205, 254, 156);
+}
 .block {
   background-color: rgb(187, 187, 187);
 }
 .lightNode {
   background-color: aquamarine;
 }
+.lightCreateNode {
+  width: 100px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  background-color: aquamarine;
+}
 .miningNode {
+  background-color: rgb(255, 153, 127);
+}
+.miningCreateNode {
+  width: 100px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
   background-color: rgb(255, 153, 127);
 }
 .textEvent {
@@ -4230,6 +4582,13 @@ export default {
   text-align: center;
   line-height: 30px;
   font-weight: bold;
+}
+.textStatusNode {
+  padding-top: 20px;
+  height: 30px;
+  width: 100%;
+  text-align: center;
+  line-height: 30px;
 }
 .demo-progress .el-progress--line {
   margin-bottom: 1px;

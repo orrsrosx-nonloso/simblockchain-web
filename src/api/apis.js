@@ -207,6 +207,25 @@ export const editRewardPre = function (data) {
     return http('post', 'http://localhost:8081/singleReward/editReward', data)
 }
 
+//账户创建
+export const createAccount = function (data) {
+    return http('post', 'http://localhost:8081/singleAccount/createAccount', data)
+}
+
+//账户删除
+export const deleteAccount = function (data) {
+    return http('post', 'http://localhost:8081/singleAccount/deleteAccount', data)
+}
+
+//查找所有账户
+export const findAllAccount = function (data) {
+    return http('post', 'http://localhost:8081/singleAccount/findAllAccount', data)
+}
+//查找节点下账户列表
+export const findAccountList = function (data) {
+    return http('post', 'http://localhost:8081/singleAccount/findAccountList', data)
+}
+
 // 获取权限菜单
 export const getRolesApi = function (data) {
     return http('get', '/http/getTable', {
