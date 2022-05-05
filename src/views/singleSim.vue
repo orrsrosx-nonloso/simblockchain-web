@@ -99,6 +99,7 @@
                 <el-select v-model="valueTrans1" placeholder="交易发起者">
                   <el-option
                     v-for="item in NodeTrans"
+                    :fit-input-width="true"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
@@ -146,13 +147,13 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-tooltip content="查看所以经过记账节点确定的交易!" placement="top">
+                  <el-tooltip content="查看所有经过记账节点确定的交易!" placement="top">
                     <el-dropdown-item @click="getPresentUtxoData('confirmed')"
                       >已确定交易</el-dropdown-item
                     >
                   </el-tooltip>
                   <el-tooltip
-                    content="查看点击所以未经过记账节点确定的交易!"
+                    content="查看点击所有未经过记账节点确定的交易!"
                     placement="top"
                   >
                     <el-dropdown-item @click="getPresentUtxoData('unconfirmed')"
@@ -558,7 +559,7 @@
           <el-card
             id="summaryGuide"
             class="box-card"
-            :body-style="{ padding: '5px', height: '236px' }"
+            :body-style="{ padding: '5px', height: '245px' }"
           >
             <template #header>
               <div class="card-header" style="font-weight: bold">
@@ -579,7 +580,7 @@
           <el-card
             id="eventMenuGuide"
             class="box-card"
-            :body-style="{ padding: '5px', height: '237px' }"
+            :body-style="{ padding: '5px', height: '230px' }"
           >
             <template #header>
               <div class="card-header" style="font-weight: bold">
@@ -868,23 +869,24 @@
                           align="center"
                           width="250px"
                         >
-                          <el-tooltip
-                            v-if="drwaerDateNode.nodeType == `lightNode`"
-                            content="轻节点内账户的交易信息需要通过其他全节点查询!"
-                            placement="top"
-                            ><el-button
-                              size="small"
-                              @click="findLightListTransList2(item.transactionId)"
-                              round
-                              >查询交易
-                            </el-button>
-                          </el-tooltip>
-
+                          <div v-if="item.transactionsId != null">
+                            <el-tooltip
+                              v-if="drwaerDateNode.nodeType == `lightNode`"
+                              content="轻节点内账户的交易信息需要通过其他全节点查询!"
+                              placement="top"
+                              ><el-button
+                                size="small"
+                                @click="findLightListTransList2(item.transactionsId)"
+                                round
+                                >查询交易
+                              </el-button>
+                            </el-tooltip>
+                          </div>
                           <el-button
                             v-if="drwaerDateNode.nodeType != `lightNode`"
                             type="text"
-                            @click="findTransList2(item.transactionId)"
-                            >{{ item.transactionId }}</el-button
+                            @click="findTransList2(item.transactionsId)"
+                            >{{ item.transactionsId }}</el-button
                           >
                         </el-descriptions-item>
                       </el-descriptions>
@@ -1245,7 +1247,7 @@ import {
   needGuide,
   createAccount,
   deleteAccount,
-  findAllAccount,
+  findAllAccountList,
   findAccountList,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId } from "../utils/utils";
@@ -1295,6 +1297,10 @@ let summaryMesUpdata = reactive([
   {
     tabName: "Transaction fee:  ",
     data: "0%",
+  },
+  {
+    tabName: "Account quantity:  ",
+    data: "0",
   },
 ]);
 
@@ -1781,6 +1787,11 @@ export default {
       }
       accountInput.nodeId = localeNode.value;
       createAccount(accountInput).then((res) => {
+        accountListId.push({
+          accountName: res.account.accountName,
+          accountId: res.account.accountId + "",
+          targetNode: res.account.nodeId,
+        });
         if (res.staus == 0) {
           ElMessageBox.alert(res.mes, "WARING", {
             confirmButtonText: "OK",
@@ -1841,6 +1852,13 @@ export default {
     const dialogAllAccountVisible = ref(false);
 
     const findAllAccount = () => {
+      findAllAccountList(accountInput).then((res) => {
+        AllAccountData.length = 0;
+        for(let i = 0;i<res.length;i++){
+          AllAccountData.push(res[i]);
+        }
+      });
+      let asd = AllAccountData;
       dialogAllAccountVisible.value = true;
     };
     //区块共识选择
@@ -2224,10 +2242,10 @@ export default {
     const startTransactionSimVis = () => {
       transactionSimVis.value = true;
       const graph = this.flowNodeGraph();
-      const nodelistSize = nodeListId.length;
+      const nodelistSize = accountListId.length;
       if (nodelistSize <= 1) {
         setTimeout(() => {
-          ElMessageBox.alert("可供交易节点数量较少,请先创建节点!", "WARN", {
+          ElMessageBox.alert("可供交易账户数量较少,请先创建账户!", "WARN", {
             confirmButtonText: "OK",
           });
           transactionSimVis.value = false;
@@ -2240,8 +2258,8 @@ export default {
         }
         for (let i = 0; i < nodelistSize; i++) {
           NodeTrans.push({
-            value: nodeListId[i].lable,
-            label: nodeListId[i].lable,
+            value: accountListId[i].accountId,
+            label: accountListId[i].accountName,
           });
         }
       }
@@ -2630,6 +2648,10 @@ export default {
         tabName: "Transaction fee:  ",
         data: "0%",
       },
+        {
+      tabName: "Account quantity:  ",
+      data: "0",
+    },
     ]);
     //详情信息
     let eventMes = reactive([
@@ -2652,7 +2674,7 @@ export default {
     };
 
     //node创建流程
-
+    //新建节点
     const setNodeType = () => {
       let nowNodeType = nodeTypeChoose;
       let nowNodeType1 = presentTypeNode;
@@ -2669,6 +2691,13 @@ export default {
         let graph = nodeCreateMes.graph;
         let coordinate = nodeCreateMes.coordinate;
         const res = ress.preData;
+        if (res.nodeType == "miningNode") {
+          accountListId.push({
+            accountName: res.minerAccountName,
+            accountId: res.accountList + "",
+            targetNode: res.addressId,
+          });
+        }
         graph.addNode({
           width: 100,
           height: 30,
@@ -2802,7 +2831,7 @@ export default {
       });
     };
 
-    //所以utxo查看
+    //所有utxo查看
     const dialogUtxoVisible = ref(false);
 
     const tableUtxoData = reactive([
@@ -2816,6 +2845,17 @@ export default {
         UtxoBalance: "2",
       },
     ]);
+
+    const isTargetListId = () => {
+      let acList = accountListId;
+      for (let i = 0; i < acList.length; i++) {
+        let s = acList[i].targetNode;
+        if (acList[i].targetNode != undefined && acList[i].targetNode != null) {
+          return 1;
+        }
+      }
+      return 0;
+    };
 
     const getPresentUtxoData = (status) => {
       getUnconfirmed({ auth: getAuth(), status: status }).then((ress) => {
@@ -2996,43 +3036,52 @@ export default {
             },
             selected(graph, coordinate) {
               if (graph.nodeList.length > 0) {
-                createNewBlock({ auth: getAuth() }).then((ress) => {
-                  const res = ress.preData;
-                  openBlockCreate(res.miner);
-                  graph.addNode({
-                    width: 100,
-                    height: 30,
-                    coordinate,
-                    meta: {
-                      label: res.blockID,
-                      name: res.blockID,
-                      prop: "block",
-                      type: "block",
-                    },
-                  });
-                  LogEvent("create new " + res.blockID + ":", res.hash);
-                  const newBlocklist = graph.nodeList;
-                  const presentBlock = newBlocklist[newBlocklist.length - 1];
-                  presentBlock.meta.name = res.blockID;
-                  if (presentBlock.meta.prop == "block") {
-                    // let presentNodsd=presentNode.id;
-                    blockListId.push({
-                      lable: presentBlock.meta.label,
-                      id: presentBlock.id,
+                let ad = isTargetListId();
+                if (accountListId.length > 0 && isTargetListId() == 1) {
+                  createNewBlock({ auth: getAuth() }).then((ress) => {
+                    const res = ress.preData;
+                    openBlockCreate(res.miner);
+                    graph.addNode({
+                      width: 100,
+                      height: 30,
+                      coordinate,
+                      meta: {
+                        label: res.blockID,
+                        name: res.blockID,
+                        prop: "block",
+                        type: "block",
+                      },
                     });
-                  }
-                  summaryMes[2].data = "1";
-                  summaryMes[3].data = "GenesisBlock1";
-                  summaryMes[4].data = "GenesisBlock1";
-                  summaryMes[6].data = 1;
-                  setTimeout(() => {
-                    rewardFindVisible.value = true;
-                  }, 3800);
-                  // this.$refs.superFlow.addNode({
-                  //   coordinate,
-                  //   ...conf.info,
-                  // });
-                });
+                    LogEvent("create new " + res.blockID + ":", res.hash);
+                    const newBlocklist = graph.nodeList;
+                    const presentBlock = newBlocklist[newBlocklist.length - 1];
+                    presentBlock.meta.name = res.blockID;
+                    if (presentBlock.meta.prop == "block") {
+                      // let presentNodsd=presentNode.id;
+                      blockListId.push({
+                        lable: presentBlock.meta.label,
+                        id: presentBlock.id,
+                      });
+                    }
+                    summaryMes[2].data = "1";
+                    summaryMes[3].data = "GenesisBlock1";
+                    summaryMes[4].data = "GenesisBlock1";
+                    summaryMes[6].data = 1;
+                    setTimeout(() => {
+                      rewardFindVisible.value = true;
+                    }, 3800);
+                    // this.$refs.superFlow.addNode({
+                    //   coordinate,
+                    //   ...conf.info,
+                    // });
+                  });
+                } else {
+                  ElMessage({
+                    message:
+                      "创建创世块前请先创建处于节点下的非空账户!(接收创世块交易奖励)",
+                    type: "warning",
+                  });
+                }
               } else {
                 ElMessage({
                   message: "创建区块前请先创建节点.",
@@ -3290,6 +3339,7 @@ export default {
       AllAccountData,
       dialogAllAccountVisible,
       findAllAccount,
+      isTargetListId,
     };
   },
   created() {
@@ -3470,74 +3520,84 @@ export default {
           } else {
             lastBlockCoordinate.length = 0;
             lastBlockCoordinate = coordinate;
+            //是否存在节点
             const nodeEx = this.haveNodeMe(this.$refs.superFlow.graph);
             if (nodeEx) {
+              //如果当前区块链长度为0
               if (blockListId.length == 0) {
-                createNewBlock({ auth: this.getAuth() }).then((ress) => {
-                  const res = ress.preData;
-                  this.openBlockCreate(res.miner);
-                  this.$refs.superFlow.addNode({
-                    width: 100,
-                    height: 30,
-                    coordinate,
-                    meta: {
-                      label: res.blockID,
-                      name: res.blockID,
-                      prop: "block",
-                      type: "block",
-                    },
-                  });
-                  this.LogEvent("create new " + res.blockID + ":", res.hash);
-                  const nodeListIdsdadsaa = blockListId;
-                  const newBlocklist = this.$refs.superFlow.graph.nodeList;
-                  const presentBlock = newBlocklist[newBlocklist.length - 1];
-                  presentBlock.meta.name = res.blockID;
-                  if (presentBlock.meta.prop == "block") {
-                    // let presentNodsd=presentNode.id;
-                    blockListId.push({
-                      lable: presentBlock.meta.label,
-                      id: presentBlock.id,
-                    });
-                  }
-                  if (this.summaryMes[3].data == "0") {
-                    this.summaryMes[3].data = presentBlock.meta.label;
-                  }
-                  this.summaryMes[4].data = presentBlock.meta.label;
-                  const newId = uuid("link");
-                  const lengthblockListId = blockListId.length;
-                  if (lengthblockListId >= 2) {
-                    const lengthLinklength = this.linkList.length;
-                    const targetLinkList = [];
-                    if (lengthLinklength > 0) {
-                      for (var i = 0; i < lengthLinklength; i++) {
-                        targetLinkList.push(this.linkList[i]);
-                      }
-                    }
-                    targetLinkList.push({
-                      id: newId,
-                      startId: blockListId[lengthblockListId - 2].id,
-                      endId: blockListId[lengthblockListId - 1].id,
-                      startAt: [100, 24],
-                      endAt: [0, 25],
+                if (accountListId.length > 0 && this.isTargetListId() == 1) {
+                  createNewBlock({ auth: this.getAuth() }).then((ress) => {
+                    const res = ress.preData;
+                    this.openBlockCreate(res.miner);
+                    this.$refs.superFlow.addNode({
+                      width: 100,
+                      height: 30,
+                      coordinate,
                       meta: {
-                        start: blockListId[lengthblockListId - 2].label,
-                        end: blockListId[lengthblockListId - 1].label,
+                        label: res.blockID,
+                        name: res.blockID,
+                        prop: "block",
+                        type: "block",
                       },
                     });
-                    this.linkList = targetLinkList;
-                  }
+                    this.LogEvent("create new " + res.blockID + ":", res.hash);
+                    const nodeListIdsdadsaa = blockListId;
+                    const newBlocklist = this.$refs.superFlow.graph.nodeList;
+                    const presentBlock = newBlocklist[newBlocklist.length - 1];
+                    presentBlock.meta.name = res.blockID;
+                    if (presentBlock.meta.prop == "block") {
+                      // let presentNodsd=presentNode.id;
+                      blockListId.push({
+                        lable: presentBlock.meta.label,
+                        id: presentBlock.id,
+                      });
+                    }
+                    if (this.summaryMes[3].data == "0") {
+                      this.summaryMes[3].data = presentBlock.meta.label;
+                    }
+                    this.summaryMes[4].data = presentBlock.meta.label;
+                    const newId = uuid("link");
+                    const lengthblockListId = blockListId.length;
+                    if (lengthblockListId >= 2) {
+                      const lengthLinklength = this.linkList.length;
+                      const targetLinkList = [];
+                      if (lengthLinklength > 0) {
+                        for (var i = 0; i < lengthLinklength; i++) {
+                          targetLinkList.push(this.linkList[i]);
+                        }
+                      }
+                      targetLinkList.push({
+                        id: newId,
+                        startId: blockListId[lengthblockListId - 2].id,
+                        endId: blockListId[lengthblockListId - 1].id,
+                        startAt: [100, 24],
+                        endAt: [0, 25],
+                        meta: {
+                          start: blockListId[lengthblockListId - 2].label,
+                          end: blockListId[lengthblockListId - 1].label,
+                        },
+                      });
+                      this.linkList = targetLinkList;
+                    }
 
-                  const data = blockListId.length;
-                  this.summaryMes[2].data = data;
-                  this.summaryMes[6].data = 1;
-                  setTimeout(() => {
-                    this.changerewardFindVisible();
-                  }, 3800);
-                  // this.$refs.superFlow.addNode({
-                  //   coordinate,
-                  //   ...conf.info,
-                  // });
-                });
+                    const data = blockListId.length;
+                    this.summaryMes[2].data = data;
+                    this.summaryMes[6].data = 1;
+                    setTimeout(() => {
+                      this.changerewardFindVisible();
+                    }, 3800);
+                    // this.$refs.superFlow.addNode({
+                    //   coordinate,
+                    //   ...conf.info,
+                    // });
+                  });
+                } else {
+                  ElMessage({
+                    message:
+                      "创建创世块前请先创建处于节点下的非空账户!(接收创世块交易奖励)",
+                    type: "warning",
+                  });
+                }
               } else {
                 findMinExist({ auth: this.getAuth() }).then((isExists) => {
                   let isExist = isExists.preData;
@@ -4584,6 +4644,7 @@ export default {
   font-weight: bold;
 }
 .textStatusNode {
+  border-bottom-style:1px solid var(--el-border-color);
   padding-top: 20px;
   height: 30px;
   width: 100%;

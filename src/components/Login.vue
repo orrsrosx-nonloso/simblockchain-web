@@ -130,6 +130,7 @@
       </el-form>
     </div>
   </div>
+  <div class="bottomRec">Copyright © 2022 || 推荐PC端使用(Google Chrome/Microsoft Edge)</div>
 </template>
 
 <script>
@@ -390,7 +391,7 @@ export default {
   width: 100vw;
   padding: 0;
   margin: 0;
-  height: 100vh;
+  height: 96vh;
   font-size: 16px;
   background-repeat: no-repeat;
   background-position: left top;
@@ -465,5 +466,13 @@ export default {
       right: 10px;
     }
   }
+}
+.bottomRec{
+  color: rgb(73, 73, 73);
+  height: 4vh;
+  background-color: rgb(120, 147, 173);
+  font-size: 12px;
+  line-height: 27px;
+  text-align: center;
 }
 </style>

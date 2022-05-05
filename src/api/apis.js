@@ -218,13 +218,20 @@ export const deleteAccount = function (data) {
 }
 
 //查找所有账户
-export const findAllAccount = function (data) {
+export const findAllAccountList = function (data) {
     return http('post', 'http://localhost:8081/singleAccount/findAllAccount', data)
 }
 //查找节点下账户列表
 export const findAccountList = function (data) {
     return http('post', 'http://localhost:8081/singleAccount/findAccountList', data)
 }
+
+
+//查找用户所有日志信息
+export const findUserLogMes = function (data) {
+    return http('post', 'http://localhost:8081/user/findUserLogMes', data)
+}
+
 
 // 获取权限菜单
 export const getRolesApi = function (data) {
