@@ -25,7 +25,10 @@ const user = {
         },
         authGetter(state) {
             return state.userInfo.username
-        }
+        },
+        authorityGetter(state) {
+            return state.userInfo.authority
+        },
     }
 }
 export default user

@@ -130,7 +130,7 @@
       </el-form>
     </div>
   </div>
-  <div class="bottomRec">Copyright © 2022 || 推荐PC端使用(Google Chrome/Microsoft Edge)</div>
+  <div class="bottomRec">MayCopyright © 2022 || 推荐PC端使用(Google Chrome/Microsoft Edge)</div>
 </template>
 
 <script>
@@ -143,6 +143,7 @@ import { useRouter } from "vue-router";
 import { getLoginMes, registerUser } from "../api/apis";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { judgePhone } from "../utils/utils";
+import {insertToVisitor} from "../api/apis.js"
 
 export default {
   components: {
@@ -365,6 +366,7 @@ export default {
     //提交登录
   },
   mounted() {
+    insertToVisitor(null);
     this.canvas = document.getElementById("myCanvas");
     this.context = this.canvas.getContext("2d");
   },

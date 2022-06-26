@@ -1,16 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store'
 import Login from '../components/Login.vue'
+import Index from '../components/Index.vue'
 import layout from '../layout/layout.vue'
 import ErrPage from '../components/ErrPage.vue'
 import { delCookie, getCookie } from '../utils/cookie.js'
-
+import { loginOut } from "../api/apis";
+import { useStore } from "vuex";
 const routerHistory = createWebHistory()
 
 const routes = [
     {
         path: '/',
-        redirect: '/login'
+        // redirect: '/login'
+        name: 'index',
+        component: Index
     },
     {
         path: '/login',
@@ -43,9 +47,15 @@ router.onError(err => {
 })
 
 router.beforeEach(async (to, from, next) => {
-    console.log('to', to)
-    if (to.path == '/login' || to.path == '/') {
+    console.log('beforeto', to);
+    console.log('beforefrom', from);
+    console.log('beforenext', next);
+    if (to.path == '/login') {
         delCookie('userInfo')
+        const userName = store.getters.authGetter;
+        if (userName != null) {
+            loginOut({ "auth": userName }).then((res) => { console.log("默认登出成功！")});
+        }
         localStorage.clear()
         next()
     } else {
@@ -66,6 +76,10 @@ router.beforeEach(async (to, from, next) => {
             next({ path: '/login' })
         }
     }
+})
+
+router.afterEach((to, from, next) => {
+
 })
 
 export default router

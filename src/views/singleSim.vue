@@ -401,6 +401,7 @@
                   </div>
                 </div>
               </template>
+              <div class="floatplat">1</div>
               <div class="flow-container" id="flowMenuGuide" ref="flowContainer">
                 <c-scrollbar maxHeight="538px" trigger="hover">
                   <super-flow
@@ -4657,5 +4658,7 @@ export default {
 }
 [class*="driver-close-btn"] {
   visibility: hidden;
+}
+.floatplat{
 }
 </style>

@@ -226,6 +226,18 @@ export const findAccountList = function (data) {
     return http('post', 'http://localhost:8081/singleAccount/findAccountList', data)
 }
 
+//查找节点下账户列表
+export const insertToVisitor = function (data) {
+    return http('post', 'http://localhost:8081/logMesData/insertToVisitor', data)
+}
+
+//查找节点下账户列表
+export const getLogMesData = function (data) {
+    return http('post', 'http://localhost:8081/logMesData/getLogMesDatas', data)
+}
+
+
+
 
 //查找用户所有日志信息
 export const findUserLogMes = function (data) {

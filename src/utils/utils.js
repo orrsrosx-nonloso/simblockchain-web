@@ -37,6 +37,62 @@ export function getDataString() {
     return curTime;
 }
 
+export function getDataStringDay(decrease) {
+    var date = new Date();//当前时间
+    var month = zeroFill(date.getMonth() + 1);//月
+    var day = zeroFill(date.getDate());//日
+    var curTime = "";
+
+    if (decrease == 0) {
+        curTime = date.getFullYear() + "-" + month + "-" + day;
+    } else {
+        if (day <= decrease) {
+            if (month == 1) {
+                month = 12;
+                let newDay = 31 - (decrease - day);
+                curTime = (date.getFullYear() - 1) + "-" + month + "-" + newDay;
+            }
+            else {
+                month = month - 1;
+                let newDay = getDays(date.getFullYear(), month) - (decrease - day);
+                if (newDay < 10) {
+                    curTime = date.getFullYear() + "-" + month + "-" + "0" + newDay;
+                }
+                else {
+                    curTime = date.getFullYear() + "-" + month + "-" +  newDay;
+                }
+            }
+        }
+        else {
+            let newDay = day - decrease;
+            if (newDay < 10) {
+                curTime = date.getFullYear() + "-" + month + "-" + "0" + newDay;
+            }
+            else {
+                curTime = date.getFullYear() + "-" + month + "-" +  newDay;
+            }
+        }
+
+    }
+    //当前时间
+    return curTime;
+}
+
+function getDays(year, month) {
+    let days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    if ((year % 4 === 0) && (year % 100 !== 0 || year % 400 === 0)) {
+        days[1] = 29
+    }
+    return days[month]
+}
+
+
+export function getseparateDays(day) {
+    let days = day.split("-");
+    let newDay = days[1] + "/" + days[2];
+    return newDay;
+}
+
 /**
 补零
 */
@@ -61,11 +117,11 @@ export function getNodeId(i) {
 */
 export function judgePhone(i) {
     const length = i.length;
-    let first = i.substr(0,1);
-    if(length===11 && first==="1"){
+    let first = i.substr(0, 1);
+    if (length === 11 && first === "1") {
         return true;
     }
-    else{
+    else {
         return false;
     }
 }

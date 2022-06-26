@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {styleImport,createStyleImportPlugin,VantResolve} from 'vite-plugin-style-import'
 
-// @Built by JustTwo
-// author: "JustTwo"
+// @Built by orrsrosx
+// author: "orrsrosx"
 export default defineConfig({
   plugins: [
     vue(),

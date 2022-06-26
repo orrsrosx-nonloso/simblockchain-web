@@ -1,21 +1,20 @@
 <template>
   <el-row :gutter="20">
     <el-col :span="6">
-      <el-card class="box-card">
+      <el-card class="box-cards">
         <div class="textTop">用户名</div>
         <div class="textBton" :model="userName">{{ userName }}</div>
       </el-card>
     </el-col>
-    
+
     <el-col :span="6">
-      <el-card class="box-card">
+      <el-card class="box-cards">
         <div class="textTop">最近登录</div>
         <div class="textBton" :model="userLastLogin">{{ userLastLogin }}</div>
       </el-card></el-col
     >
-    
     <el-col :span="6">
-      <el-card class="box-card">
+      <el-card class="box-cards">
         <div class="textTop">最近仿真实验</div>
         <div class="textBton" :model="userLastSim">
           <span v-if="userLastSim != null">{{ userLastSim }}</span>
@@ -24,14 +23,23 @@
       </el-card></el-col
     >
     <el-col :span="6">
-      <el-card class="box-card">
+      <el-card v-if="authoritys == 0" class="box-cards">
+        <div class="textTop">系统用户在线人数</div>
+        <!-- 在线用户 -->
+        <div class="textBton" :model="userOnlineNum">
+          {{ userOnlineNum }}
+          <span plain @click="openOnlineUser" class="onlineUst">详情</span>
+        </div>
+      </el-card>
+      <el-card v-if="authoritys == 1" class="box-cards">
         <div class="textTop">实验次数</div>
-        <div class="textBton" :model="userSimNum">{{userSimNum}}</div>
-      </el-card></el-col
-    >
+        <!-- 实验次数 -->
+        <div class="textBton" :model="userSimNum">{{ userSimNum }}</div>
+      </el-card>
+    </el-col>
   </el-row>
   <el-row :gutter="10">
-    <el-col :span="12">
+    <el-col :span="8">
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
@@ -65,7 +73,11 @@
         >
       </el-card>
     </el-col>
-    <el-col :span="12">
+    <el-col :span="10">
+      <chartUser></chartUser>
+    
+    </el-col>
+    <el-col :span="6">
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
@@ -112,7 +124,7 @@
         </div>
       </el-card>
       <el-drawer v-model="drawer" direction="rtl" title="日志" size="40%">
-        <el-scrollbar v-if="screenWidth<1366" height="38%">
+        <el-scrollbar v-if="screenWidth < 1366" height="38%">
           <div v-for="use in userLogMesAll" class="logMes">
             <div class="leftMes">{{ use.message }}</div>
             <div class="leftMes">
@@ -121,7 +133,7 @@
             </div>
           </div>
         </el-scrollbar>
-        <el-scrollbar v-if="screenWidth>=1366" height="48%">
+        <el-scrollbar v-if="screenWidth >= 1366" height="48%">
           <div v-for="use in userLogMesAll" class="logMes">
             <div class="leftMes">{{ use.message }}</div>
             <div class="leftMes">
@@ -141,18 +153,42 @@ import { useStore } from "vuex";
 import { ref, reactive } from "vue";
 import { findUserLogMes } from "../api/apis";
 import { ElMessage } from "element-plus";
+import chartUser from "../views/treePage/chartUser.vue";
+import { ElNotification } from "element-plus";
+
+
+//图表的使用
+
+
+let onlineUserMes = ref("");
+const openOnlineUser = () => {
+  ElNotification({
+    title: "在线用户列表",
+    dangerouslyUseHTMLString: true,
+    message: onlineUserMes.value,
+  });
+};
+
+//数据统计功能模块
+const activeIndex = ref("1");
+
 
 const drawer = ref(false);
 const router = useRouter();
 const store = useStore();
 let screenWidth = document.body.clientWidth;
 const userName = store.getters.authGetter;
+//权限
+const authoritys = store.getters.authorityGetter;
 const userLastLogin = ref("");
 const userLastSim = ref("");
 const userSimNum = ref(0);
+const userOnlineNum = ref(0);
+let userOnlines = reactive([]);
 let userLogMes = reactive([]);
 let userLogMesSimple = reactive([]);
 let userLogMesAll = reactive([]);
+let userLogMesDataDay = reactive([]);
 let params = {
   username: userName,
   password: "",
@@ -178,8 +214,26 @@ findUserLogMes(params).then((res) => {
   if (res.status == 1) {
     userLastLogin.value = res.lastLogin;
     userLastSim.value = res.lastSim;
+    userOnlineNum.value = res.onlineUser.length;
+    userOnlines = res.onlineUser;
     userLogMes = res.logMes;
+    let dsada = userOnlines;
     userLogMes.sort(desc);
+    onlineUserMes = "";
+    userOnlines.forEach(function (element) {
+      onlineUserMes=onlineUserMes+"<strong>"+element+"<strong> <br>"
+    });
+    // for(let i = 0; i < userOnlines.length; i++){
+    //   if(i=userOnlines.length-1){
+    //     onlineUserMes=onlineUserMes+"<strong>"+userOnlines[i]+"<strong>"
+    //   }
+    //   else{
+    //     onlineUserMes=onlineUserMes+"<strong>"+userOnlines[i]+"<strong> <br>"
+    //   }
+    // }
+    userLogMesDataDay.length=0;
+    userLogMesDataDay = res.userLogMesDataDay;
+    let sadsdaas = onlineUserMes;
     for (let i = 0; i < userLogMes.length; i++) {
       if (i < 5) {
         userLogMesSimple.push(userLogMes[i]);
@@ -214,6 +268,12 @@ findUserLogMes(params).then((res) => {
 }
 .card-header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-header-statistics {
+  width: 100%;
+  height: 55px;
   justify-content: space-between;
   align-items: center;
 }
@@ -268,5 +328,39 @@ findUserLogMes(params).then((res) => {
   line-height: 24px;
   text-align: left;
   color: rgba(39, 39, 39, 0.45);
+}
+
+.simCharts {
+  display: none;
+}
+.registerChartharts {
+  display: none;
+}
+.lineChartsV {
+  padding-left: -10px;
+  display: inline-block;
+}
+.simChartsV {
+  display: inline-block;
+}
+.registerCharthartsV {
+  display: inline-block;
+}
+.onlineUst {
+  padding-left: 80%;
+  font-size: 12px;
+  color: rgb(0, 171, 171);
+  cursor: pointer;
+}
+.onlineUst:hover {
+  color: rgb(0, 206, 206);
+}
+.box-cards {
+  height: 97px;
+}
+.chart-box{
+  width: 100%;
+  height: auto;
+  border: 1px solid #bfcbd9;
 }
 </style>

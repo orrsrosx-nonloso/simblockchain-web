@@ -53,6 +53,7 @@
 </template>
 
 <script setup>
+//权限页面封装
 import retrieval from "../components/retrieval.vue";
 import tableBox from "../components/table.vue";
 import pagination from "../components/pagination.vue";
@@ -198,7 +199,7 @@ const tableColumn = [
   },
   {
     prop: "date",
-    label: "日期",
+    label: "创建日期",
   },
   {
     prop: "phone",

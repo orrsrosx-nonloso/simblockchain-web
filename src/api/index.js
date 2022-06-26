@@ -21,7 +21,7 @@ http.interceptors.request.use(function (config) {
     if (config.url.indexOf("route") == -1 && config.url.indexOf("getLogin") == -1 
     && config.url.indexOf("loginOut") == -1 && config.url.indexOf("checkLogin") == -1 && config.url.indexOf("findAllUser") == -1
     && config.url.indexOf("registerUser") == -1 && config.url.indexOf("findUserPage") == -1
-    && config.url.indexOf("deleteUser") == -1) {
+    && config.url.indexOf("deleteUser") == -1 && config.url.indexOf("insertToVisitor") == -1) {
         config.data.token = getCookie('token');
     }
     return config;
@@ -55,7 +55,7 @@ http.interceptors.response.use(function (response) {
  * 函数的参数及返回值如下：
  * @param {String} method  请求的方法：get、post、delete、put
  * @param {String} url     请求的url:
- * @param {Object} data    请求的参数 JustTwo
+ * @param {Object} data    请求的参数 orrsrosx
  * @returns {Promise}     返回一个promise对象，其实就相当于axios请求数据的返回值
  */
 export default function (method, url, data = null) {

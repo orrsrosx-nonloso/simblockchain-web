@@ -1,4 +1,4 @@
-// 动态路由菜单  JustTwo
+// 动态路由菜单  orrsrosx
 import table from '../views/table.vue'
 import tree from '../views/tree.vue'
 import auth from '../views/auth.vue'
