@@ -29,7 +29,11 @@
                     v-model="accountNameC"
                     placeholder="输入为空时会随机生成账户名"
                 /></span> -->
-                <el-form :inline="true" :model="accountNameC" class="demo-form-inline">
+                <el-form
+                  :inline="true"
+                  :model="accountNameC"
+                  class="demo-form-inline"
+                >
                   <el-form-item label="目标节点:">
                     <el-input
                       v-model="localeNode"
@@ -48,17 +52,35 @@
               <template #footer>
                 <span class="dialog-footer">
                   <el-button @click="accountCreateVis = false">关闭</el-button>
-                  <el-button type="primary" @click="startCreateAccount()">创建</el-button>
+                  <el-button type="primary" @click="startCreateAccount()"
+                    >创建</el-button
+                  >
                 </span>
               </template>
             </el-dialog>
             <el-dialog v-model="dialogAllAccountVisible" width="840px">
               <el-table :data="AllAccountData" height="300" style="width: 100%">
-                <el-table-column prop="accountName" label="账户名称" width="200" />
+                <el-table-column
+                  prop="accountName"
+                  label="账户名称"
+                  width="200"
+                />
                 <el-table-column prop="address" label="账户地址" width="200" />
-                <el-table-column prop="transactions" label="交易数量" width="100" />
-                <el-table-column prop="totalReceived" label="接收总量" width="100" />
-                <el-table-column prop="totalSent" label="发送总量" width="100" />
+                <el-table-column
+                  prop="transactions"
+                  label="交易数量"
+                  width="100"
+                />
+                <el-table-column
+                  prop="totalReceived"
+                  label="接收总量"
+                  width="100"
+                />
+                <el-table-column
+                  prop="totalSent"
+                  label="发送总量"
+                  width="100"
+                />
                 <el-table-column prop="balance" label="账户余额" width="100" />
               </el-table>
             </el-dialog>
@@ -83,8 +105,13 @@
                       >普通交易模拟</el-dropdown-item
                     >
                   </el-tooltip>
-                  <el-tooltip content="模拟双花问题情况下的交易!" placement="top">
-                    <el-dropdown-item @click="doubleSpent">双花问题模拟</el-dropdown-item>
+                  <el-tooltip
+                    content="模拟双花问题情况下的交易!"
+                    placement="top"
+                  >
+                    <el-dropdown-item @click="doubleSpent"
+                      >双花问题模拟</el-dropdown-item
+                    >
                   </el-tooltip>
                 </el-dropdown-menu>
               </template>
@@ -133,7 +160,9 @@
               <template #footer>
                 <span class="dialog-footer">
                   <el-button @click="changetransactionSimVis">Cancel</el-button>
-                  <el-button type="primary" @click="startTransSim">Confirm</el-button>
+                  <el-button type="primary" @click="startTransSim"
+                    >Confirm</el-button
+                  >
                 </span>
               </template>
             </el-dialog>
@@ -147,7 +176,10 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-tooltip content="查看所有经过记账节点确定的交易!" placement="top">
+                  <el-tooltip
+                    content="查看所有经过记账节点确定的交易!"
+                    placement="top"
+                  >
                     <el-dropdown-item @click="getPresentUtxoData('confirmed')"
                       >已确定交易</el-dropdown-item
                     >
@@ -166,12 +198,32 @@
             <el-dialog v-model="dialogUtxoVisible" width="840px">
               <el-table :data="tableUtxoData" height="300" style="width: 100%">
                 <el-table-column prop="TransId" label="交易Id" width="100" />
-                <el-table-column prop="inputId" label="交易输入ID" width="100" />
-                <el-table-column prop="outPutId" label="交易输出ID" width="100" />
-                <el-table-column prop="totalInput" label="总交易输入" width="100" />
-                <el-table-column prop="totalOutput" label="总交易输出" width="100" />
+                <el-table-column
+                  prop="inputId"
+                  label="交易输入ID"
+                  width="100"
+                />
+                <el-table-column
+                  prop="outPutId"
+                  label="交易输出ID"
+                  width="100"
+                />
+                <el-table-column
+                  prop="totalInput"
+                  label="总交易输入"
+                  width="100"
+                />
+                <el-table-column
+                  prop="totalOutput"
+                  label="总交易输出"
+                  width="100"
+                />
                 <el-table-column prop="status" label="状态" width="100" />
-                <el-table-column prop="UtxoBalance" label="未交易事务量" width="120" />
+                <el-table-column
+                  prop="UtxoBalance"
+                  label="未交易事务量"
+                  width="120"
+                />
               </el-table>
             </el-dialog>
           </div>
@@ -196,11 +248,27 @@
               </el-button>
             </el-tooltip>
             <el-dialog v-model="dialogP2PNetVisible" width="640px">
-              <el-table :data="tableP2PNetData" height="300" style="width: 100%">
+              <el-table
+                :data="tableP2PNetData"
+                height="300"
+                style="width: 100%"
+              >
                 <el-table-column prop="addressId" label="节点" width="140" />
-                <el-table-column prop="Neighbor1" label="邻居节点1" width="140" />
-                <el-table-column prop="Neighbor2" label="邻居节点2" width="140" />
-                <el-table-column prop="Neighbor3" label="邻居节点3" width="140" />
+                <el-table-column
+                  prop="Neighbor1"
+                  label="邻居节点1"
+                  width="140"
+                />
+                <el-table-column
+                  prop="Neighbor2"
+                  label="邻居节点2"
+                  width="140"
+                />
+                <el-table-column
+                  prop="Neighbor3"
+                  label="邻居节点3"
+                  width="140"
+                />
               </el-table>
             </el-dialog>
           </div>
@@ -220,7 +288,10 @@
               :before-close="consensusHandleClose"
             >
               <div>
-                <el-tooltip content="工作量证明共识机制(Proof of Work)" placement="top">
+                <el-tooltip
+                  content="工作量证明共识机制(Proof of Work)"
+                  placement="top"
+                >
                   <el-radio v-model="consensusChoose" label="1" size="large"
                     >POW</el-radio
                   ></el-tooltip
@@ -229,7 +300,11 @@
                   content="股权证明/权益证明共识机制(Proof of Stake)"
                   placement="top"
                 >
-                  <el-radio v-model="consensusChoose" label="2" disabled size="large"
+                  <el-radio
+                    v-model="consensusChoose"
+                    label="2"
+                    disabled
+                    size="large"
                     >POS</el-radio
                   ></el-tooltip
                 >
@@ -237,7 +312,11 @@
                   content="历史工作证明共识机制(Proof of History)"
                   placement="top"
                 >
-                  <el-radio v-model="consensusChoose" disabled label="3" size="large"
+                  <el-radio
+                    v-model="consensusChoose"
+                    disabled
+                    label="3"
+                    size="large"
                     >POH</el-radio
                   ></el-tooltip
                 >
@@ -297,7 +376,10 @@
               :before-close="powFindHandleClose"
               :show-close="false"
             >
-              <div class="demo-progress" style="padding-left: 20%; padding-right: 20%">
+              <div
+                class="demo-progress"
+                style="padding-left: 20%; padding-right: 20%"
+              >
                 <el-form :model="showFindBlockMes">
                   <el-descriptions title="">
                     <el-descriptions-item label="">
@@ -320,7 +402,11 @@
             </el-dialog>
           </div>
           <div class="drag-box">
-            <el-button class="opButton" type="primary" size="small" @click="blockTranSim"
+            <el-button
+              class="opButton"
+              type="primary"
+              size="small"
+              @click="blockTranSim"
               >区块传输模拟
             </el-button>
           </div>
@@ -345,10 +431,13 @@
           </div>
         </div></el-col
       >
-      <el-col :span="15"
+      <el-col :span="15" class="midContent"
         ><div class="grid-content">
           <div class="drag-box">
-            <el-card class="box-card" :body-style="{ padding: '5px', height: '538px' }">
+            <el-card
+              class="box-card"
+              :body-style="{ padding: '5px', height: superFlowHeight + 'px' }"
+            >
               <template #header>
                 <div class="card-header">
                   <span>节点与区块</span>
@@ -401,9 +490,36 @@
                   </div>
                 </div>
               </template>
-              <div class="floatplat">1</div>
-              <div class="flow-container" id="flowMenuGuide" ref="flowContainer">
-                <c-scrollbar maxHeight="538px" trigger="hover">
+              <div
+                class="flow-container"
+                id="flowMenuGuide"
+                ref="flowContainer"
+              >
+                <div
+                  class="ys-float-btn"
+                  :style="{
+                    width: itemWidth + 'px',
+                    height: itemHeight + 'px',
+                    left: leftFloat + 'px',
+                    top: topFloat + 'px',
+                  }"
+                  ref="div"
+                  @click="onBtnClicked"
+                >
+                  <div class="content-node-box" style="background-color: rgb(205, 254, 156);">
+                    <i class="iconfont"
+                          >&#xe63e;<span class="icon-text">全节点</span></i
+                        ></div>
+                  <div class="content-node-box" style="background-color: aquamarine;">
+                    <i class="iconfont"
+                          >&#xe63e;<span class="icon-text">轻节点</span></i
+                        ></div>
+                  <div class="content-node-box" style="background-color: rgb(255, 153, 127);">
+                    <i class="iconfont"
+                          >&#xe63e;<span class="icon-text">挖矿节点</span></i
+                        ></div>
+                </div>
+                <c-scrollbar maxHeight="100%" trigger="hover">
                   <super-flow
                     ref="superFlow"
                     :node-list="nodeList"
@@ -424,10 +540,14 @@
                         :class="`flow-node ellipsis ${meta.type}`"
                       >
                         <i v-if="meta.prop == `node`" class="iconfont"
-                          >&#xe63e;<span class="icon-text">{{ meta.name }}</span></i
+                          >&#xe63e;<span class="icon-text">{{
+                            meta.name
+                          }}</span></i
                         >
                         <i v-if="meta.prop == `block`" class="iconfont"
-                          >&#xea18;<span class="icon-text">{{ meta.name }}</span></i
+                          >&#xea18;<span class="icon-text">{{
+                            meta.name
+                          }}</span></i
                         >
                       </div>
                       <!-- 轻节点 -->
@@ -443,7 +563,10 @@
                 :show-close="false"
                 :before-close="nodetypeHandleClose"
               >
-                <div :model="presentTypeNode" style="left: 0; padding-bottom: 20px">
+                <div
+                  :model="presentTypeNode"
+                  style="left: 0; padding-bottom: 20px"
+                >
                   请选择节点类型
                 </div>
                 <div class="nodeCreateD">
@@ -451,7 +574,10 @@
                     content="包含完整的区块链数据（默认包含完整的网络路由功能）!"
                     placement="top"
                   >
-                    <el-radio v-model="nodeTypeChoose" label="fullNode" size="large"
+                    <el-radio
+                      v-model="nodeTypeChoose"
+                      label="fullNode"
+                      size="large"
                       ><div class="fullCreateNode">
                         <i class="iconfont"
                           >&#xe63e;<span class="icon-text">全节点</span></i
@@ -465,7 +591,10 @@
                     content="仅包含区块头数据,移动端使用较多（默认包含完整的网络路由功能）!"
                     placement="top"
                   >
-                    <el-radio v-model="nodeTypeChoose" label="lightNode" size="large"
+                    <el-radio
+                      v-model="nodeTypeChoose"
+                      label="lightNode"
+                      size="large"
                       ><div class="lightCreateNode">
                         <i class="iconfont"
                           >&#xe63e;<span class="icon-text">轻节点</span></i
@@ -479,7 +608,10 @@
                     content="负责产生区块的节点（默认包含完整的网络路由功能和区块链数据）!"
                     placement="top"
                   >
-                    <el-radio v-model="nodeTypeChoose" label="miningNode" size="large"
+                    <el-radio
+                      v-model="nodeTypeChoose"
+                      label="miningNode"
+                      size="large"
                       ><div class="miningCreateNode">
                         <i class="iconfont"
                           >&#xe63e;<span class="icon-text">挖矿节点</span></i
@@ -490,7 +622,9 @@
                 </div>
                 <template #footer>
                   <span class="dialog-footer">
-                    <el-button type="primary" @click="setNodeType">保存</el-button>
+                    <el-button type="primary" @click="setNodeType"
+                      >保存</el-button
+                    >
                   </span>
                 </template>
               </el-dialog>
@@ -504,7 +638,9 @@
                 :show-close="false"
                 :before-close="nodetypeHandleClose"
               >
-                <div :model="presentTypeNode" style="left: 0">请设置挖矿节点算力</div>
+                <div :model="presentTypeNode" style="left: 0">
+                  请设置挖矿节点算力
+                </div>
                 <div>
                   <el-tooltip
                     content="最低算力为10,不设上线,算力跨度为10!"
@@ -515,7 +651,9 @@
                 </div>
                 <template #footer>
                   <span class="dialog-footer">
-                    <el-button type="primary" @click="setHashRate">设置</el-button>
+                    <el-button type="primary" @click="setHashRate"
+                      >设置</el-button
+                    >
                   </span>
                 </template>
               </el-dialog>
@@ -560,7 +698,7 @@
           <el-card
             id="summaryGuide"
             class="box-card"
-            :body-style="{ padding: '5px', height: '245px' }"
+            :body-style="{ padding: '5px', height: SUMMARYHeight+'px' }"
           >
             <template #header>
               <div class="card-header" style="font-weight: bold">
@@ -581,7 +719,7 @@
           <el-card
             id="eventMenuGuide"
             class="box-card"
-            :body-style="{ padding: '5px', height: '230px' }"
+            :body-style="{ padding: '5px', height: EVENTHeight+'px' }"
           >
             <template #header>
               <div class="card-header" style="font-weight: bold">
@@ -636,12 +774,19 @@
                 >
                   {{ drwaerDateBlock.timestamp }}</el-descriptions-item
                 >
-                <el-descriptions-item label="Height" label-align="center" align="center">
+                <el-descriptions-item
+                  label="Height"
+                  label-align="center"
+                  align="center"
+                >
                   {{ drwaerDateBlock.height }}
                 </el-descriptions-item>
-                <el-descriptions-item label="Miner" label-align="center" align="center">{{
-                  drwaerDateBlock.miner
-                }}</el-descriptions-item>
+                <el-descriptions-item
+                  label="Miner"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateBlock.miner }}</el-descriptions-item
+                >
                 <el-descriptions-item
                   label="Number of Transactions"
                   label-align="center"
@@ -654,9 +799,12 @@
                   align="center"
                   >{{ drwaerDateBlock.difficulty }}</el-descriptions-item
                 >
-                <el-descriptions-item label="Nonce" label-align="center" align="center">{{
-                  drwaerDateBlock.nonce
-                }}</el-descriptions-item>
+                <el-descriptions-item
+                  label="Nonce"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateBlock.nonce }}</el-descriptions-item
+                >
                 <el-descriptions-item
                   label="Transaction Volume"
                   label-align="center"
@@ -702,9 +850,11 @@
                     <el-table-column prop="hash" label="hash" width="200" />
                     <el-table-column label="inputId" width="100">
                       <template #default="scope">
-                        <el-button type="text" @click="getInputData(scope.row.inputId)">{{
-                          scope.row.inputId
-                        }}</el-button>
+                        <el-button
+                          type="text"
+                          @click="getInputData(scope.row.inputId)"
+                          >{{ scope.row.inputId }}</el-button
+                        >
                       </template>
                     </el-table-column>
                     <el-table-column label="outputsId" width="100">
@@ -716,9 +866,21 @@
                         >
                       </template>
                     </el-table-column>
-                    <el-table-column prop="totalInput" label="totalInput" width="100" />
-                    <el-table-column prop="totalOutput" label="totalOutput" width="110" />
-                    <el-table-column prop="createTime" label="createTime" width="200" />
+                    <el-table-column
+                      prop="totalInput"
+                      label="totalInput"
+                      width="100"
+                    />
+                    <el-table-column
+                      prop="totalOutput"
+                      label="totalOutput"
+                      width="110"
+                    />
+                    <el-table-column
+                      prop="createTime"
+                      label="createTime"
+                      width="200"
+                    />
                     <el-table-column prop="status" label="status" width="100" />
                     <el-table-column prop="utxo" label="utxo" width="100" />
                   </el-table>
@@ -782,7 +944,10 @@
                 >
               </el-descriptions>
               <div class="textNode">节点内账户详情</div>
-              <div v-if="drwaerDateNode.accountList == null" class="textStatusNode">
+              <div
+                v-if="drwaerDateNode.accountList == null"
+                class="textStatusNode"
+              >
                 当前节点不包含任何账户<el-button
                   @click="createAccountVis(drwaerDateNode.addressId, 'dialog2')"
                   type="text"
@@ -814,7 +979,9 @@
                     >
                       <!-- 自定义标题 -->
                       <template #title>
-                        <div style="margin-left = 10px">{{ item.accountName }}</div>
+                        <div style="margin-left = 10px">
+                          {{ item.accountName }}
+                        </div>
                       </template>
                       <el-descriptions :column="1" border width="50px">
                         <el-descriptions-item
@@ -860,7 +1027,9 @@
                           align="center"
                           width="250px"
                           >{{ item.walletId
-                          }}<el-button type="text" @click="checkWallet(item.walletId)"
+                          }}<el-button
+                            type="text"
+                            @click="checkWallet(item.walletId)"
                             >查看</el-button
                           ></el-descriptions-item
                         >
@@ -877,7 +1046,9 @@
                               placement="top"
                               ><el-button
                                 size="small"
-                                @click="findLightListTransList2(item.transactionsId)"
+                                @click="
+                                  findLightListTransList2(item.transactionsId)
+                                "
                                 round
                                 >查询交易
                               </el-button>
@@ -978,9 +1149,11 @@
                     <el-table-column prop="hash" label="hash" width="200" />
                     <el-table-column label="inputId" width="100">
                       <template #default="scope">
-                        <el-button type="text" @click="getInputData(scope.row.inputId)">{{
-                          scope.row.inputId
-                        }}</el-button>
+                        <el-button
+                          type="text"
+                          @click="getInputData(scope.row.inputId)"
+                          >{{ scope.row.inputId }}</el-button
+                        >
                       </template>
                     </el-table-column>
                     <el-table-column label="outputsId" width="100">
@@ -992,9 +1165,21 @@
                         >
                       </template>
                     </el-table-column>
-                    <el-table-column prop="totalInput" label="totalInput" width="100" />
-                    <el-table-column prop="totalOutput" label="totalOutput" width="110" />
-                    <el-table-column prop="createTime" label="createTime" width="200" />
+                    <el-table-column
+                      prop="totalInput"
+                      label="totalInput"
+                      width="100"
+                    />
+                    <el-table-column
+                      prop="totalOutput"
+                      label="totalOutput"
+                      width="110"
+                    />
+                    <el-table-column
+                      prop="createTime"
+                      label="createTime"
+                      width="200"
+                    />
                     <el-table-column prop="status" label="status" width="100" />
                     <el-table-column prop="utxo" label="utxo" width="100" />
                   </el-table>
@@ -1020,15 +1205,27 @@
               label-align="left"
               align="left"
               min-width="100px"
-              ><el-tag size="small">{{ walletData.id }}</el-tag></el-descriptions-item
+              ><el-tag size="small">{{
+                walletData.id
+              }}</el-tag></el-descriptions-item
             >
-            <el-descriptions-item label="publicKkey" label-align="left" align="left">{{
-              walletData.publicKkey
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Address" label-align="left" align="left">{{
-              walletData.address
-            }}</el-descriptions-item>
-            <el-descriptions-item label="privateKey" label-align="left" align="left">
+            <el-descriptions-item
+              label="publicKkey"
+              label-align="left"
+              align="left"
+              >{{ walletData.publicKkey }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="Address"
+              label-align="left"
+              align="left"
+              >{{ walletData.address }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="privateKey"
+              label-align="left"
+              align="left"
+            >
               {{ walletData.privateKey }}
             </el-descriptions-item>
           </el-descriptions></el-form
@@ -1045,15 +1242,27 @@
               label-align="left"
               align="left"
               min-width="100px"
-              ><el-tag size="small">钱包唯一标识ID</el-tag></el-descriptions-item
+              ><el-tag size="small"
+                >钱包唯一标识ID</el-tag
+              ></el-descriptions-item
             >
-            <el-descriptions-item label="publickey" label-align="left" align="left"
+            <el-descriptions-item
+              label="publickey"
+              label-align="left"
+              align="left"
               >公钥用于接收交易虚拟货币</el-descriptions-item
             >
-            <el-descriptions-item label="Address" label-align="left" align="left"
+            <el-descriptions-item
+              label="Address"
+              label-align="left"
+              align="left"
               >钱包对应的账户地址</el-descriptions-item
             >
-            <el-descriptions-item label="privateKey" label-align="left" align="left">
+            <el-descriptions-item
+              label="privateKey"
+              label-align="left"
+              align="left"
+            >
               私钥用于虚拟货币交易时的交易签名
             </el-descriptions-item>
           </el-descriptions></el-form
@@ -1070,18 +1279,35 @@
               label-align="left"
               align="left"
               min-width="100px"
-              ><el-tag size="small">{{ inputData.id }}</el-tag></el-descriptions-item
+              ><el-tag size="small">{{
+                inputData.id
+              }}</el-tag></el-descriptions-item
             >
-            <el-descriptions-item label="address" label-align="left" align="left">{{
-              inputData.address
-            }}</el-descriptions-item>
-            <el-descriptions-item label="signature" label-align="left" align="left">
+            <el-descriptions-item
+              label="address"
+              label-align="left"
+              align="left"
+              >{{ inputData.address }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="signature"
+              label-align="left"
+              align="left"
+            >
               {{ inputData.signature }}
             </el-descriptions-item>
-            <el-descriptions-item label="pubKey" label-align="left" align="left">
+            <el-descriptions-item
+              label="pubKey"
+              label-align="left"
+              align="left"
+            >
               {{ inputData.pubKey }}
             </el-descriptions-item>
-            <el-descriptions-item label="transId" label-align="left" align="left">
+            <el-descriptions-item
+              label="transId"
+              label-align="left"
+              align="left"
+            >
               <el-button
                 v-for="item in inputData.transId"
                 type="text"
@@ -1089,9 +1315,12 @@
                 >{{ item }}</el-button
               >
             </el-descriptions-item>
-            <el-descriptions-item label="tranValue" label-align="left" align="left">{{
-              inputData.tranValue
-            }}</el-descriptions-item>
+            <el-descriptions-item
+              label="tranValue"
+              label-align="left"
+              align="left"
+              >{{ inputData.tranValue }}</el-descriptions-item
+            >
           </el-descriptions></el-form
         ></c-scrollbar
       >
@@ -1106,15 +1335,27 @@
               label-align="left"
               align="left"
               min-width="100px"
-              ><el-tag size="small">{{ outputData.id }}</el-tag></el-descriptions-item
+              ><el-tag size="small">{{
+                outputData.id
+              }}</el-tag></el-descriptions-item
             >
-            <el-descriptions-item label="address" label-align="left" align="left">{{
-              outputData.address
-            }}</el-descriptions-item>
-            <el-descriptions-item label="tranValue" label-align="left" align="left">{{
-              outputData.tranValue
-            }}</el-descriptions-item>
-            <el-descriptions-item label="transId" label-align="left" align="left">
+            <el-descriptions-item
+              label="address"
+              label-align="left"
+              align="left"
+              >{{ outputData.address }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="tranValue"
+              label-align="left"
+              align="left"
+              >{{ outputData.tranValue }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="transId"
+              label-align="left"
+              align="left"
+            >
               <el-button
                 v-for="item in outputData.transId"
                 type="text"
@@ -1136,36 +1377,66 @@
               label-align="left"
               align="left"
               min-width="100px"
-              ><el-tag size="small">{{ transData.id }}</el-tag></el-descriptions-item
+              ><el-tag size="small">{{
+                transData.id
+              }}</el-tag></el-descriptions-item
             >
-            <el-descriptions-item label="TransHash" label-align="left" align="left">{{
-              transData.hash
-            }}</el-descriptions-item>
-            <el-descriptions-item label="InputId" label-align="left" align="left">
+            <el-descriptions-item
+              label="TransHash"
+              label-align="left"
+              align="left"
+              >{{ transData.hash }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="InputId"
+              label-align="left"
+              align="left"
+            >
               <el-button type="text" @click="getInputData(transData.inputId)">{{
                 transData.inputId
               }}</el-button>
             </el-descriptions-item>
-            <el-descriptions-item label="OutputId" label-align="left" align="left">
-              <el-button type="text" @click="getOutputData(transData.outputId)">{{
-                transData.outputId
-              }}</el-button>
+            <el-descriptions-item
+              label="OutputId"
+              label-align="left"
+              align="left"
+            >
+              <el-button
+                type="text"
+                @click="getOutputData(transData.outputId)"
+                >{{ transData.outputId }}</el-button
+              >
             </el-descriptions-item>
-            <el-descriptions-item label="createTime" label-align="left" align="left">{{
-              transData.createTime
-            }}</el-descriptions-item>
-            <el-descriptions-item label="totalInput" label-align="left" align="left">{{
-              transData.totalInput
-            }}</el-descriptions-item>
-            <el-descriptions-item label="totalOutput" label-align="left" align="left">{{
-              transData.totalOutput
-            }}</el-descriptions-item>
-            <el-descriptions-item label="status" label-align="left" align="left">{{
-              transData.status
-            }}</el-descriptions-item>
-            <el-descriptions-item label="utxo" label-align="left" align="left">{{
-              transData.utxo
-            }}</el-descriptions-item>
+            <el-descriptions-item
+              label="createTime"
+              label-align="left"
+              align="left"
+              >{{ transData.createTime }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="totalInput"
+              label-align="left"
+              align="left"
+              >{{ transData.totalInput }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="totalOutput"
+              label-align="left"
+              align="left"
+              >{{ transData.totalOutput }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="status"
+              label-align="left"
+              align="left"
+              >{{ transData.status }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="utxo"
+              label-align="left"
+              align="left"
+              >{{ transData.utxo }}</el-descriptions-item
+            >
           </el-descriptions></el-form
         ></c-scrollbar
       >
@@ -1338,6 +1609,28 @@ let lastBlockCoordinate = reactive([457.8750305175781, 185.0999984741211]);
 
 export default {
   components: {},
+  props: {
+    text: {
+      type: String,
+      default: "默认文字",
+    },
+    itemWidth: {
+      type: Number,
+      default: 100,
+    },
+    itemHeight: {
+      type: Number,
+      default: 80,
+    },
+    gapWidth: {
+      type: Number,
+      default: 10,
+    },
+    coefficientHeight: {
+      type: Number,
+      default: 0.8,
+    },
+  },
   setup() {
     //折叠面板配置
     const activeName = ref(0);
@@ -1451,39 +1744,45 @@ export default {
     };
     //
     const findLightListTransList2 = (list) => {
-      findFullNodeToEnquire({ auth: getAuth(), nodeType: "fullNode" }).then((ress) => {
-        let resdata = ress.preData;
-        if (resdata != null) {
-          ElMessageBox.alert("该轻节点通过全节点(" + resdata + ")查询交易信息", "Mes", {
-            confirmButtonText: "OK",
-          });
-          List.transListId = list;
-          nodeTableData.length = 0;
-          FindTransListBYid(List).then((ress) => {
-            const res = ress.preData;
-            let lengths = res.length;
-            for (let i = 0; i < lengths; i++) {
-              nodeTableData.push({
-                id: res[i].transId,
-                hash: res[i].txIdHash,
-                inputId: res[i].inputsId,
-                outputsId: res[i].outputsId,
-                totalInput: res[i].totalInput,
-                totalOutput: res[i].totalOutput,
-                createTime: res[i].createTime,
-                status: res[i].status,
-                utxo: res[i].utxo,
-              });
-            }
-            let aasa = nodeTableData;
-            innerDrawer2.value = true;
-          });
-        } else {
-          ElMessageBox.alert("无可用的全节点用来查询交易信息！", "Mes", {
-            confirmButtonText: "OK",
-          });
+      findFullNodeToEnquire({ auth: getAuth(), nodeType: "fullNode" }).then(
+        (ress) => {
+          let resdata = ress.preData;
+          if (resdata != null) {
+            ElMessageBox.alert(
+              "该轻节点通过全节点(" + resdata + ")查询交易信息",
+              "Mes",
+              {
+                confirmButtonText: "OK",
+              }
+            );
+            List.transListId = list;
+            nodeTableData.length = 0;
+            FindTransListBYid(List).then((ress) => {
+              const res = ress.preData;
+              let lengths = res.length;
+              for (let i = 0; i < lengths; i++) {
+                nodeTableData.push({
+                  id: res[i].transId,
+                  hash: res[i].txIdHash,
+                  inputId: res[i].inputsId,
+                  outputsId: res[i].outputsId,
+                  totalInput: res[i].totalInput,
+                  totalOutput: res[i].totalOutput,
+                  createTime: res[i].createTime,
+                  status: res[i].status,
+                  utxo: res[i].utxo,
+                });
+              }
+              let aasa = nodeTableData;
+              innerDrawer2.value = true;
+            });
+          } else {
+            ElMessageBox.alert("无可用的全节点用来查询交易信息！", "Mes", {
+              confirmButtonText: "OK",
+            });
+          }
         }
-      });
+      );
     };
 
     const NodeDetailHandleClose = (done: () => void) => {
@@ -1649,6 +1948,9 @@ export default {
     const auth = computed(() => {
       return store.getters.authGetter;
     });
+    const isPhone = computed(() => {
+      return store.getters.getIsPhone;
+    });
     const getAuth = () => {
       return auth.value;
     };
@@ -1703,20 +2005,21 @@ export default {
 
     //编辑中介费比例
     function rewardAuthData() {
-      editRewardPre({ auth: getAuth(), rewardValue: rewardFee.value + "" }).then(
-        (ress) => {
-          let res = ress.preData;
-          if (res == true) {
-            ElMessage({
-              message: "设置成功!",
-              type: "success",
-            });
-            summaryMes[7].data = rewardFee.value + "%";
-          } else {
-            ElMessage.error("设置失败!");
-          }
+      editRewardPre({
+        auth: getAuth(),
+        rewardValue: rewardFee.value + "",
+      }).then((ress) => {
+        let res = ress.preData;
+        if (res == true) {
+          ElMessage({
+            message: "设置成功!",
+            type: "success",
+          });
+          summaryMes[7].data = rewardFee.value + "%";
+        } else {
+          ElMessage.error("设置失败!");
         }
-      );
+      });
       rewardFindVisible.value = false;
     }
 
@@ -1855,7 +2158,7 @@ export default {
     const findAllAccount = () => {
       findAllAccountList(accountInput).then((res) => {
         AllAccountData.length = 0;
-        for(let i = 0;i<res.length;i++){
+        for (let i = 0; i < res.length; i++) {
           AllAccountData.push(res[i]);
         }
       });
@@ -1887,15 +2190,23 @@ export default {
               this.BifurcatedChainCreate(res);
             });
           } else {
-            ElMessageBox.alert("当前挖矿节点数量小于2,请添加新挖矿节点!", "WARING", {
-              confirmButtonText: "OK",
-            });
+            ElMessageBox.alert(
+              "当前挖矿节点数量小于2,请添加新挖矿节点!",
+              "WARING",
+              {
+                confirmButtonText: "OK",
+              }
+            );
           }
         });
       } else {
-        ElMessageBox.alert("当前区块或节点数量小于2,请添加新区块和节点!", "WARING", {
-          confirmButtonText: "OK",
-        });
+        ElMessageBox.alert(
+          "当前区块或节点数量小于2,请添加新区块和节点!",
+          "WARING",
+          {
+            confirmButtonText: "OK",
+          }
+        );
       }
     };
     //模拟区块传输
@@ -2297,14 +2608,20 @@ export default {
               this.setPowFindVisible(true);
               this.increase();
               setTimeout(() => {
-                this.setShowBlockMes("交易发起者" + res.inputAddressId + "确定交易内容");
+                this.setShowBlockMes(
+                  "交易发起者" + res.inputAddressId + "确定交易内容"
+                );
                 this.increase();
                 setTimeout(() => {
                   this.increase();
-                  this.setShowBlockMes(res.inputAddressId + "利用私钥对交易进行签名");
+                  this.setShowBlockMes(
+                    res.inputAddressId + "利用私钥对交易进行签名"
+                  );
                   setTimeout(() => {
                     this.increase();
-                    this.setShowBlockMes(res.inputAddressId + "开始验证交易合法性!");
+                    this.setShowBlockMes(
+                      res.inputAddressId + "开始验证交易合法性!"
+                    );
                     setTimeout(() => {
                       this.increase();
                       this.setShowBlockMes(
@@ -2430,20 +2747,22 @@ export default {
     const dialogConWalletVisible = ref(false);
 
     const checkWallet = (walletId) => {
-      findWalletCon({ walletId: walletId + "", auth: getAuth() }).then((ress) => {
-        let res = ress.preData;
-        if (res != null || res != "") {
-          walletData.id = res.walletId;
-          walletData.publicKkey = res.publicKey;
-          walletData.privateKey = res.privateKey;
-          walletData.address = res.address;
-          dialogWalletVisible.value = true;
-        } else {
-          ElMessageBox.alert("查看失败", "WARN", {
-            confirmButtonText: "OK",
-          });
+      findWalletCon({ walletId: walletId + "", auth: getAuth() }).then(
+        (ress) => {
+          let res = ress.preData;
+          if (res != null || res != "") {
+            walletData.id = res.walletId;
+            walletData.publicKkey = res.publicKey;
+            walletData.privateKey = res.privateKey;
+            walletData.address = res.address;
+            dialogWalletVisible.value = true;
+          } else {
+            ElMessageBox.alert("查看失败", "WARN", {
+              confirmButtonText: "OK",
+            });
+          }
         }
-      });
+      );
     };
 
     //交易溯源
@@ -2481,9 +2800,13 @@ export default {
             }
           });
         } else {
-          ElMessageBox.alert("输入ID未0时表示产生区块时的奖励输入!", "Message", {
-            confirmButtonText: "OK",
-          });
+          ElMessageBox.alert(
+            "输入ID未0时表示产生区块时的奖励输入!",
+            "Message",
+            {
+              confirmButtonText: "OK",
+            }
+          );
         }
       } else {
         ElMessageBox.alert("信息不存在!", "Message", {
@@ -2583,7 +2906,10 @@ export default {
       id: 1,
       blockID: "GenesisBlock1",
       height: 1,
-      hash: ["000a6c2a3347ff2ef0a48ae2508716", "cfab42ae75b71d52ab36d2815ead9efa35"],
+      hash: [
+        "000a6c2a3347ff2ef0a48ae2508716",
+        "cfab42ae75b71d52ab36d2815ead9efa35",
+      ],
       timestamp: "2022-02-16 23:15:09",
       confirmations: 1,
       miner: null,
@@ -2593,7 +2919,8 @@ export default {
       transactionVolume: 0,
       reward: 10,
       feeReward: 0,
-      prevBlockHash: "0000000000000000000000000000000000000000000000000000000000000000",
+      prevBlockHash:
+        "0000000000000000000000000000000000000000000000000000000000000000",
       transactionId: "",
     });
     let drwaerDateNode = reactive({
@@ -2649,10 +2976,10 @@ export default {
         tabName: "Transaction fee:  ",
         data: "0%",
       },
-        {
-      tabName: "Account quantity:  ",
-      data: "0",
-    },
+      {
+        tabName: "Account quantity:  ",
+        data: "0",
+      },
     ]);
     //详情信息
     let eventMes = reactive([
@@ -2710,31 +3037,33 @@ export default {
             type: res.nodeType,
           },
         });
-        addP2pNet({ addressId: res.addressId, auth: getAuth() }).then((ress) => {
-          const res = ress.preData[0];
-          const localNetWork = ress.preData[1];
-          if (res.success == "true") {
-            if (res.addressId == "Node1") {
-              ElMessage({
-                message: "节点网络初始化!",
-                type: "success",
-              });
+        addP2pNet({ addressId: res.addressId, auth: getAuth() }).then(
+          (ress) => {
+            const res = ress.preData[0];
+            const localNetWork = ress.preData[1];
+            if (res.success == "true") {
+              if (res.addressId == "Node1") {
+                ElMessage({
+                  message: "节点网络初始化!",
+                  type: "success",
+                });
+              } else {
+                ElMessage({
+                  message: "节点网络添加成功!",
+                  type: "success",
+                });
+                //可视化网络节点添加
+                this.localNetWorkAdd(localNetWork);
+                this.setNodeLists();
+              }
             } else {
               ElMessage({
-                message: "节点网络添加成功!",
-                type: "success",
+                message: "节点网络异常!",
+                type: "warning",
               });
-              //可视化网络节点添加
-              this.localNetWorkAdd(localNetWork);
-              this.setNodeLists();
             }
-          } else {
-            ElMessage({
-              message: "节点网络异常!",
-              type: "warning",
-            });
           }
-        });
+        );
         LogEvent("create new " + res.addressId + ":", res.address);
         // const nodeListIdsdadsaa = this.nodeListId;
 
@@ -2892,6 +3221,15 @@ export default {
     };
 
     return {
+      timerFloat: null,
+      currentTop: 0,
+      clientWidth: 0,
+      clientHeight: 0,
+      superFlowHeight: 538,
+      SUMMARYHeight: 245,
+      EVENTHeight: 230,
+      leftFloat: 0,
+      topFloat: 0,
       drawerType,
       linkSetting: {
         desc: "",
@@ -3033,7 +3371,9 @@ export default {
           {
             label: "创世块",
             disable(graph) {
-              return !!graph.nodeList.find((node) => node.meta.label === "GenesisBlock1");
+              return !!graph.nodeList.find(
+                (node) => node.meta.label === "GenesisBlock1"
+              );
             },
             selected(graph, coordinate) {
               if (graph.nodeList.length > 0) {
@@ -3130,51 +3470,54 @@ export default {
                 target.splice(index, 1);
               }
               this.removeNodes();
-              deleteNode({ addressId: node.meta.name, auth: getAuth() }).then((ress) => {
-                const res = ress.preData;
-                if (res == true) {
-                  node.remove();
-                  LogEvent("delete : ", node.meta.name);
+              deleteNode({ addressId: node.meta.name, auth: getAuth() }).then(
+                (ress) => {
+                  const res = ress.preData;
+                  if (res == true) {
+                    node.remove();
+                    LogEvent("delete : ", node.meta.name);
+                  }
                 }
-              });
+              );
             },
           },
           {
             label: "查看",
             selected: (node) => {
               if (node.meta.prop == "node") {
-                findNodeByAddressId({ addressId: node.meta.name, auth: getAuth() }).then(
-                  (ress) => {
-                    const res = ress.preData;
-                    if (res == null) {
-                      ElMessage.error("无法查看!");
-                    } else {
-                      drwaerDateNode.address = res.address;
-                      drwaerDateNode.addressId = res.addressId;
-                      drwaerDateNode.transactions = res.transactions;
-                      drwaerDateNode.totalReceived = res.totalReceived;
-                      drwaerDateNode.totalSent = res.totalSent;
-                      drwaerDateNode.balance = res.balance;
-                      drwaerDateNode.nodeType = res.nodeType;
-                      drwaerDateNode.walletId = res.walletId;
-                      drwaerDateNode.transactionId = res.transactionsId;
-                      drwaerDateNode.hashRate = res.hashRate;
-                      drwaerDateNode.accountList = res.accountList;
-                      if (res.accountList != null && res.accountList != "") {
-                        accountInput.accountName = res.accountList;
-                        findAccountList(accountInput).then((res) => {
-                          drwaerDateNodeAccount.length = 0;
-                          for (let i = 0; i < res.length; i++) {
-                            drwaerDateNodeAccount.push(res[i]);
-                          }
-                        });
-                      }
-                      let sue = drwaerDateNode;
-                      this.drawerTrue("dialog2");
-                      setPresentTypeNode(res.addressId);
+                findNodeByAddressId({
+                  addressId: node.meta.name,
+                  auth: getAuth(),
+                }).then((ress) => {
+                  const res = ress.preData;
+                  if (res == null) {
+                    ElMessage.error("无法查看!");
+                  } else {
+                    drwaerDateNode.address = res.address;
+                    drwaerDateNode.addressId = res.addressId;
+                    drwaerDateNode.transactions = res.transactions;
+                    drwaerDateNode.totalReceived = res.totalReceived;
+                    drwaerDateNode.totalSent = res.totalSent;
+                    drwaerDateNode.balance = res.balance;
+                    drwaerDateNode.nodeType = res.nodeType;
+                    drwaerDateNode.walletId = res.walletId;
+                    drwaerDateNode.transactionId = res.transactionsId;
+                    drwaerDateNode.hashRate = res.hashRate;
+                    drwaerDateNode.accountList = res.accountList;
+                    if (res.accountList != null && res.accountList != "") {
+                      accountInput.accountName = res.accountList;
+                      findAccountList(accountInput).then((res) => {
+                        drwaerDateNodeAccount.length = 0;
+                        for (let i = 0; i < res.length; i++) {
+                          drwaerDateNodeAccount.push(res[i]);
+                        }
+                      });
                     }
+                    let sue = drwaerDateNode;
+                    this.drawerTrue("dialog2");
+                    setPresentTypeNode(res.addressId);
                   }
-                );
+                });
               } else if (node.meta.prop == "block") {
                 findBlockByBlockId({
                   blockId: node.meta.name,
@@ -3241,6 +3584,7 @@ export default {
       },
       fontList: ["14px Arial", "italic small-caps bold 12px arial"],
       driver: null,
+      isPhone,
       summaryMes,
       eventMes,
       linkList,
@@ -3357,6 +3701,13 @@ export default {
     });
     const data = getDataString();
     this.summaryMes[0].data = data;
+    this.clientWidth = document.documentElement.clientWidth;
+    this.clientHeight = document.documentElement.clientHeight;
+    this.leftFloat = this.clientWidth - this.itemWidth - this.gapWidth;
+    this.topFloat = this.clientHeight * this.coefficientHeight;
+    window.addEventListener("scroll", this.handleScrollStart);
+
+    
   },
   mounted() {
     //s标识表示simblock页面
@@ -3376,13 +3727,49 @@ export default {
         }
       });
     }
+    //浮动说明面板位置定制
+    let targetelements: HTMLElement = document.querySelector(".flow-container");
+    let targetelementsPs: HTMLElement = document.querySelector(".midContent");
+    let targeTop = targetelements.offsetTop + this.itemHeight / 2;
+    let targeLeft =
+      targetelements.clientWidth + targetelementsPs.offsetLeft - this.itemWidth;
+    if (screenWidth < minSize) {
+      targeTop += this.gapWidth + this.itemHeight / 2;
+      targeLeft -= this.gapWidth;
+    } else {
+      let targetelementsP: HTMLElement =
+        document.querySelector(".verticalContent");
+      targeTop += targetelementsP.offsetTop;
+      targeLeft += targetelementsP.offsetLeft;
+    }
+
+    this.leftFloat = targeLeft;
+    this.topFloat = targeTop;
+    let tsad = document.documentElement;
 
     document.addEventListener("mousemove", this.docMousemove);
     document.addEventListener("mouseup", this.docMouseup);
+
+    //画布与图像高度配置
+    if (this.isPhone) {
+      let targetelements: HTMLElement = document.querySelector(".isPhone");
+      this.superFlowHeight = targetelements.clientHeight * 0.85; //90
+      this.SUMMARYHeight = targetelements.clientHeight * 0.43; //45
+      this.EVENTHeight = targetelements.clientHeight * 0.32; //32
+    } else {
+      let targetelements: HTMLElement =
+        document.querySelector(".verticalContent");
+      this.superFlowHeight = targetelements.clientHeight * 0.8; //80
+      this.SUMMARYHeight = targetelements.clientHeight * 0.38; //38
+      this.EVENTHeight = targetelements.clientHeight * 0.35; //36
+    }
   },
   beforeUnmount() {
     document.removeEventListener("mousemove", this.docMousemove);
     document.removeEventListener("mouseup", this.docMouseup);
+  },
+  beforeDestroy() {
+    window.removeEventListener("scroll", this.handleScrollStart);
   },
   methods: {
     flowNodeGraph() {
@@ -3488,7 +3875,8 @@ export default {
       } else if (conf.isDown) {
         // 鼠标移动量大于 5 时 移动状态生效
         conf.isMove =
-          Math.abs(clientX - conf.clientX) > 5 || Math.abs(clientY - conf.clientY) > 5;
+          Math.abs(clientX - conf.clientX) > 5 ||
+          Math.abs(clientY - conf.clientY) > 5;
       }
     },
     //拖拽结束动作
@@ -3497,15 +3885,16 @@ export default {
       conf.isDown = false;
 
       if (conf.isMove) {
-        const {
-          top,
-          right,
-          bottom,
-          left,
-        } = this.$refs.flowContainer.getBoundingClientRect();
+        const { top, right, bottom, left } =
+          this.$refs.flowContainer.getBoundingClientRect();
         let graph = this.$refs.superFlow.graph;
         // 判断鼠标是否进入 flow container
-        if (clientX > left && clientX < right && clientY > top && clientY < bottom) {
+        if (
+          clientX > left &&
+          clientX < right &&
+          clientY > top &&
+          clientY < bottom
+        ) {
           // 获取拖动元素左上角相对 super flow 区域原点坐标
           const coordinate = this.$refs.superFlow.getMouseCoordinate(
             clientX - conf.offsetLeft,
@@ -3617,10 +4006,14 @@ export default {
                           type: "block",
                         },
                       });
-                      this.LogEvent("create new " + res.blockID + ":", res.hash);
+                      this.LogEvent(
+                        "create new " + res.blockID + ":",
+                        res.hash
+                      );
                       const nodeListIdsdadsaa = blockListId;
                       const newBlocklist = this.$refs.superFlow.graph.nodeList;
-                      const presentBlock = newBlocklist[newBlocklist.length - 1];
+                      const presentBlock =
+                        newBlocklist[newBlocklist.length - 1];
                       presentBlock.meta.name = res.blockID;
                       if (presentBlock.meta.prop == "block") {
                         // let presentNodsd=presentNode.id;
@@ -3659,7 +4052,8 @@ export default {
 
                       const data = blockListId.length;
                       this.summaryMes[2].data = data;
-                      this.summaryMes[6].data = 1 + Number(this.summaryMes[6].data);
+                      this.summaryMes[6].data =
+                        1 + Number(this.summaryMes[6].data);
                       // this.$refs.superFlow.addNode({
                       //   coordinate,
                       //   ...conf.info,
@@ -3778,7 +4172,9 @@ export default {
                     //模拟竞争挖矿
                     this.setPowMinFindVisible(true);
                     this.increase();
-                    this.setShowBlockMes("即将进入所有节点竞争挖矿模拟界面......");
+                    this.setShowBlockMes(
+                      "即将进入所有节点竞争挖矿模拟界面......"
+                    );
                     setTimeout(() => {
                       //挖矿竞争界面处理perAddNumIns
                       for (let k = 1; k <= 40; k++) {
@@ -3796,12 +4192,16 @@ export default {
                         setTimeout(() => {
                           this.increase();
                           this.setShowBlockMes(
-                            "挖矿节点(" + res.miner + ")开始处理未确定交易等事务!"
+                            "挖矿节点(" +
+                              res.miner +
+                              ")开始处理未确定交易等事务!"
                           );
                           setTimeout(() => {
                             this.increase();
                             this.setShowBlockMes(
-                              res.miner + "处理的未确定交易等事务id:" + res.transactions
+                              res.miner +
+                                "处理的未确定交易等事务id:" +
+                                res.transactions
                             );
                             setTimeout(() => {
                               this.increase();
@@ -3829,8 +4229,8 @@ export default {
                                     res.hash
                                   );
                                   // const nodeListIdsdadsaa = blockListId;
-                                  const newBlocklist = this.$refs.superFlow.graph
-                                    .nodeList;
+                                  const newBlocklist =
+                                    this.$refs.superFlow.graph.nodeList;
                                   const presentBlock =
                                     newBlocklist[newBlocklist.length - 1];
                                   presentBlock.meta.name = res.blockID;
@@ -3842,28 +4242,40 @@ export default {
                                     });
                                   }
                                   if (this.summaryMes[3].data == "0") {
-                                    this.summaryMes[3].data = presentBlock.meta.label;
+                                    this.summaryMes[3].data =
+                                      presentBlock.meta.label;
                                   }
-                                  this.summaryMes[4].data = presentBlock.meta.label;
+                                  this.summaryMes[4].data =
+                                    presentBlock.meta.label;
                                   const newId = uuid("link");
                                   const lengthblockListId = blockListId.length;
                                   if (lengthblockListId >= 2) {
-                                    const lengthLinklength = this.linkList.length;
+                                    const lengthLinklength =
+                                      this.linkList.length;
                                     const targetLinkList = [];
                                     if (lengthLinklength > 0) {
-                                      for (var i = 0; i < lengthLinklength; i++) {
+                                      for (
+                                        var i = 0;
+                                        i < lengthLinklength;
+                                        i++
+                                      ) {
                                         targetLinkList.push(this.linkList[i]);
                                       }
                                     }
                                     targetLinkList.push({
                                       id: newId,
-                                      startId: blockListId[lengthblockListId - 2].id,
-                                      endId: blockListId[lengthblockListId - 1].id,
+                                      startId:
+                                        blockListId[lengthblockListId - 2].id,
+                                      endId:
+                                        blockListId[lengthblockListId - 1].id,
                                       startAt: [100, 24],
                                       endAt: [0, 25],
                                       meta: {
-                                        start: blockListId[lengthblockListId - 2].label,
-                                        end: blockListId[lengthblockListId - 1].label,
+                                        start:
+                                          blockListId[lengthblockListId - 2]
+                                            .label,
+                                        end: blockListId[lengthblockListId - 1]
+                                          .label,
                                       },
                                     });
                                     this.linkList = targetLinkList;
@@ -3948,7 +4360,10 @@ export default {
       }
       const lengthLinklength = this.linkList.length;
       for (let i = 0; i < lengthLinklength; i++) {
-        if (this.linkList[i].startId == startuuid && this.linkList[i].endId == enduuid) {
+        if (
+          this.linkList[i].startId == startuuid &&
+          this.linkList[i].endId == enduuid
+        ) {
           if (i == 0) {
             this.linkList.shift();
           } else {
@@ -3969,7 +4384,10 @@ export default {
             targetLinkList.push(this.linkList[i]);
           } else {
             console.log(
-              "remove:" + this.linkList[i].startId + "-" + this.linkList[i].endId
+              "remove:" +
+                this.linkList[i].startId +
+                "-" +
+                this.linkList[i].endId
             );
           }
         }
@@ -4035,7 +4453,9 @@ export default {
                   );
                   setTimeout(() => {
                     this.increase();
-                    this.setShowBlockMes("挖矿节点开始处理交易池内unconfirmed事务!");
+                    this.setShowBlockMes(
+                      "挖矿节点开始处理交易池内unconfirmed事务!"
+                    );
                     setTimeout(() => {
                       this.increase();
                       this.setShowBlockMes(
@@ -4060,7 +4480,8 @@ export default {
                             const bifBlock1 = res[0];
                             const bifBlock2 = res[1];
                             const lengthblockListId = blockListId.length;
-                            const start = blockListId[lengthblockListId - 1].lable;
+                            const start =
+                              blockListId[lengthblockListId - 1].lable;
                             this.addSuperNode(coordinate, bifBlock1, "block");
                             const coordinate2 = coordinate;
                             coordinate2[1] = coordinate2[1] - 60;
@@ -4075,7 +4496,8 @@ export default {
                             this.summaryMes[4].data =
                               bifBlock1.blockId + " or " + bifBlock2.blockId;
                             this.summaryMes[2].data = data;
-                            this.summaryMes[6].data = 1 + Number(this.summaryMes[6].data);
+                            this.summaryMes[6].data =
+                              1 + Number(this.summaryMes[6].data);
                             setTimeout(() => {
                               this.setPowFindVisible(false);
                               this.setShowBlockMes(" ");
@@ -4170,7 +4592,10 @@ export default {
       };
       let length = linkList.length;
       for (let i = length - 1; i >= 0; i--) {
-        if (linkList[i].start.meta.prop === "node" && linkList[i]._end.meta.prop) {
+        if (
+          linkList[i].start.meta.prop === "node" &&
+          linkList[i]._end.meta.prop
+        ) {
           end.valueTrans1 = linkList[i].start.meta.label;
           end.valueTrans2 = linkList[i]._end.meta.label;
         }
@@ -4203,8 +4628,13 @@ export default {
               }
             }
             if (list[i].neighbourThree != null) {
-              if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourThree)) {
-                this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourThree);
+              if (
+                this.isLinkExist(list[i].nodeAddress, list[i].neighbourThree)
+              ) {
+                this.bothWayLinkAdd(
+                  list[i].nodeAddress,
+                  list[i].neighbourThree
+                );
               }
             }
           }
@@ -4216,7 +4646,10 @@ export default {
       for (let i = 0; i < localLinkList.length; i++) {
         let rqw = start === localLinkList[i].meta.start;
         let sdas = end === localLinkList[i].meta.end;
-        if (start === localLinkList[i].meta.start && end === localLinkList[i].meta.end) {
+        if (
+          start === localLinkList[i].meta.start &&
+          end === localLinkList[i].meta.end
+        ) {
           return false;
         } else if (
           end === localLinkList[i].meta.start &&
@@ -4401,6 +4834,34 @@ export default {
         this.driver.start();
       });
     },
+    onBtnClicked() {
+      this.$emit("onFloatBtnClicked");
+    },
+    handleScrollStart() {
+      this.timerFloat && clearTimeout(this.timerFloat);
+      this.timerFloat = setTimeout(() => {
+        this.handleScrollEnd();
+      }, 300);
+      this.currentTop =
+        document.documentElement.scrollTop || document.body.scrollTop;
+      if (this.leftFloat > this.clientWidth / 2) {
+        this.leftFloat = this.clientWidth - this.itemWidth / 2;
+      } else {
+        this.leftFloat = -this.itemWidth / 2;
+      }
+    },
+    handleScrollEnd() {
+      let scrollTop =
+        document.documentElement.scrollTop || document.body.scrollTop;
+      if (scrollTop === this.currentTop) {
+        if (this.leftFloat > this.clientWidth / 2) {
+          this.leftFloat = this.clientWidth - this.itemWidth - this.gapWidth;
+        } else {
+          this.leftFloat = this.gapWidth;
+        }
+        clearTimeout(this.timerFloat);
+      }
+    },
   },
 };
 </script>
@@ -4506,7 +4967,8 @@ export default {
   font-family: "iconfont"; /* Project id 3114720 */
   src: url("//at.alicdn.com/t/font_3114720_53ytv0qyp8e.woff2?t=1650037385345")
       format("woff2"),
-    url("//at.alicdn.com/t/font_3114720_53ytv0qyp8e.woff?t=1650037385345") format("woff"),
+    url("//at.alicdn.com/t/font_3114720_53ytv0qyp8e.woff?t=1650037385345")
+      format("woff"),
     url("//at.alicdn.com/t/font_3114720_53ytv0qyp8e.ttf?t=1650037385345")
       format("truetype");
 }
@@ -4645,7 +5107,7 @@ export default {
   font-weight: bold;
 }
 .textStatusNode {
-  border-bottom-style:1px solid var(--el-border-color);
+  border-bottom-style: 1px solid var(--el-border-color);
   padding-top: 20px;
   height: 30px;
   width: 100%;
@@ -4659,6 +5121,11 @@ export default {
 [class*="driver-close-btn"] {
   visibility: hidden;
 }
-.floatplat{
+.content-node-box{
+  width: 85%;
+  height: 29%;
+  margin: 2%;
+  font-size: 8px;
+  line-height: 22px;
 }
 </style>

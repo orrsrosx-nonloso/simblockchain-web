@@ -4,7 +4,7 @@
       <canvas id="myCanvas" :width="width" :height="height"> </canvas>
     </div>
     <div v-if="status == 1" id="loginBox">
-      <h4>SBC</h4>
+      <h4>SIMBLOCKCHAIN</h4>
       <el-form label-width="0px" :model="state.formLabelAlign">
         <el-form-item label="" prop="userName" style="margin-top: 40px">
           <el-row>
@@ -130,7 +130,9 @@
       </el-form>
     </div>
   </div>
-  <div class="bottomRec">MayCopyright © 2022 || 推荐PC端使用(Google Chrome/Microsoft Edge)</div>
+  <div class="bottomRec">
+    MayCopyright © 2022 || 推荐PC端使用(Google Chrome/Microsoft Edge)
+  </div>
 </template>
 
 <script>
@@ -143,7 +145,7 @@ import { useRouter } from "vue-router";
 import { getLoginMes, registerUser } from "../api/apis";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { judgePhone } from "../utils/utils";
-import {insertToVisitor} from "../api/apis.js"
+import { insertToVisitor } from "../api/apis.js";
 
 export default {
   components: {
@@ -192,7 +194,8 @@ export default {
     const { t } = useI18n();
 
     function changeType() {
-      state.passwordType = state.passwordType == "password" ? "text" : "password";
+      state.passwordType =
+        state.passwordType == "password" ? "text" : "password";
     }
 
     function regist() {
@@ -275,9 +278,17 @@ export default {
           store
             .dispatch("asyncGetRoutes", res.data.username)
             .then((path) => {
-              console.log("path", path);
-              state.loginLoading = false;
-              router.push("/layout/" + path[0].path);
+              //小于1100时设置为不可访问
+              let screenWidth = document.body.clientWidth;
+              let minSize = 1100;
+              if(screenWidth<minSize){
+                router.push("/needUserPc");
+              }{
+                console.log("path", path);
+                state.loginLoading = false;
+                router.push("/layout/" + path[0].path);
+              }
+              
             })
             .catch(() => {
               console.log("store2", store);
@@ -346,7 +357,9 @@ export default {
         passWord: "",
       },
       loginRules: {
-        userName: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+        userName: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+        ],
         passWord: [{ required: true, message: "请输入密码", trigger: "blur" }],
       },
       router,
@@ -420,7 +433,11 @@ export default {
     padding: 50px 40px 40px 40px;
     box-shadow: -15px 15px 15px rgba(6, 17, 47, 0.7);
     opacity: 1;
-    background: linear-gradient(230deg, rgba(53, 57, 74, 0) 0%, rgb(0, 0, 0) 100%);
+    background: linear-gradient(
+      230deg,
+      rgba(53, 57, 74, 0) 0%,
+      rgb(0, 0, 0) 100%
+    );
     .inps input {
       border: none;
       color: #fff;
@@ -450,7 +467,11 @@ export default {
     padding: 50px 40px 40px 40px;
     box-shadow: -15px 15px 15px rgba(6, 17, 47, 0.7);
     opacity: 1;
-    background: linear-gradient(230deg, rgba(53, 57, 74, 0) 0%, rgb(0, 0, 0) 100%);
+    background: linear-gradient(
+      230deg,
+      rgba(53, 57, 74, 0) 0%,
+      rgb(0, 0, 0) 100%
+    );
     .inps input {
       border: none;
       color: #fff;
@@ -469,7 +490,7 @@ export default {
     }
   }
 }
-.bottomRec{
+.bottomRec {
   color: rgb(73, 73, 73);
   height: 4vh;
   background-color: rgb(120, 147, 173);

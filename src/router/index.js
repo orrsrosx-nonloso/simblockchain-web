@@ -4,6 +4,7 @@ import Login from '../components/Login.vue'
 import Index from '../components/Index.vue'
 import layout from '../layout/layout.vue'
 import ErrPage from '../components/ErrPage.vue'
+import needUserPc from '../components/needUserPc.vue'
 import { delCookie, getCookie } from '../utils/cookie.js'
 import { loginOut } from "../api/apis";
 import { useStore } from "vuex";
@@ -31,6 +32,11 @@ const routes = [
         path: '/404',
         name: 'notFound',
         component: ErrPage
+    },
+    {//needPC
+        path: '/needUserPc',
+        name: 'needUserPc',
+        component: needUserPc
     }
 ]
 

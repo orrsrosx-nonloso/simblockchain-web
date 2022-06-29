@@ -1,20 +1,5 @@
 <template>
-  <!-- <div class="card-header-stat">
-    <el-menu
-      :default-active="activeIndexss"
-      class="tab"
-      mode="horizontal"
-      @select="callback"
-    >
-      <el-menu-item index="1">访问数据统计</el-menu-item>
-      <el-menu-item v-if="authorityGet == 0" index="2">用户注册统计</el-menu-item>
-      <el-menu-item v-if="authorityGet == 0" index="3">用户仿真统计</el-menu-item>
-    </el-menu>
-  </div>
-  <div class="tab-box">
-    <div id="chart"></div>
-  </div> -->
-  <!-- <div class="card-header-statistics">
+ <!-- <div class="card-header-statistics">
     <el-menu
       :default-active="activeIndexss"
       class="el-menu-demo"
@@ -22,8 +7,12 @@
       @select="callback"
     >
       <el-menu-item index="1">访问数据统计</el-menu-item>
-      <el-menu-item v-if="authorityGet == 0" index="2">用户注册统计</el-menu-item>
-      <el-menu-item v-if="authorityGet == 0" index="3">用户仿真统计</el-menu-item>
+      <el-menu-item v-if="authorityGet == 0" index="2"
+        >用户注册统计</el-menu-item
+      >
+      <el-menu-item v-if="authorityGet == 0" index="3"
+        >用户仿真统计</el-menu-item
+      >
     </el-menu>
   </div>
   <div class="tab-box">
@@ -282,28 +271,12 @@
 </script>
 <style>
 /* .tab-box {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
   width: 100%;
-  height: 100%;
-  margin: 10px auto;
-  padding-top: 20px;
-}
-.tab {
-  width: 100%;
-}
-#chart {
-  width: 100%;
-  height: 50%;
-}
-.card-header-stat {
-  width: 99%;
-  height: 55px;
-  justify-content: space-between;
-  align-items: center;
-} */
-/* .tab-box {
-  width: 100%;
-  height: 100%;
-  margin: 10px auto;
+  height: 65%;
+  margin: auto 10px 10px auto;
+  border: 1px solid #e4e7ed;
   padding-top: 20px;
 }
 .tab {
@@ -311,10 +284,14 @@
   width: 30px;
 }
 #chart {
-  width: 100%;
-  height: 50%;
+  width: 92%;
+  height: 90%;
+  padding-left: 10px;
 }
 .card-header-statistics {
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #e4e7ed;
   width: 99%;
   height: 55px;
   justify-content: space-between;

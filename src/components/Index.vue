@@ -1,13 +1,20 @@
 <template>
   <el-container style="width: 100vw; height: 100vh">
     <el-header>
-      <el-menu :default-active="activeIndex" mode="horizontal" >
+      <el-menu :default-active="activeIndex" mode="horizontal">
         <el-menu-item>
-          <img src="../assets/logopage.png" style="width: 320px; height: 62px" />
+          <img
+            src="../assets/logopage.png"
+            style="width: 320px; height: 62px"
+          />
         </el-menu-item>
 
         <el-menu-item style="margin-left: auto; font-weight: bold">
-          <el-button @click="LoginWithSub" style="color: #1e1e1e" type="text" plain
+          <el-button
+            @click="LoginWithSub"
+            style="color: #1e1e1e"
+            type="text"
+            plain
             >开始仿真实验</el-button
           >
         </el-menu-item>
@@ -39,7 +46,7 @@
                 </div>
               </div>
               <div class="boxPage">
-                <img src="../assets/study.png" alt="" style="width: 460px;">
+                <img src="../assets/study.png" alt="" style="width: 460px" />
               </div>
             </div>
           </el-carousel-item>
@@ -47,7 +54,8 @@
       </slot>
     </el-main>
     <el-footer height="40px" style="color: #909399; text-align: center"
-      >MayCopyright © 2022 || 推荐PC端使用(Google Chrome/Microsoft Edge)</el-footer
+      >MayCopyright © 2022 || 推荐PC端使用(Google Chrome/Microsoft
+      Edge)</el-footer
     >
   </el-container>
 </template>
@@ -59,8 +67,7 @@ import { useStore } from "vuex";
 // import { useRouter } from "vue-router";
 // const router = useRouter();
 
-import {insertToVisitor} from "../api/apis.js"
-
+import { insertToVisitor } from "../api/apis.js";
 
 export default {
   data() {
@@ -80,20 +87,27 @@ export default {
       }
     }
     function LoginWithP() {
-      let j = getAuth();
-      if (j != null) {
-        router.replace("/layout/tree");
-      } else {
-        router.replace("/login");
+      let screenWidth = document.body.clientWidth;
+      let minSize = 1100;
+      if (screenWidth < minSize) {
+        router.push("/needUserPc");
+      }
+      {
+        let j = getAuth();
+        if (j != null) {
+          router.replace("/layout/tree");
+        } else {
+          router.replace("/login");
+        }
       }
     }
-    return { LoginWithP,LoginWithSub };
+    return { LoginWithP, LoginWithSub };
   },
   created() {
     insertToVisitor(null);
   },
   components: {},
-  
+
   computed: {},
   methods: {},
 };
@@ -141,10 +155,10 @@ export default {
 .textButton {
   padding-top: 5%;
 }
-.buttons{
+.buttons {
   color: rgb(255, 255, 255);
 }
-.buttons:hover{
+.buttons:hover {
   color: rgb(227, 251, 255);
 }
 </style>
