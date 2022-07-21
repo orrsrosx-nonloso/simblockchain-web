@@ -51,7 +51,7 @@ export default {
       "周四",
       "周五",
       "周六",
-      "周s日",
+      "周日",
     ]);
     const setDayData = (dayDataArray) => {
       for (let i = 0; i <= 6; i++) {
@@ -86,6 +86,32 @@ export default {
     };
     let authorityGet = getAuthss();
     let activeIndexss = ref("1");
+    // //提前获取第一组数据
+    // let accountInput = reactive({
+    //   accountName: "",
+    //   auth: "",
+    //   nodeId: null,
+    //   account: null,
+    // });
+    // getLogMesData(accountInput).then((res) => {
+    //   let targetDay = reactive([]);
+    //   let targetData1 = reactive([]);
+    //   let dataDay = res.logMesData;
+    //   for (let i = 0; i < 7; i++) {
+    //     let day = getDataStringDay(i);
+    //     if (day == dataDay[i].data) {
+    //       let dayss = getseparateDays(day);
+    //       targetDay.unshift(dayss);
+    //       targetData1.unshift(dataDay[i].visitor);
+    //     } else {
+    //       let dayss = getseparateDays(day);
+    //       targetDay.unshift(dayss);
+    //       targetData1.unshift(5);
+    //     }
+    //   }
+    //   setDayData(targetDay);
+    //   setStatistics1(targetData1);
+    // });
     return {
       dayData,
       setDayData,
@@ -110,7 +136,7 @@ export default {
           trigger: "axis",
         },
         legend: {
-          data: ["系统访问数据ss"],
+          data: ["系统访问数据"],
         },
         grid: {
           left: "3%",
@@ -133,7 +159,7 @@ export default {
         },
         series: [
           {
-            name: "系统访问数据ss",
+            name: "系统访问数据",
             type: "line",
             stack: "量",
             data: statistics1,
@@ -277,13 +303,16 @@ export default {
       let dataDay = res.logMesData;
       for (let i = 0; i < 7; i++) {
         let day = getDataStringDay(i);
-        if (day == dataDay[i].data) {
-          let dayss = getseparateDays(day);
-          targetDay.unshift(dayss);
-          targetData1.unshift(dataDay[i].visitor);
-          targetData2.unshift(dataDay[i].register);
-          targetData3.unshift(dataDay[i].simblocks);
-        } else {
+        for (let j = 0; j < 7; j++) {
+          if (day == dataDay[j].data) {
+            let dayss = getseparateDays(day);
+            targetDay.unshift(dayss);
+            targetData1.unshift(dataDay[j].visitor);
+            targetData2.unshift(dataDay[j].register);
+            targetData3.unshift(dataDay[j].simblocks);
+          }
+        }
+        if (targetData1[i] == null) {
           let dayss = getseparateDays(day);
           targetDay.unshift(dayss);
           targetData1.unshift(0);
@@ -298,7 +327,7 @@ export default {
     });
     setTimeout(() => {
       this.drawEcharts(this.option[0]);
-    }, 100);
+    }, 200);
   },
   methods: {
     callback(key, keyPath) {

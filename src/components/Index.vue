@@ -1,7 +1,8 @@
 <template>
   <el-container style="width: 100vw; height: 100vh">
     <el-header>
-      <el-menu :default-active="activeIndex" mode="horizontal">
+      <el-menu  mode="horizontal">
+        <!-- :default-active="1" -->
         <el-menu-item>
           <img
             src="../assets/logopage.png"
@@ -40,9 +41,9 @@
                     color="#626aef"
                     size="large"
                     @click="LoginWithP"
-                    :dark="isDark"
                     >开始仿真实验</el-button
                   >
+                    <!-- :dark="isDark" -->
                 </div>
               </div>
               <div class="boxPage">

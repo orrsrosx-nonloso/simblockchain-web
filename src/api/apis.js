@@ -236,6 +236,11 @@ export const getLogMesData = function (data) {
     return http('post', 'http://localhost:8081/logMesData/getLogMesDatas', data)
 }
 
+//Modify network parameters in manual mode.
+export const manualP2pNetModift = function (data) {
+    return http('post', 'http://localhost:8081/p2pNetwork/manualSetP2pNet', data)
+}
+
 
 
 

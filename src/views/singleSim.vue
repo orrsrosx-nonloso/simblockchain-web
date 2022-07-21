@@ -238,7 +238,84 @@
             </el-button>
           </div>
           <div class="drag-box">
-            <el-tooltip content="点击查看当前区块链网络结构!" placement="top">
+            <el-dropdown>
+              <el-button class="opButtontdrwaer2" type="primary" size="small"
+                >网络配置
+                <arrow-down />
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="centerDialogVisible = true"
+                    >配置网络参数</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="openmanualDialog()"
+                    >手动配置网络结构</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="getPresentP2PNetWork"
+                    >网络拓扑结构查看</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-dialog
+              v-model="manualDialogVisible"
+              title="Manually configure neighbor nodes"
+              width="50%"
+              :show-close="false"
+              :before-close="handleCloseManualConfig"
+            >
+              <el-row>
+                <el-col :span="1"></el-col>
+                <el-col :span="22"
+                  ><el-table
+                    :data="state.tableData"
+                    height="350px"
+                    stripe
+                    style="width: 100%"
+                  >
+                    <el-table-column prop="node" label="Node" width="180" />
+                    <el-table-column
+                      prop="numConnect"
+                      label="Num Connection"
+                      width="180"
+                    />
+                    <!-- :ref="scope.row.node" -->
+                    <el-table-column prop="neighborNode" label="Neighbor node">
+                      <template #default="scope">
+                        <el-cascader
+                          :options="scope.row.options"
+                          :props="props"
+                          collapse-tags
+                          clearable
+                          v-model="scope.row.value"
+                          @change="
+                            (val) => {
+                              handleChange(
+                                val,
+                                scope.row.node,
+                                scope.row.numConnect,
+                                scope.row.value
+                              );
+                            }
+                          "
+                        />
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </el-col>
+                <el-col :span="1"></el-col>
+              </el-row>
+
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="outP2pNetManualSetting">Cancel</el-button>
+                  <el-button type="primary" @click="setUpP2pNet"
+                    >SetUp</el-button
+                  >
+                </span>
+              </template>
+            </el-dialog>
+            <!-- <el-tooltip content="点击查看当前区块链网络结构!" placement="top">
               <el-button
                 class="opButton"
                 @click="getPresentP2PNetWork"
@@ -246,30 +323,35 @@
                 size="small"
                 >P2P网络结构
               </el-button>
-            </el-tooltip>
-            <el-dialog v-model="dialogP2PNetVisible" width="640px">
+            </el-tooltip> -->
+            <el-dialog v-model="dialogP2PNetVisible" width="50%" title="Network details">
               <el-table
-                :data="tableP2PNetData"
-                height="300"
-                style="width: 100%"
-              >
-                <el-table-column prop="addressId" label="节点" width="140" />
-                <el-table-column
-                  prop="Neighbor1"
-                  label="邻居节点1"
-                  width="140"
-                />
-                <el-table-column
-                  prop="Neighbor2"
-                  label="邻居节点2"
-                  width="140"
-                />
-                <el-table-column
-                  prop="Neighbor3"
-                  label="邻居节点3"
-                  width="140"
-                />
-              </el-table>
+                    :data="filterTableData"
+                    height="350px"
+                    stripe
+                    style="width: 100%"
+                  >
+                    <el-table-column prop="node" label="Node" width="140" />
+                    <el-table-column
+                      prop="numConnect"
+                      label="Num Connection"
+                      width="140"
+                    />
+                    <!-- :ref="scope.row.node" -->
+                    <el-table-column prop="searchP2pData" label="Neighbor node">
+                      <template #header>
+                       <el-input v-model="searchP2pData" size="small" placeholder="Type to search node" />
+                      </template>
+                      <template #default="scope">
+                        <el-input v-model="scope.row.boundStr" disabled placeholder="Please input" />
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <template #footer>
+                    <span class="dialog-footer">
+                      <el-button @click="visP2pNetCheck">可视化网络结构查看</el-button>
+                    </span>
+              </template>
             </el-dialog>
           </div>
           <div class="base_title">区块操作</div>
@@ -445,6 +527,22 @@
                     <el-tooltip
                       class="box-item"
                       effect="dark"
+                      content="仿真网络结构的实时显示"
+                      placement="top-start"
+                    >
+                      <el-switch
+                        v-model="switchNetwork"
+                        :loading="loading1"
+                        :before-change="beforeSwitchNetworkChange"
+                        class="switchNetwork"
+                        active-text="on"
+                        inactive-text="off"
+                        @change="p2pSwitchChange"
+                      />
+                    </el-tooltip>
+                    <el-tooltip
+                      class="box-item"
+                      effect="dark"
                       content="清除当前仿真所有数据"
                       placement="top-start"
                     >
@@ -506,18 +604,38 @@
                   ref="div"
                   @click="onBtnClicked"
                 >
-                  <div class="content-node-box" style="background-color: rgb(205, 254, 156);">
+                  <div
+                    class="content-node-box"
+                    style="background-color: rgb(205, 254, 156)"
+                  >
                     <i class="iconfont"
-                          >&#xe63e;<span class="icon-text">全节点</span></i
-                        ></div>
-                  <div class="content-node-box" style="background-color: aquamarine;">
+                      >&#xe63e;<span class="icon-text">全节点</span></i
+                    >
+                  </div>
+                  <div
+                    class="content-node-box"
+                    style="background-color: aquamarine"
+                  >
                     <i class="iconfont"
-                          >&#xe63e;<span class="icon-text">轻节点</span></i
-                        ></div>
-                  <div class="content-node-box" style="background-color: rgb(255, 153, 127);">
+                      >&#xe63e;<span class="icon-text">轻节点</span></i
+                    >
+                  </div>
+                  <div
+                    class="content-node-box"
+                    style="background-color: rgb(255, 153, 127)"
+                  >
                     <i class="iconfont"
-                          >&#xe63e;<span class="icon-text">挖矿节点</span></i
-                        ></div>
+                      >&#xe63e;<span class="icon-text">挖矿节点</span></i
+                    >
+                  </div>
+                  <div
+                    class="content-node-box"
+                    style="background-color: #a0a0a0"
+                  >
+                    <i class="iconfont"
+                      >&#xea18; <span class="icon-text">区块</span></i
+                    >
+                  </div>
                 </div>
                 <c-scrollbar maxHeight="100%" trigger="hover">
                   <super-flow
@@ -658,6 +776,53 @@
                 </template>
               </el-dialog>
 
+              <el-dialog
+                v-model="centerDialogVisible"
+                title="Network generation configuration"
+                width="30%"
+                :show-close="false"
+                :before-close="handleCloseNetConfig"
+              >
+                <el-form :model="networkForm" label-width="120px">
+                  <h3>Network topology generation strategy:</h3>
+                  <el-radio-group
+                    v-model="networkForm.labelPosition"
+                    style="margin-top: 15px"
+                  >
+                    <el-radio label="Adaptive" border>Adaptive</el-radio>
+                    <el-radio label="Manual" border>Manual</el-radio>
+                  </el-radio-group>
+                  <el-form-item
+                    style="margin-top: 20px"
+                    label="Max Outbound"
+                    prop="MaxOutbound"
+                    :rules="[
+                      {
+                        type: 'number',
+                        message: 'Max Outbound must be a number',
+                      },
+                    ]"
+                  >
+                    <el-input
+                      v-model.number="networkForm.MaxOutbound"
+                      type="text"
+                      autocomplete="off"
+                      placeholder="The limit is 4 to 8(default:4)."
+                    />
+                  </el-form-item>
+                </el-form>
+                <template #footer>
+                  <span class="dialog-footer">
+                    <el-button @click="centerDialogVisible = false"
+                      >Cancel</el-button
+                    >
+                    <el-button type="primary" @click="submitForm()"
+                      >Confirm</el-button
+                    >
+                  </span>
+                </template>
+              </el-dialog>
+
               <!-- <Draggable
                 :list="node1"
                 item-key="id"
@@ -698,7 +863,7 @@
           <el-card
             id="summaryGuide"
             class="box-card"
-            :body-style="{ padding: '5px', height: SUMMARYHeight+'px' }"
+            :body-style="{ padding: '5px', height: SUMMARYHeight + 'px' }"
           >
             <template #header>
               <div class="card-header" style="font-weight: bold">
@@ -719,7 +884,7 @@
           <el-card
             id="eventMenuGuide"
             class="box-card"
-            :body-style="{ padding: '5px', height: EVENTHeight+'px' }"
+            :body-style="{ padding: '5px', height: EVENTHeight + 'px' }"
           >
             <template #header>
               <div class="card-header" style="font-weight: bold">
@@ -727,7 +892,7 @@
               </div>
             </template>
             <c-scrollbar maxHeight="237px" maxWidth="280px" trigger="hover">
-              <el-collapse height="110%" v-model="activeName" accordion>
+              <el-collapse height="110%"  accordion>
                 <el-collapse-item v-for="item in eventMes" :name="item.name">
                   <template #title>
                     <div style="margin-left = 10px">{{ item.eventName }}</div>
@@ -1486,6 +1651,7 @@
   </el-scrollbar>
 </template>
 <script lang="ts">
+// import type { FormInstance } from "element-plus";
 import { ref, reactive } from "vue";
 import { ElMessageBox } from "element-plus";
 import { ElMessage, ElLoading, ElNotification } from "element-plus";
@@ -1521,8 +1687,9 @@ import {
   deleteAccount,
   findAllAccountList,
   findAccountList,
+  manualP2pNetModift
 } from "../api/apis";
-import { uuid, getDataString, getNodeId } from "../utils/utils";
+import { uuid, getDataString, getNodeId, checkNumber } from "../utils/utils";
 import { t } from "element-plus/es/locale";
 import { useStore } from "vuex";
 import { computed, h } from "vue";
@@ -1632,6 +1799,7 @@ export default {
     },
   },
   setup() {
+    //仿真加载
     //折叠面板配置
     const activeName = ref(0);
     //拖拽区块节点配置
@@ -1904,6 +2072,10 @@ export default {
     };
 
     return {
+      props: {
+        // props.
+        multiple: true,
+      },
       disabled,
       node1,
       node2,
@@ -1942,6 +2114,393 @@ export default {
     };
   },
   data() {
+    //手动配置情况下的数据列表
+    const state = reactive({
+      page: 1,
+      pageSize: 8,
+      total: 5,
+      tableData: [
+        {
+          node: "Node1",
+          numConnect: "Tom",
+          boundStr:"",
+          value: [],
+          options: [],
+        },
+      ],
+      tableHisData: [
+        {
+          node: "Node1",
+          numConnect: "Tom",
+          boundStr:"",
+          value: [],
+          options: [],
+        },
+      ],
+      tableChangeHisData: [
+        {
+          node: "Node1",
+          numConnect: "Tom",
+          boundStr:"",
+          value: [],
+          options: [],
+        },
+      ],
+    });
+    //manual page change
+    function handleCurrentChange(e) {}
+    const options = reactive([
+      {
+        value: "1",
+        vaString: "",
+        disabled: false,
+        label: "Asia",
+        children: [
+          {
+            disabled: false,
+            value: "2",
+            label: "China",
+          },
+          {
+            disabled: false,
+            value: "6",
+            label: "Japan",
+          },
+          {
+            disabled: false,
+            value: "10",
+            label: "Korea",
+          },
+        ],
+      },
+      // ,
+      // {
+      //   value: 14,
+      //   label: "Europe",
+      //   children: [
+      //     {
+      //       disabled: true,
+      //       value: 15,
+      //       label: "France",
+      //     },
+      //     {
+      //       value: 19,
+      //       label: "UK",
+      //     },
+      //   ],
+      // },
+      // {
+      //   value: 23,
+      //   label: "North America",
+      //   children: [
+      //     {
+      //       value: 24,
+      //       label: "US",
+      //     },
+      //     {
+      //       value: 28,
+      //       label: "Canada",
+      //     },
+      //   ],
+      // },
+    ]);
+
+    //网络配置相关参数
+    const centerDialogVisible = ref(false);
+    //手动网络配置图形界面
+    const manualDialogVisible = ref(false);
+
+    //网络配置结构参数
+    const networkForm = reactive({
+      labelPosition: ref("Adaptive"),
+      MaxOutbound: "",
+      firstStates: ref(false),
+      recentlyNodeId: "",
+    });
+    //打开手动界面
+    const openmanualDialog = () => {
+      if (networkForm.labelPosition != "Adaptive") {
+        if (nodeListId.length <= 1) {
+          ElMessageBox.alert(
+            "The number of nodes is less than 2. Please create new node.",
+            "WARING",
+            {
+              confirmButtonText: "OK",
+            }
+          );
+        } else {
+          manualDialogVisible.value = true;
+        }
+      } else {
+        ElMessageBox.alert(
+          "You can't use this function because the current mode is Adaptive",
+          "WARING",
+          {
+            confirmButtonText: "OK",
+          }
+        );
+      }
+    };
+    // const formRef = ref<FormInstance>();
+
+    const handleCloseNetConfig = (done: () => void) => {
+      ElMessageBox.confirm(
+        "Are you sure to close this dialog? The data of MaxOutbound will be reset automatically."
+      )
+        .then(() => {
+          let a = networkForm.MaxOutbound;
+          if (!checkNumber(a)) {
+            networkForm.MaxOutbound = "";
+          }
+          done();
+        })
+        .catch(() => {
+          // catch error
+        });
+    };
+
+    const handleCloseManualConfig = (done: () => void) => {
+      let change = false;
+      let localHisData = state.tableHisData;
+      let localData = state.tableData;
+      for (let i = 0; i < localData.length; i++) {
+        if (localData[i].value.toString() != localHisData[i].value.toString()) {
+          change = true;
+          break;
+        }
+      }
+      if (change) {
+        ElMessageBox.confirm(
+          "Are you sure you want to discard the modification?",
+          "Warning",
+          {
+            confirmButtonText: "OK",
+            cancelButtonText: "Cancel",
+            type: "warning",
+          }
+        )
+          .then(() => {
+            state.tableData.length = 0;
+            state.tableData = JSON.parse(JSON.stringify(state.tableHisData));
+            manualDialogVisible.value = false;
+          })
+          .catch(() => {});
+      } else {
+        ElMessageBox.confirm("Are you sure to close this dialog?")
+          .then(() => {
+            done();
+          })
+          .catch(() => {
+            // catch error
+          });
+      }
+    };
+
+    const submitForm = () => {
+      let a = networkForm.MaxOutbound;
+      if (!checkNumber(a)) {
+        if (a == "") {
+          ElMessageBox.alert(
+            "You can modify the related configuration again in the network configuration toolbar.",
+            "SUCCESS",
+            {
+              confirmButtonText: "OK",
+            }
+          );
+          if (networkForm.labelPosition != "Adaptive") {
+            ElMessageBox.alert(
+              "In the manual state, continuous configuration is required in the network configuration toolbar on the left.",
+              "NOTICE",
+              {
+                confirmButtonText: "OK",
+              }
+            );
+          }
+          centerDialogVisible.value = false;
+          if (networkForm.recentlyNodeId == "Node1") {
+            nodeAddP2pNet(
+              networkForm.recentlyNodeId,
+              4,
+              networkForm.labelPosition
+            );
+          }
+        } else {
+          ElMessageBox.alert(
+            "Please enter the correct Max Outbound",
+            "WARING",
+            {
+              confirmButtonText: "OK",
+            }
+          );
+        }
+      } else {
+        let numa = parseInt(a);
+        if (numa < 4 || numa > 8) {
+          ElMessageBox.alert(
+            "Please enter the correct Max Outbound(4-8)",
+            "WARING",
+            {
+              confirmButtonText: "OK",
+            }
+          );
+        } else {
+          ElMessageBox.alert(
+            "You can modify the related configuration again in the network configuration toolbar.",
+            "SUCCESS",
+            {
+              confirmButtonText: "OK",
+            }
+          );
+          if (networkForm.labelPosition != "Adaptive") {
+            ElMessageBox.alert(
+              "In the manual state, continuous configuration is required in the network configuration toolbar on the left.",
+              "NOTICE",
+              {
+                confirmButtonText: "OK",
+              }
+            );
+          }
+          centerDialogVisible.value = false;
+          if (networkForm.recentlyNodeId == "Node1") {
+            nodeAddP2pNet(
+              networkForm.recentlyNodeId,
+              networkForm.MaxOutbound,
+              networkForm.labelPosition
+            );
+          }
+        }
+      }
+      // if (!formEl) return;
+      // formEl.validate((valid) => {
+      //   if (valid) {
+      //     console.log("submit!");
+      //   } else {
+      //     console.log("error submit!");
+      //     return false;
+      //   }
+      // });
+    };
+
+    //manual model setting commit
+    const setUpP2pNet = () => {
+      let localData = state.tableData;
+      //历史记录
+      let localHisData = state.tableHisData;
+      let change = false;
+      let params = { auth: getAuth(), p2pTableData: [], mes: "" ,status:1};
+      for (let i = 0; i < localData.length; i++) {
+        //Only the modified parameters are passed in.
+        if (localData[i].value.toString() != localHisData[i].value.toString()) {
+          let outBound = "";
+          if (localData[i].value.length != 0) {
+            localData[i].value.forEach(function (element) {
+              if (outBound == "") {
+                outBound = element[1];
+              } else {
+                outBound = outBound + "," + element[1];
+              }
+            });
+          }
+          let changeContent = {
+            nodeId: localData[i].node,
+            numConnection: localData[i].numConnect,
+            outBound: outBound,
+          };
+          params.p2pTableData.push(changeContent);
+          // for()
+          change = true;
+        }
+      }
+      if(change){
+        manualP2pNetModift(params).then((res) => {
+          const loading = ElLoading.service({
+            lock: true,
+            background: "rgba(0, 0, 0, 0.7)",
+          });
+          setTimeout(() => {
+            loading.close();
+            ElMessageBox.alert(
+              res.mes,
+              "NOTICE",
+              {
+                confirmButtonText: "OK",
+              }
+            );
+            manualDialogVisible.value = false;
+            //历史数据修改
+            state.tableHisData = JSON.parse(JSON.stringify(state.tableData));
+            state.tableChangeHisData = JSON.parse(JSON.stringify(state.tableData));
+          }, 100);
+      });
+      }
+      console.log(localData);
+    };
+
+    const outP2pNetManualSetting = () => {
+      let change = false;
+      let localHisData = state.tableHisData;
+      let localData = state.tableData;
+      for (let i = 0; i < localData.length; i++) {
+        if (localData[i].value.toString() != localHisData[i].value.toString()) {
+          change = true;
+          break;
+        }
+      }
+      if (change) {
+        ElMessageBox.confirm(
+          "Are you sure you want to discard the modification?",
+          "Warning",
+          {
+            confirmButtonText: "OK",
+            cancelButtonText: "Cancel",
+            type: "warning",
+          }
+        )
+          .then(() => {
+            state.tableData.length = 0;
+            state.tableData = JSON.parse(JSON.stringify(state.tableHisData));
+            manualDialogVisible.value = false;
+          })
+          .catch(() => {});
+      } else {
+        manualDialogVisible.value = false;
+      }
+    };
+    const handleChange = (val, node, numConnect, values) => {
+      if (values.length > numConnect) {
+        //可优化。数据量过大时采用点对点修改
+        state.tableData = JSON.parse(JSON.stringify(state.tableChangeHisData));
+        manualDialogVisible.value = false;
+        
+        setTimeout(() => {
+          manualDialogVisible.value = true;
+          setTimeout(() => {
+            ElMessageBox.alert(
+          "The selected value is greater than numConnect, please select again.",
+          "Warning",
+          {
+            confirmButtonText: "OK",
+          }
+        );
+          }, 50);
+        }, 50);
+
+        console.log("biggger");
+      }
+      else{
+        state.tableChangeHisData = JSON.parse(JSON.stringify(state.tableData));
+      }
+    };
+
+    //查看情况的内容过滤：
+    const searchP2pData = ref('')
+    const filterTableData = computed(() =>
+      state.tableData.filter(
+        (data) =>
+          !searchP2pData.value ||
+          data.node.toLowerCase().includes(searchP2pData.value.toLowerCase())
+      )
+    )
     //获取当前用户
     const store = useStore();
 
@@ -3001,8 +3560,187 @@ export default {
       }, 100);
     };
 
+    //节点网络的添加
+    const nodeAddP2pNet = (addressId, connected, labelPositions) => {
+      addP2pNet({
+        addressId: addressId,
+        auth: getAuth(),
+        defaultConeect: connected + "",
+        labelPosition: labelPositions,
+      }).then((ress) => {
+        const res = ress.preData[0];
+        const localNetWork = ress.preData[1];
+        if (res.success == "true") {
+          if (res.addressId == "Node1") {
+            ElMessage({
+              message: "节点网络初始化!",
+              type: "success",
+            });
+          } else {
+            if (labelPositions == "Adaptive") {
+              ElMessage({
+                message: "节点网络添加成功!",
+                type: "success",
+              });
+            }
+            //可视化网络节点添加
+            // this.localNetWorkAdd(localNetWork);
+            // this.setNodeLists();
+          }
+          //Configure node network data in manual mode.
+          configManualData(localNetWork);
+        } else {
+          ElMessage({
+            message: "节点网络异常!",
+            type: "warning",
+          });
+        }
+      });
+    };
+    //Configure node network data in manual mode.
+    const configManualData = (localNetWork) => {
+      let opetionLen = parseInt((localNetWork.length - 1) / 5 + "");
+      let nodeLength = localNetWork.length;
+      if (opetionLen == 0) {
+        options.length = 0;
+        let childrens = [];
+        state.tableData.length = 0;
+        for (let i = 0; i < nodeLength; i++) {
+          childrens.push({
+            value: localNetWork[i].nodeAddress,
+            label: localNetWork[i].nodeAddress,
+            disabled: false,
+          });
+          state.tableData.push({
+            node: localNetWork[i].nodeAddress,
+            numConnect: localNetWork[i].numConnection,
+            value: reactive([]),
+            boundStr:"",
+            options: [],
+          });
+        }
+        options.push({
+          value: "Node1~5",
+          vaString: "",
+          label: "Node1~5",
+          disabled: false,
+          children: childrens,
+        });
+        for (let i = 0; i < nodeLength; i++) {
+          // let newoptions = options.concat();
+          let newoptions = JSON.parse(JSON.stringify(options));
+          for (let j = 0; j < nodeLength; j++) {
+            if (newoptions[0].children[j].value == state.tableData[i].node) {
+              newoptions[0].children[j].disabled = true;
+              state.tableData[i].options = newoptions;
+            }
+          }
+        }
+        //级联选择器默认值添加localNetWork.outbound
+        for (let i = 0; i < nodeLength; i++) {
+          for (let j = 0; j < nodeLength; j++) {
+            let sda = state;
+            let outbounss = localNetWork[i].outbound;
+            let targetsds = state.tableData[i].options[0].children[i].value;
+            if (
+              localNetWork[i].outbound != null &&
+              localNetWork[i].outbound.indexOf(
+                state.tableData[i].options[0].children[j].value
+              ) != -1
+            ) {
+              let valuelist = [
+                "Node1~5",
+                state.tableData[i].options[0].children[j].value,
+              ];
+              state.tableData[i].value.push(valuelist);
+            }
+          }
+        }
+      } else {
+        //后期改为插入更新
+        options.length = 0;
+        let childrens = [];
+        let childrensList = [];
+        state.tableData.length = 0;
+        for (let i = 0; i < nodeLength; i++) {
+          if (i % 5 == 0 && i != 0) {
+            let neelist = JSON.parse(JSON.stringify(childrens));
+            childrensList.push(neelist);
+            childrens.length = 0;
+          }
+          childrens.push({
+            value: localNetWork[i].nodeAddress,
+            label: localNetWork[i].nodeAddress,
+            disabled: false,
+          });
+          state.tableData.push({
+            node: localNetWork[i].nodeAddress,
+            numConnect: localNetWork[i].numConnection,
+            value: [],
+            boundStr:"",
+            options: [],
+          });
+          //结束前讲剩余的数插入
+          if (i == nodeLength - 1) {
+            let neelist = JSON.parse(JSON.stringify(childrens));
+            childrensList.push(neelist);
+          }
+        }
+        for (let j = 0; j < childrensList.length; j++) {
+          let targetValue = "Node" + (j * 5 + 1) + "~" + (j + 1) * 5;
+          options.push({
+            value: targetValue,
+            vaString: "",
+            label: targetValue,
+            disabled: false,
+            children: childrensList[j],
+          });
+        }
+        for (let i = 0; i < nodeLength; i++) {
+          let normali = 0;
+          let newoptions = JSON.parse(JSON.stringify(options));
+          for (let j = 0; j < nodeLength; j++) {
+            if (j % 5 == 0 && j != 0) {
+              normali++;
+            }
+            if (
+              newoptions[normali].children[j % 5].value ==
+              state.tableData[i].node
+            ) {
+              newoptions[normali].children[j % 5].disabled = true;
+              state.tableData[i].options = newoptions;
+            }
+          }
+        }
+        //级联选择器默认值添加localNetWork.outbound
+        for (let i = 0; i < nodeLength; i++) {
+          let normali = 0;
+          for (let j = 0; j < nodeLength; j++) {
+            if (j % 5 == 0 && j != 0) {
+              normali++;
+            }
+
+            if (
+              localNetWork[i].outbound != null &&
+              localNetWork[i].outbound.indexOf(
+                state.tableData[i].options[normali].children[j % 5].value
+              ) != -1
+            ) {
+              let valuelist = [
+                state.tableData[i].options[normali].value,
+                state.tableData[i].options[normali].children[j % 5].value,
+              ];
+              state.tableData[i].value.push(valuelist);
+            }
+          }
+        }
+      }
+      state.tableHisData.length = 0;
+      state.tableHisData = JSON.parse(JSON.stringify(state.tableData));
+      state.tableChangeHisData = JSON.parse(JSON.stringify(state.tableData));
+    };
     //node创建流程
-    //新建节点
+    //新建节点，并赋予节点类型
     const setNodeType = () => {
       let nowNodeType = nodeTypeChoose;
       let nowNodeType1 = presentTypeNode;
@@ -3015,7 +3753,16 @@ export default {
         auth: getAuth(),
         nodeType: nowNodeType.value,
       };
+      const loading = ElLoading.service({
+        lock: true,
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+
       createNewNode(params).then((ress) => {
+        setTimeout(() => {
+          loading.close();
+        }, 200);
+
         let graph = nodeCreateMes.graph;
         let coordinate = nodeCreateMes.coordinate;
         const res = ress.preData;
@@ -3037,33 +3784,19 @@ export default {
             type: res.nodeType,
           },
         });
-        addP2pNet({ addressId: res.addressId, auth: getAuth() }).then(
-          (ress) => {
-            const res = ress.preData[0];
-            const localNetWork = ress.preData[1];
-            if (res.success == "true") {
-              if (res.addressId == "Node1") {
-                ElMessage({
-                  message: "节点网络初始化!",
-                  type: "success",
-                });
-              } else {
-                ElMessage({
-                  message: "节点网络添加成功!",
-                  type: "success",
-                });
-                //可视化网络节点添加
-                this.localNetWorkAdd(localNetWork);
-                this.setNodeLists();
-              }
-            } else {
-              ElMessage({
-                message: "节点网络异常!",
-                type: "warning",
-              });
-            }
+        //每次创建节点后，自适应状态会自动配置节点网络
+        if (res.addressId != "Node1") {
+          let connected = 4;
+          if (checkNumber(networkForm.MaxOutbound)) {
+            nodeAddP2pNet(
+              res.addressId,
+              networkForm.MaxOutbound,
+              networkForm.labelPosition
+            );
+          } else {
+            nodeAddP2pNet(res.addressId, connected, networkForm.labelPosition);
           }
-        );
+        }
         LogEvent("create new " + res.addressId + ":", res.address);
         // const nodeListIdsdadsaa = this.nodeListId;
 
@@ -3088,25 +3821,18 @@ export default {
         const data = nodeListId.length;
         summaryMes[1].data = data + "";
         presentTypeNode.value = res.addressId;
+        networkForm.recentlyNodeId = res.addressId;
+        //延迟显示网络配置
+        if (networkForm.firstStates == false) {
+          networkForm.firstStates = true;
+          setTimeout(() => {
+            centerDialogVisible.value = true;
+          }, 50);
+        }
 
         // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
       });
 
-      // const nodeTypeC = {
-      //   addressId: presentTypeNode.value,
-      //   nodeType: nowNodeType.value,
-      //   auth: getAuth(),
-      // };
-      // if (nowNodeType) {
-      //   updateNodeType(nodeTypeC).then((ress) => {
-      //     const res = ress.preData;
-      //     if (res) {
-      //       changeNodetype();
-      //     } else {
-      //       changeNodetype();
-      //     }
-      //   });
-      // }
       changeNodetype();
       nodeTypeChoose.value = "fullNode";
     };
@@ -3137,28 +3863,23 @@ export default {
     ]);
 
     const getPresentP2PNetWork = () => {
-      getAllNetWork({ auth: getAuth() }).then((ress) => {
-        const res = ress.preData;
-        if (res.length == 0) {
-          ElMessage({
-            message: "节点网络未创建,请先创建节点!",
-            type: "warning",
-          });
-        } else {
-          tableP2PNetData.length = 0;
-
-          for (let i = 0; i < res.length; i++) {
-            tableP2PNetData.push({
-              addressId: res[i].nodeAddress,
-              Neighbor1: res[i].neighbourOne,
-              Neighbor2: res[i].neighbourTwo,
-              Neighbor3: res[i].neighbourThree,
-            });
+      let seeP2pTableData = state.tableData;
+      for(let i = 0;i<seeP2pTableData.length;i++){
+        if(seeP2pTableData[i].value.length!=0){
+          let str="";
+          for(let j =0;j<seeP2pTableData[i].value.length;j++){
+            if(j==0){
+              str = seeP2pTableData[i].value[j][1];
+            }
+            else{
+              str = str+","+seeP2pTableData[i].value[j][1];
+            }
           }
-          let sada = tableP2PNetData;
-          dialogP2PNetVisible.value = true;
+          seeP2pTableData[i].boundStr = str;
         }
-      });
+      }
+      dialogP2PNetVisible.value = true;
+
     };
 
     //所有utxo查看
@@ -3220,7 +3941,58 @@ export default {
       }
     };
 
+    //switchNetwork改变之前的功能
+    const switchNetwork = ref(false);
+    const loading1 = ref(false); //加载
+    const beforeSwitchNetworkChange = () => {
+      loading1.value = true;
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          loading1.value = false;
+          console.log(Date);
+          return resolve(true);
+        }, 1000);
+      });
+    };
+    const visP2pNetCheck = () =>{
+      dialogP2PNetVisible.value = false;
+      beforeSwitchNetworkChange();
+      setTimeout(() => {
+        switchNetwork.value = true;
+        p2pSwitchChange(true);
+      }, 1000);
+    }
+
+     const p2pSwitchChange = (val) => {
+      if(val){
+        const loading = ElLoading.service({
+          lock: true,
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+        setTimeout(() => {
+          loading.close();
+        }, 1000);
+        this.localNetWorkAdd(state.tableData);
+        ElMessage.success("Visualization success");
+
+      }
+      else{
+        this.removeAllNodeLink();
+        ElMessage.success("Close visualization success");
+      }
+      console.log(Date+"change");
+      console.log(val+"switch");
+    }
+
     return {
+      p2pSwitchChange,
+      visP2pNetCheck,
+      state,
+      handleCloseNetConfig,
+      submitForm,
+      switchNetwork,
+      loading1,
+      beforeSwitchNetworkChange,
       timerFloat: null,
       currentTop: 0,
       clientWidth: 0,
@@ -3685,6 +4457,17 @@ export default {
       dialogAllAccountVisible,
       findAllAccount,
       isTargetListId,
+      centerDialogVisible,
+      networkForm,
+      manualDialogVisible,
+      handleCloseManualConfig,
+      options,
+      openmanualDialog,
+      setUpP2pNet,
+      outP2pNetManualSetting,
+      handleChange,
+      searchP2pData,
+      filterTableData
     };
   },
   created() {
@@ -3706,10 +4489,11 @@ export default {
     this.leftFloat = this.clientWidth - this.itemWidth - this.gapWidth;
     this.topFloat = this.clientHeight * this.coefficientHeight;
     window.addEventListener("scroll", this.handleScrollStart);
-
-    
   },
   mounted() {
+    //网络配置第一次显示初始化
+    this.networkForm.firstStates = false;
+    console.info(this.networkForm.firstStates);
     //s标识表示simblock页面
     let params = {
       auth: this.getAuth(),
@@ -4612,37 +5396,46 @@ export default {
       let i = list;
       let g = list;
     },
+
+
     //网络节点连线添加
     localNetWorkAdd(list) {
-      if (list.length == 1) {
+      if (list.length <= 1) {
         return;
       } else {
+        let localLinkList = this.linkList;
         for (let i = 0; i < list.length; i++) {
-          if (list[i].neighbourOne != null) {
-            if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourOne)) {
-              this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourOne);
-            }
-            if (list[i].neighbourTwo != null) {
-              if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourTwo)) {
-                this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourTwo);
-              }
-            }
-            if (list[i].neighbourThree != null) {
-              if (
-                this.isLinkExist(list[i].nodeAddress, list[i].neighbourThree)
-              ) {
-                this.bothWayLinkAdd(
-                  list[i].nodeAddress,
-                  list[i].neighbourThree
-                );
-              }
+          if(list[i].value.length!=0){
+            for(let j=0;j<list[i].value.length;j++){
+                this.bothWayLinkAdd(list[i].node,list[i].value[j][1]);
             }
           }
+          // if (list[i].neighbourOne != null) {
+          //   if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourOne)) {
+          //     this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourOne);
+          //   }
+          //   if (list[i].neighbourTwo != null) {
+          //     if (this.isLinkExist(list[i].nodeAddress, list[i].neighbourTwo)) {
+          //       this.bothWayLinkAdd(list[i].nodeAddress, list[i].neighbourTwo);
+          //     }
+          //   }
+          //   if (list[i].neighbourThree != null) {
+          //     if (
+          //       this.isLinkExist(list[i].nodeAddress, list[i].neighbourThree)
+          //     ) {
+          //       this.bothWayLinkAdd(
+          //         list[i].nodeAddress,
+          //         list[i].neighbourThree
+          //       );
+          //     }
+          //   }
+          // }
         }
+        let linksada = this.$refs.superFlow.graph.linkList;
+        let linksadasda = 1;
       }
     },
-    isLinkExist(start, end) {
-      let localLinkList = this.$refs.superFlow.graph.linkList;
+    isLinkExist(start, end,localLinkList) {
       for (let i = 0; i < localLinkList.length; i++) {
         let rqw = start === localLinkList[i].meta.start;
         let sdas = end === localLinkList[i].meta.end;
@@ -4677,8 +5470,8 @@ export default {
           enduuid = nodeListId[i].id;
         }
       }
-      const newId = uuid("node" + end);
-      const lengthLinklength = this.linkList.length;
+      let newId = uuid("node" + end);
+      let lengthLinklength = this.linkList.length;
       const difDist = [
         [100, 15],
         [50, 0],
@@ -4700,7 +5493,7 @@ export default {
           }
         }
       }
-      if (neddBoth == false) {
+      if(this.isLinkExist(start,end,targetLinkList)){
         targetLinkList.push({
           id: newId,
           startId: startuuid,
@@ -4709,25 +5502,46 @@ export default {
           endAt: [0, 15],
           meta: { start: start, end: end },
         });
-      } else {
+      newId = uuid("node" + start);
+      //   targetLinkList.push({
+      //         id: newId,
+      //         startId: enduuid,
+      //         endId: startuuid,
+      //         startAt: [0, 15],
+      //         endAt: targetLinkList[i].startAt,
+      //         meta: { start: start, end: end },
+      //       });
+
+      // if (neddBoth == false) {
+      //   targetLinkList.push({
+      //     id: newId,
+      //     startId: startuuid,
+      //     endId: enduuid,
+      //     startAt: difDist[0],
+      //     endAt: [0, 15],
+      //     meta: { start: start, end: end },
+      //   });
+      // } else {
+        lengthLinklength = targetLinkList.length;
         for (var i = 0; i < lengthLinklength; i++) {
           if (
-            start == targetLinkList[i].meta.end &&
+            end == targetLinkList[i].meta.end &&
             targetLinkList[i].endAt[0] == 0 &&
             targetLinkList[i].endAt[1] == 15
           ) {
             targetLinkList.push({
               id: newId,
-              startId: startuuid,
-              endId: enduuid,
+              startId: enduuid,
+              endId: startuuid,
               startAt: [0, 15],
               endAt: targetLinkList[i].startAt,
-              meta: { start: start, end: end },
+              meta: { start: end, end: start },
             });
+            break;
           }
         }
       }
-
+      // }
       this.linkList = targetLinkList;
     },
     setNodeLists() {
@@ -5121,11 +5935,15 @@ export default {
 [class*="driver-close-btn"] {
   visibility: hidden;
 }
-.content-node-box{
+.content-node-box {
   width: 85%;
-  height: 29%;
+  height: 23%;
   margin: 2%;
-  font-size: 8px;
-  line-height: 22px;
+  font-size: 6px;
+  color: #1f1f1f;
+  line-height: 16px;
+}
+.switchNetwork {
+  padding-right: 15px;
 }
 </style>

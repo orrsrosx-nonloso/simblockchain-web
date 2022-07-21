@@ -1,4 +1,5 @@
-//关于一些菜单的全局变量
+//关于一些菜单的全局变量,
+//已经弃用
 export let modelSim = "0"; 
 
 export const setsingle = function(){

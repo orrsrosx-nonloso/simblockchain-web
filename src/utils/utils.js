@@ -78,12 +78,13 @@ export function getDataStringDay(decrease) {
     return curTime;
 }
 
+//获取当前月份的天数
 function getDays(year, month) {
     let days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if ((year % 4 === 0) && (year % 100 !== 0 || year % 400 === 0)) {
         days[1] = 29
     }
-    return days[month]
+    return days[month-1];//对应的月份集合减一
 }
 
 
@@ -124,4 +125,15 @@ export function judgePhone(i) {
     else {
         return false;
     }
+}
+
+/**
+判断是否为数字
+*/
+export function checkNumber(i) {
+    var reg = /^[0-9]+.?[0-9]*$/;
+    if(reg.test(i)){
+        return true;
+    }
+    return false;
 }

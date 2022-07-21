@@ -53,14 +53,11 @@ router.onError(err => {
 })
 
 router.beforeEach(async (to, from, next) => {
-    console.log('beforeto', to);
-    console.log('beforefrom', from);
-    console.log('beforenext', next);
     if (to.path == '/login') {
         delCookie('userInfo')
         const userName = store.getters.authGetter;
         if (userName != null) {
-            loginOut({ "auth": userName }).then((res) => { console.log("默认登出成功！")});
+            loginOut({ "auth": userName }).then((res) => { console.log("默认登出成功！") });
         }
         localStorage.clear()
         next()
@@ -79,7 +76,12 @@ router.beforeEach(async (to, from, next) => {
                 }
             }
         } else { // 未登录
-            next({ path: '/login' })
+            if (to.name == 'index' || to.path == '/') {
+                next()
+            }
+            else {
+                next({ path: '/login' })
+            }
         }
     }
 })

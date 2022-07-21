@@ -35,6 +35,7 @@
                 placeholder="密码"
                 v-model="state.formLabelAlign.password"
                 :type="state.passwordType"
+                @keyup.enter="login"
               ></el-input>
             </el-col>
           </el-row>
@@ -256,53 +257,58 @@ export default {
     // }
     function login() {
       const params = JSON.parse(JSON.stringify(state.formLabelAlign));
-
-      // JSON.parse(JSON.stringify(state.formLabelAlign));
-      state.loginLoading = true;
-      const res = {
-        status: 1,
-        msg: "登录成功",
-        data: {
-          _id: "60405311da60180001956279",
-          password: "111111",
-          username: "admin1",
-          auth: "admin1",
-          create_date: "2022/3/23",
-          delete_date: "0",
-        },
-      };
-      getLoginMes(params).then((res) => {
-        if (res.status === 1) {
-          store.commit("getUser", { token: res.data._id, ...res.data });
-          console.log("store", store);
-          store
-            .dispatch("asyncGetRoutes", res.data.username)
-            .then((path) => {
-              //小于1100时设置为不可访问
-              let screenWidth = document.body.clientWidth;
-              let minSize = 1100;
-              if(screenWidth<minSize){
-                router.push("/needUserPc");
-              }{
-                console.log("path", path);
-                state.loginLoading = false;
-                router.push("/layout/" + path[0].path);
-              }
-              
-            })
-            .catch(() => {
-              console.log("store2", store);
-              state.loginLoading = false;
+      if (params.username == "" || params.password == "") {
+        ElMessageBox.alert("请输入账户名或密码！", "WARING", {
+              confirmButtonText: "OK",
             });
-          // console.log(store.dispatch('asyncGetRoutes'))
-        } else {
-          state.loginLoading = false;
-          ElMessageBox.alert(res.msg, "WARING", {
-            confirmButtonText: "OK",
-          });
-        }
-      });
-      console.log(params);
+      } else {
+        state.loginLoading = true;
+        const res = {
+          status: 1,
+          msg: "登录成功",
+          data: {
+            _id: "60405311da60180001956279",
+            password: "111111",
+            username: "admin1",
+            auth: "admin1",
+            create_date: "2022/3/23",
+            delete_date: "0",
+          },
+        };
+        getLoginMes(params).then((res) => {
+          if (res.status === 1) {
+            store.commit("getUser", { token: res.data._id, ...res.data });
+            console.log("store", store);
+            store
+              .dispatch("asyncGetRoutes", res.data.username)
+              .then((path) => {
+                //小于1100时设置为不可访问
+                let screenWidth = document.body.clientWidth;
+                let minSize = 1100;
+                if (screenWidth < minSize) {
+                  router.push("/needUserPc");
+                }
+                {
+                  console.log("path", path);
+                  state.loginLoading = false;
+                  router.push("/layout/" + path[0].path);
+                }
+              })
+              .catch(() => {
+                console.log("store2", store);
+                state.loginLoading = false;
+              });
+            // console.log(store.dispatch('asyncGetRoutes'))
+          } else {
+            state.loginLoading = false;
+            ElMessageBox.alert(res.msg, "WARING", {
+              confirmButtonText: "OK",
+            });
+          }
+        });
+        console.log(params);
+      }
+      // JSON.parse(JSON.stringify(state.formLabelAlign));
     }
     return {
       canvas: null,
