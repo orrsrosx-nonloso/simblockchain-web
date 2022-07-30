@@ -12,7 +12,7 @@
 
         <el-menu-item style="margin-left: auto; font-weight: bold">
           <el-button
-            @click="LoginWithSub"
+            @click="LoginWithP"
             style="color: #1e1e1e"
             type="text"
             plain
@@ -24,6 +24,7 @@
     <el-main>
       <slot name="main">
         <el-carousel indicator-position="outside" height="55vh" arrow="never">
+          <!-- 临时列表 -->
           <el-carousel-item v-for="item in 1" :key="item">
             <div class="boxContent">
               <div class="boxText">
@@ -89,10 +90,11 @@ export default {
     }
     function LoginWithP() {
       let screenWidth = document.body.clientWidth;
-      let minSize = 1100;
+      let minSize = 1200;
       if (screenWidth < minSize) {
         router.push("/needUserPc");
       }
+      else
       {
         let j = getAuth();
         if (j != null) {

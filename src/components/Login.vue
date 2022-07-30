@@ -284,10 +284,11 @@ export default {
               .then((path) => {
                 //小于1100时设置为不可访问
                 let screenWidth = document.body.clientWidth;
-                let minSize = 1100;
+                let minSize = 1200;
                 if (screenWidth < minSize) {
                   router.push("/needUserPc");
                 }
+                else
                 {
                   console.log("path", path);
                   state.loginLoading = false;
