@@ -4,6 +4,8 @@ Data：2022/7/16
 
 Event: When we create an account under the node, the new account will be automatically allocated under the change node.
 
+close;
+
 ### 2 
 Data：2022/7/16
 event:after created new empty account,you create new account will have the  following exception
@@ -22,3 +24,18 @@ java.lang.NullPointerException: null
 ### 4
 主界面添加用户登录状态判断
 
+
+### 5
+单流程仿真清除数据之后网络仿真状态恢复
+
+
+### 6
+网络仿真策略修改后直接关闭界面未恢复原样
+
+
+### 7 
+地域的可手动配置
+
+
+### 8
+队列存储堆栈的形式来进行事务驱动

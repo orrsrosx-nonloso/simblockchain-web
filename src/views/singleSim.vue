@@ -12,9 +12,8 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item
-                    @click="createAccountVis(drwaerDateNode.addressId, null)"
-                    >创建账户</el-dropdown-item
+                  <el-dropdown-item @click="createAccountVis(null, null)"
+                    >创建空账户</el-dropdown-item
                   >
                   <el-dropdown-item @click="findAllAccount"
                     >查看所有账户</el-dropdown-item
@@ -324,33 +323,47 @@
                 >P2P网络结构
               </el-button>
             </el-tooltip> -->
-            <el-dialog v-model="dialogP2PNetVisible" width="50%" title="Network details">
+            <el-dialog
+              v-model="dialogP2PNetVisible"
+              width="50%"
+              title="Network details"
+            >
               <el-table
-                    :data="filterTableData"
-                    height="350px"
-                    stripe
-                    style="width: 100%"
-                  >
-                    <el-table-column prop="node" label="Node" width="140" />
-                    <el-table-column
-                      prop="numConnect"
-                      label="Num Connection"
-                      width="140"
+                :data="filterTableData"
+                height="350px"
+                stripe
+                style="width: 100%"
+              >
+                <el-table-column prop="node" label="Node" width="140" />
+                <el-table-column
+                  prop="numConnect"
+                  label="Num Connection"
+                  width="140"
+                />
+                <!-- :ref="scope.row.node" -->
+                <el-table-column prop="searchP2pData" label="Neighbor node">
+                  <template #header>
+                    <el-input
+                      v-model="searchP2pData"
+                      size="small"
+                      placeholder="Type to search node"
                     />
-                    <!-- :ref="scope.row.node" -->
-                    <el-table-column prop="searchP2pData" label="Neighbor node">
-                      <template #header>
-                       <el-input v-model="searchP2pData" size="small" placeholder="Type to search node" />
-                      </template>
-                      <template #default="scope">
-                        <el-input v-model="scope.row.boundStr" disabled placeholder="Please input" />
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                  <template #footer>
-                    <span class="dialog-footer">
-                      <el-button @click="visP2pNetCheck">可视化网络结构查看</el-button>
-                    </span>
+                  </template>
+                  <template #default="scope">
+                    <el-input
+                      v-model="scope.row.boundStr"
+                      disabled
+                      placeholder="Please input"
+                    />
+                  </template>
+                </el-table-column>
+              </el-table>
+              <template #footer>
+                <span class="dialog-footer">
+                  <el-button @click="visP2pNetCheck"
+                    >可视化网络结构查看</el-button
+                  >
+                </span>
               </template>
             </el-dialog>
           </div>
@@ -608,7 +621,7 @@
                     class="content-node-box"
                     style="background-color: rgb(205, 254, 156)"
                   >
-                    <i class="iconfont"
+                    <i class="iconfont" style="color: #000000"
                       >&#xe63e;<span class="icon-text">全节点</span></i
                     >
                   </div>
@@ -616,15 +629,15 @@
                     class="content-node-box"
                     style="background-color: aquamarine"
                   >
-                    <i class="iconfont"
+                    <i class="iconfont" style="color: #000000"
                       >&#xe63e;<span class="icon-text">轻节点</span></i
                     >
                   </div>
                   <div
                     class="content-node-box"
-                    style="background-color: rgb(255, 153, 127)"
+                    style="background-color: rgb(255, 153, 127); color: #000000"
                   >
-                    <i class="iconfont"
+                    <i class="iconfont" style="color: #000000"
                       >&#xe63e;<span class="icon-text">挖矿节点</span></i
                     >
                   </div>
@@ -632,7 +645,7 @@
                     class="content-node-box"
                     style="background-color: #a0a0a0"
                   >
-                    <i class="iconfont"
+                    <i class="iconfont" style="color: #000000"
                       >&#xea18; <span class="icon-text">区块</span></i
                     >
                   </div>
@@ -652,23 +665,43 @@
                   >
                     <template v-slot:node="{ meta }">
                       <!-- 全节点 -->
+
                       <div
                         @mouseup="nodeMouseUp"
                         @click="nodeClick"
                         :class="`flow-node ellipsis ${meta.type}`"
                       >
-                        <i v-if="meta.prop == `node`" class="iconfont"
+                        <div
+                          :id="`loacalBlockTraFor${meta.name}`"
+                          style="
+                            height: 100%;
+                            width: 20px;
+                            background-color: #878787;
+                            color: #f57e7e;
+                            display: none;
+                          "
+                          v-if="meta.prop == `node`"
+                        >
+                          <i class="iconfont">&#xea18;</i>
+                        </div>
+
+                        <i
+                          style="width: 100%"
+                          v-if="meta.prop == `node`"
+                          class="iconfont"
                           >&#xe63e;<span class="icon-text">{{
                             meta.name
                           }}</span></i
                         >
-                        <i v-if="meta.prop == `block`" class="iconfont"
+                        <i
+                          style="width: 100%"
+                          v-if="meta.prop == `block`"
+                          class="iconfont"
                           >&#xea18;<span class="icon-text">{{
                             meta.name
                           }}</span></i
                         >
                       </div>
-                      <!-- 轻节点 -->
                     </template>
                   </super-flow>
                 </c-scrollbar>
@@ -892,7 +925,7 @@
               </div>
             </template>
             <c-scrollbar maxHeight="237px" maxWidth="280px" trigger="hover">
-              <el-collapse height="110%"  accordion>
+              <el-collapse height="110%" accordion>
                 <el-collapse-item v-for="item in eventMes" :name="item.name">
                   <template #title>
                     <div style="margin-left = 10px">{{ item.eventName }}</div>
@@ -1687,7 +1720,7 @@ import {
   deleteAccount,
   findAllAccountList,
   findAccountList,
-  manualP2pNetModift
+  manualP2pNetModift,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId, checkNumber } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -2123,7 +2156,7 @@ export default {
         {
           node: "Node1",
           numConnect: "Tom",
-          boundStr:"",
+          boundStr: "",
           value: [],
           options: [],
         },
@@ -2132,7 +2165,7 @@ export default {
         {
           node: "Node1",
           numConnect: "Tom",
-          boundStr:"",
+          boundStr: "",
           value: [],
           options: [],
         },
@@ -2141,7 +2174,7 @@ export default {
         {
           node: "Node1",
           numConnect: "Tom",
-          boundStr:"",
+          boundStr: "",
           value: [],
           options: [],
         },
@@ -2214,9 +2247,13 @@ export default {
     const networkForm = reactive({
       labelPosition: ref("Adaptive"),
       MaxOutbound: "",
-      firstStates: ref(false),
+      firstStates: ref(false), //节点一初次创建
       recentlyNodeId: "",
     });
+    const changeFirstStatesFor = (value: boolean) => {
+      networkForm.firstStates = value;
+    };
+
     //打开手动界面
     const openmanualDialog = () => {
       if (networkForm.labelPosition != "Adaptive") {
@@ -2387,7 +2424,7 @@ export default {
       //历史记录
       let localHisData = state.tableHisData;
       let change = false;
-      let params = { auth: getAuth(), p2pTableData: [], mes: "" ,status:1};
+      let params = { auth: getAuth(), p2pTableData: [], mes: "", status: 1 };
       for (let i = 0; i < localData.length; i++) {
         //Only the modified parameters are passed in.
         if (localData[i].value.toString() != localHisData[i].value.toString()) {
@@ -2411,7 +2448,7 @@ export default {
           change = true;
         }
       }
-      if(change){
+      if (change) {
         manualP2pNetModift(params).then((res) => {
           const loading = ElLoading.service({
             lock: true,
@@ -2419,19 +2456,17 @@ export default {
           });
           setTimeout(() => {
             loading.close();
-            ElMessageBox.alert(
-              res.mes,
-              "NOTICE",
-              {
-                confirmButtonText: "OK",
-              }
-            );
+            ElMessageBox.alert(res.mes, "NOTICE", {
+              confirmButtonText: "OK",
+            });
             manualDialogVisible.value = false;
             //历史数据修改
             state.tableHisData = JSON.parse(JSON.stringify(state.tableData));
-            state.tableChangeHisData = JSON.parse(JSON.stringify(state.tableData));
+            state.tableChangeHisData = JSON.parse(
+              JSON.stringify(state.tableData)
+            );
           }, 100);
-      });
+        });
       }
       console.log(localData);
     };
@@ -2471,36 +2506,35 @@ export default {
         //可优化。数据量过大时采用点对点修改
         state.tableData = JSON.parse(JSON.stringify(state.tableChangeHisData));
         manualDialogVisible.value = false;
-        
+
         setTimeout(() => {
           manualDialogVisible.value = true;
           setTimeout(() => {
             ElMessageBox.alert(
-          "The selected value is greater than numConnect, please select again.",
-          "Warning",
-          {
-            confirmButtonText: "OK",
-          }
-        );
+              "The selected value is greater than numConnect, please select again.",
+              "Warning",
+              {
+                confirmButtonText: "OK",
+              }
+            );
           }, 50);
         }, 50);
 
         console.log("biggger");
-      }
-      else{
+      } else {
         state.tableChangeHisData = JSON.parse(JSON.stringify(state.tableData));
       }
     };
 
     //查看情况的内容过滤：
-    const searchP2pData = ref('')
+    const searchP2pData = ref("");
     const filterTableData = computed(() =>
       state.tableData.filter(
         (data) =>
           !searchP2pData.value ||
           data.node.toLowerCase().includes(searchP2pData.value.toLowerCase())
       )
-    )
+    );
     //获取当前用户
     const store = useStore();
 
@@ -2627,6 +2661,8 @@ export default {
     let accountNameC = ref("");
     const createAccountVis = (value?, drawer?) => {
       if (value != null) {
+        localeNode.value = value;
+      } else {
         localeNode.value = value;
       }
       changeAccountVis();
@@ -2770,7 +2806,10 @@ export default {
     };
     //模拟区块传输
     const blockTranSim = (done: () => void) => {
-      this.removeAllNodeLink();
+      if (switchNetwork.value == true) {
+        switchNetwork.value = false;
+        this.removeAllNodeLink();
+      }
       findpresentMin({ auth: getAuth() }).then((ress) => {
         const res = ress.preData;
         if (res == null || res == "") {
@@ -2816,7 +2855,21 @@ export default {
       });
     };
 
-    //模拟区块传输
+    //flowNode是否包含当前节点
+    const flowNodeConNode = (flowNode, localNode) => {
+      if (flowNode.length == 0) {
+        return false;
+      } else {
+        for (let j = 0; j < flowNode.length; j++) {
+          if (flowNode[j].nodeAddress == localNode) {
+            return true;
+          }
+        }
+        return false;
+      }
+    };
+
+    //模拟区块传输数据处理部分
     const SimBlockTrans = (miner) => {
       getAllNetWork({ auth: getAuth() }).then((ress) => {
         const res = ress.preData;
@@ -2825,18 +2878,38 @@ export default {
         let length = res.length;
         let allNode = [];
         let spreadNode = [];
-        let oldSpreadNode = [];
+        let flowNodeAdlist = [];
         let flowNode = [];
+        let localOutbound = [];
         for (let i = 0; i < length; i++) {
           allNode.push(res[i].nodeAddress);
         }
+        let targetLen = 0;
         //获取传输模拟数据
         while (allNode.length != 0) {
+          targetLen++;
           let id = 0;
           if (spreadNode.length > 0) {
-            id = getNodeId(spreadNode[0]) - 1;
+            let end = flowNodeConNode(flowNode, spreadNode[0]);
+            if (!end) {
+              id = getNodeId(spreadNode[0]) - 1;
+              spreadNode.shift();
+            } else {
+              spreadNode.shift();
+              continue;
+            }
           } else {
-            id = getNodeId(miner) - 1;
+            if (allNode.length == res.length) {
+              id = getNodeId(miner) - 1;
+            } else {
+              spreadNode.push(allNode[0]);
+              continue;
+            }
+          }
+          let minerNodes = res[id].outbound;
+          if (minerNodes != null && minerNodes != "") {
+            localOutbound = minerNodes.split(",");
+            flowNodeAdlist.push(localOutbound);
           }
           for (let i = 0; i < allNode.length; i++) {
             if (allNode[i] == res[id].nodeAddress) {
@@ -2845,100 +2918,202 @@ export default {
               } else {
                 allNode.splice(i, i);
               }
-            } else if (allNode[i] == res[id].neighbourOne) {
-              if (i == 0) {
-                allNode.shift();
-              } else {
-                allNode.splice(i, i);
-              }
-            } else if (allNode[i] == res[id].neighbourTwo) {
-              if (i == 0) {
-                allNode.shift();
-              } else {
-                allNode.splice(i, i);
-              }
-            } else if (allNode[i] == res[id].neighbourThree) {
-              if (i == 0) {
-                allNode.shift();
-              } else {
-                allNode.splice(i, i);
-              }
             }
+            if (localOutbound.length != 0) {
+              for (let k = 0; k < localOutbound.length; k++) {
+                if (localOutbound[k] == allNode[i]) {
+                  spreadNode.push(localOutbound[k]);
+                  if (i == 0) {
+                    allNode.shift();
+                  } else {
+                    allNode.splice(i, i);
+                  }
+                }
+              }
+            } else {
+              break;
+            }
+            //     targetLen++;
+            // let id = 0;
+            // if(targetLen<res.length){
+            //   if (spreadNode.length > 0) {
+            //     if(spreadNode[0]=="Node1"&&node1vis==true){
+            //       node1vis=false;
+            //       id = getNodeId(spreadNode[0]) - 1;
+            //       spreadNode.shift();
+            //     }else{
+            //       if(outNode.indexOf(spreadNode[0])==-1){
+            //         id = getNodeId(spreadNode[0]) - 1;
+            //         spreadNode.shift();
+            //       }
+            //       else{
+            //         spreadNode.shift();
+            //         if(spreadNode.length==0){
+            //           spreadNode.push(allNode[0]);
+            //         }
+            //         continue;
+            //       }
+            //     }
+
+            //   } else {
+            //     if(allNode.length==res.length){
+            //       id = getNodeId(miner) - 1;
+            //     }
+            //     else{
+            //       if(spreadNode.length==0){
+            //         spreadNode.push(allNode[0]);
+            //       }
+            //       continue;
+            //     }
+            //   }
+            // }else{
+            //     id = getNodeId(allNode[0]) - 1;
+            // }
+            // let minerNodes = res[id].outbound;
+            // if(minerNodes!=null&&minerNodes!=""){
+            //   localOutbound = minerNodes.split(",");
+            // }
+            // for (let i = 0; i < allNode.length; i++) {
+            //   if (allNode[i] == res[id].nodeAddress) {
+            //     if (i == 0) {
+            //       outNode.push(allNode[i]);
+            //       allNode.shift();
+            //     } else {
+            //       outNode.push(allNode[i]);
+            //       allNode.splice(i, 1);
+            //     }
+            //   }
+            // }
+            // for (let i = 0; i < allNode.length; i++) {
+            //   if(localOutbound.length!=0){
+            //     for(let k = 0;k<localOutbound.length;k++){
+            //       if(localOutbound[k]==allNode[i]){
+            //         spreadNode.push(localOutbound[k]);
+            //         if (i == 0) {
+            //           outNode.push(allNode[i]);
+            //           allNode.shift();
+            //         } else {
+            //           outNode.push(allNode[i]);
+            //           allNode.splice(i, i);
+            //         }
+            //       }
+            //     }
+            //   }
+            //   else{
+            //     break;
+            //   }
+            // if (allNode[i] == res[id].nodeAddress) {
+            //   if (i == 0) {
+            //     allNode.shift();
+            //   } else {
+            //     allNode.splice(i, i);
+            //   }
+            // } else if (allNode[i] == res[id].neighbourOne) {
+            //   if (i == 0) {
+            //     allNode.shift();
+            //   } else {
+            //     allNode.splice(i, i);
+            //   }
+            // } else if (allNode[i] == res[id].neighbourTwo) {
+            //   if (i == 0) {
+            //     allNode.shift();
+            //   } else {
+            //     allNode.splice(i, i);
+            //   }
+            // } else if (allNode[i] == res[id].neighbourThree) {
+            //   if (i == 0) {
+            //     allNode.shift();
+            //   } else {
+            //     allNode.splice(i, i);
+            //   }
+            // }
           }
           flowNode.push({
             nodeAddress: res[id].nodeAddress,
-            neighbourOne: res[id].neighbourOne,
-            neighbourTwo: res[id].neighbourTwo,
-            neighbourThree: res[id].neighbourThree,
+            ouboundList: JSON.parse(JSON.stringify(localOutbound)),
           });
 
-          if (
-            res[id].nodeAddress != null &&
-            oldSpreadNode.indexOf(res[id].nodeAddress) == -1
-          ) {
-            spreadNode.push(res[id].nodeAddress);
-            oldSpreadNode.push(res[id].nodeAddress);
-          }
-          if (
-            res[id].neighbourOne != null &&
-            oldSpreadNode.indexOf(res[id].neighbourOne) == -1
-          ) {
-            spreadNode.push(res[id].neighbourOne);
-            oldSpreadNode.push(res[id].neighbourOne);
-          }
-          if (
-            res[id].neighbourTwo != null &&
-            oldSpreadNode.indexOf(res[id].neighbourTwo) == -1
-          ) {
-            spreadNode.push(res[id].neighbourTwo);
-            oldSpreadNode.push(res[id].neighbourTwo);
-          }
-          if (
-            res[id].neighbourThree != null &&
-            oldSpreadNode.indexOf(res[id].neighbourThree) == -1
-          ) {
-            spreadNode.push(res[id].neighbourThree);
-            oldSpreadNode.push(res[id].neighbourThree);
-          }
-          spreadNode.shift();
+          // if (
+          //   res[id].nodeAddress != null &&
+          //   oldSpreadNode.indexOf(res[id].nodeAddress) == -1
+          // ) {
+          //   spreadNode.push(res[id].nodeAddress);
+          //   oldSpreadNode.push(res[id].nodeAddress);
+          // }
+          // if (
+          //   res[id].neighbourOne != null &&
+          //   oldSpreadNode.indexOf(res[id].neighbourOne) == -1
+          // ) {
+          //   spreadNode.push(res[id].neighbourOne);
+          //   oldSpreadNode.push(res[id].neighbourOne);
+          // }
+          // if (
+          //   res[id].neighbourTwo != null &&
+          //   oldSpreadNode.indexOf(res[id].neighbourTwo) == -1
+          // ) {
+          //   spreadNode.push(res[id].neighbourTwo);
+          //   oldSpreadNode.push(res[id].neighbourTwo);
+          // }
+          // if (
+          //   res[id].neighbourThree != null &&
+          //   oldSpreadNode.indexOf(res[id].neighbourThree) == -1
+          // ) {
+          //   spreadNode.push(res[id].neighbourThree);
+          //   oldSpreadNode.push(res[id].neighbourThree);
+          // }
         }
         //开始模拟传输
-        analogueTransmission(flowNode);
+        analogueTransmission(flowNode, miner);
       });
     };
 
     //开始模拟传输
-    const analogueTransmission = (miner) => {
+    const analogueTransmission = (miner, localMiner) => {
       const loading = ElLoading.service({
         lock: true,
         text: "Simulation",
-        background: "rgba(255, 255, 255,0.4)",
+        background: "rgba(255, 255, 255,0.2)",
       });
       setTimeout(() => {
         loading.close();
       }, 3000 * miner.length);
       for (let i = 0; i < miner.length; i++) {
         setTimeout(() => {
+          this.visTargetNode(miner[i].nodeAddress);
           ElMessage({
             message: `节点` + miner[i].nodeAddress + `开始传输!`,
             type: "success",
           });
-          if (miner[i].neighbourOne != null) {
-            this.addNewNodeLink(miner[i].nodeAddress, miner[i].neighbourOne);
-          }
-          if (miner[i].neighbourTwo != null) {
-            this.addNewNodeLink(miner[i].nodeAddress, miner[i].neighbourTwo);
-          }
-          if (miner[i].neighbourThree != null) {
-            this.addNewNodeLink(miner[i].nodeAddress, miner[i].neighbourThree);
+          for (let j = 0; j < miner[i].ouboundList.length; j++) {
+            this.addNewNodeLink(miner[i].nodeAddress, miner[i].ouboundList[j]);
           }
           setTimeout(() => {
+            this.disVisTargetNode(miner[i].nodeAddress);
+            let nodeoutboundListStr = "";
+            for (let j = 0; j < miner[i].ouboundList.length; j++) {
+              if (j == 0) {
+                nodeoutboundListStr = miner[i].ouboundList[j];
+              } else {
+                nodeoutboundListStr =
+                  nodeoutboundListStr + "," + miner[i].ouboundList[j];
+              }
+              this.visTargetNode(miner[i].ouboundList[j]);
+            }
             ElMessage({
-              message: `节点` + miner[i].nodeAddress + `结束传输!`,
+              message: `节点` + nodeoutboundListStr + `成功接收区块消息!`,
               type: "success",
             });
-            this.removeAllNodeLink();
-          }, 2000);
+            setTimeout(() => {
+              for (let j = 0; j < miner[i].ouboundList.length; j++) {
+                this.disVisTargetNode(miner[i].ouboundList[j]);
+              }
+              ElMessage({
+                message: `节点` + miner[i].nodeAddress + `结束传输!`,
+                type: "success",
+              });
+              this.removeAllNodeLink();
+            }, 500);
+          }, 1800);
           LogEvent("Node Transmit", miner[i].nodeAddress + "开始区块传输!");
         }, 3000 * i);
       }
@@ -2947,7 +3122,8 @@ export default {
           message: `区块传输模拟结束!`,
           type: "success",
         });
-        this.makeNodelistVis();
+        this.removeAllNodeLink();
+        this.visTargetNode(miner[0].nodeAddress);
       }, 3000 * miner.length + 500);
     };
 
@@ -3615,7 +3791,7 @@ export default {
             node: localNetWork[i].nodeAddress,
             numConnect: localNetWork[i].numConnection,
             value: reactive([]),
-            boundStr:"",
+            boundStr: "",
             options: [],
           });
         }
@@ -3677,7 +3853,7 @@ export default {
             node: localNetWork[i].nodeAddress,
             numConnect: localNetWork[i].numConnection,
             value: [],
-            boundStr:"",
+            boundStr: "",
             options: [],
           });
           //结束前讲剩余的数插入
@@ -3739,9 +3915,15 @@ export default {
       state.tableHisData = JSON.parse(JSON.stringify(state.tableData));
       state.tableChangeHisData = JSON.parse(JSON.stringify(state.tableData));
     };
+    //仿真存在情况
+    const simState = ref(false);
     //node创建流程
     //新建节点，并赋予节点类型
     const setNodeType = () => {
+      // let node = document.getElementById("loacalBlockTraForNode1");
+      // if(node!=null){
+      //   node.style.display="inline-block";
+      // }
       let nowNodeType = nodeTypeChoose;
       let nowNodeType1 = presentTypeNode;
       let nowNodeType2 = nowNodeType.value;
@@ -3774,7 +3956,7 @@ export default {
           });
         }
         graph.addNode({
-          width: 100,
+          width: 94,
           height: 30,
           coordinate,
           meta: {
@@ -3832,7 +4014,7 @@ export default {
 
         // const newNodelistsda = this.$refs.superFlow.graph.nodeList;
       });
-
+      simState.value = true;
       changeNodetype();
       nodeTypeChoose.value = "fullNode";
     };
@@ -3864,22 +4046,20 @@ export default {
 
     const getPresentP2PNetWork = () => {
       let seeP2pTableData = state.tableData;
-      for(let i = 0;i<seeP2pTableData.length;i++){
-        if(seeP2pTableData[i].value.length!=0){
-          let str="";
-          for(let j =0;j<seeP2pTableData[i].value.length;j++){
-            if(j==0){
+      for (let i = 0; i < seeP2pTableData.length; i++) {
+        if (seeP2pTableData[i].value.length != 0) {
+          let str = "";
+          for (let j = 0; j < seeP2pTableData[i].value.length; j++) {
+            if (j == 0) {
               str = seeP2pTableData[i].value[j][1];
-            }
-            else{
-              str = str+","+seeP2pTableData[i].value[j][1];
+            } else {
+              str = str + "," + seeP2pTableData[i].value[j][1];
             }
           }
           seeP2pTableData[i].boundStr = str;
         }
       }
       dialogP2PNetVisible.value = true;
-
     };
 
     //所有utxo查看
@@ -3954,17 +4134,17 @@ export default {
         }, 1000);
       });
     };
-    const visP2pNetCheck = () =>{
+    const visP2pNetCheck = () => {
       dialogP2PNetVisible.value = false;
       beforeSwitchNetworkChange();
       setTimeout(() => {
         switchNetwork.value = true;
         p2pSwitchChange(true);
       }, 1000);
-    }
+    };
 
-     const p2pSwitchChange = (val) => {
-      if(val){
+    const p2pSwitchChange = (val) => {
+      if (val) {
         const loading = ElLoading.service({
           lock: true,
           background: "rgba(0, 0, 0, 0.7)",
@@ -3974,15 +4154,13 @@ export default {
         }, 1000);
         this.localNetWorkAdd(state.tableData);
         ElMessage.success("Visualization success");
-
-      }
-      else{
+      } else {
         this.removeAllNodeLink();
         ElMessage.success("Close visualization success");
       }
-      console.log(Date+"change");
-      console.log(val+"switch");
-    }
+      console.log(Date + "change");
+      console.log(val + "switch");
+    };
 
     return {
       p2pSwitchChange,
@@ -4026,7 +4204,7 @@ export default {
           label: "节点生成",
           value: {
             width: 100,
-            height: 30,
+            height: 40,
             meta: {
               label: "node1",
               prop: "node",
@@ -4153,6 +4331,7 @@ export default {
                 if (accountListId.length > 0 && isTargetListId() == 1) {
                   createNewBlock({ auth: getAuth() }).then((ress) => {
                     const res = ress.preData;
+                    this.visLocalMinerNode(res);
                     openBlockCreate(res.miner);
                     graph.addNode({
                       width: 100,
@@ -4174,6 +4353,7 @@ export default {
                       blockListId.push({
                         lable: presentBlock.meta.label,
                         id: presentBlock.id,
+                        miner: res.miner,
                       });
                     }
                     summaryMes[2].data = "1";
@@ -4467,7 +4647,9 @@ export default {
       outP2pNetManualSetting,
       handleChange,
       searchP2pData,
-      filterTableData
+      filterTableData,
+      changeFirstStatesFor,
+      simState,
     };
   },
   created() {
@@ -4551,6 +4733,25 @@ export default {
   beforeUnmount() {
     document.removeEventListener("mousemove", this.docMousemove);
     document.removeEventListener("mouseup", this.docMouseup);
+  },
+  beforeRouteLeave(to, from, next) {
+    let j = this.simState;
+    if (j) {
+      ElMessageBox.alert(
+        "仿真进行中，您确定要退出当前界面吗？(仿真数据讲自动缓存)",
+        "Alert",
+        {
+          // if you want to disable its autofocus
+          // autofocus: false,
+          confirmButtonText: "OK",
+          callback: (action) => {
+            next();
+          },
+        }
+      );
+    } else {
+      next();
+    }
   },
   beforeDestroy() {
     window.removeEventListener("scroll", this.handleScrollStart);
@@ -4640,6 +4841,7 @@ export default {
           nodegraph.linkList.length = 0;
           nodeListId.length = 0;
           blockListId.length = 0;
+          this.changeFirstStatesFor(false);
           this.summaryMes = summaryMesUpdata;
           this.LogEvent("清除数据成功 ", null);
           const router = useRouter();
@@ -4702,6 +4904,7 @@ export default {
                 if (accountListId.length > 0 && this.isTargetListId() == 1) {
                   createNewBlock({ auth: this.getAuth() }).then((ress) => {
                     const res = ress.preData;
+                    this.visLocalMinerNode(res);
                     this.openBlockCreate(res.miner);
                     this.$refs.superFlow.addNode({
                       width: 100,
@@ -4724,6 +4927,7 @@ export default {
                       blockListId.push({
                         lable: presentBlock.meta.label,
                         id: presentBlock.id,
+                        miner: res.miner,
                       });
                     }
                     if (this.summaryMes[3].data == "0") {
@@ -4742,10 +4946,10 @@ export default {
                       }
                       targetLinkList.push({
                         id: newId,
-                        startId: blockListId[lengthblockListId - 2].id,
-                        endId: blockListId[lengthblockListId - 1].id,
-                        startAt: [100, 24],
-                        endAt: [0, 25],
+                        startId: blockListId[lengthblockListId - 1].id,
+                        endId: blockListId[lengthblockListId - 2].id,
+                        startAt: [0, 25],
+                        endAt: [100, 24],
                         meta: {
                           start: blockListId[lengthblockListId - 2].label,
                           end: blockListId[lengthblockListId - 1].label,
@@ -4778,6 +4982,7 @@ export default {
                   if (isExist === true) {
                     createNewBlock({ auth: this.getAuth() }).then((ress) => {
                       const res = ress.preData;
+                      this.visLocalMinerNode(res);
                       this.openBlockCreate(res.miner);
                       this.$refs.superFlow.addNode({
                         width: 100,
@@ -4804,6 +5009,7 @@ export default {
                         blockListId.push({
                           lable: presentBlock.meta.label,
                           id: presentBlock.id,
+                          miner: res.miner,
                         });
                       }
                       if (this.summaryMes[3].data == "0") {
@@ -4822,10 +5028,10 @@ export default {
                         }
                         targetLinkList.push({
                           id: newId,
-                          startId: blockListId[lengthblockListId - 2].id,
-                          endId: blockListId[lengthblockListId - 1].id,
-                          startAt: [100, 24],
-                          endAt: [0, 25],
+                          startId: blockListId[lengthblockListId - 1].id,
+                          endId: blockListId[lengthblockListId - 2].id,
+                          startAt: [0, 25],
+                          endAt: [100, 24],
                           meta: {
                             start: blockListId[lengthblockListId - 2].label,
                             end: blockListId[lengthblockListId - 1].label,
@@ -4994,6 +5200,7 @@ export default {
                                 this.increase();
                                 this.setShowBlockMes("区块产生中!");
                                 setTimeout(() => {
+                                  this.visLocalMinerNode(res);
                                   this.increase();
                                   this.setStatus("success");
                                   this.setShowBlockMes("区块产生成功!");
@@ -5023,6 +5230,7 @@ export default {
                                     blockListId.push({
                                       lable: presentBlock.meta.label,
                                       id: presentBlock.id,
+                                      miner: res.miner,
                                     });
                                   }
                                   if (this.summaryMes[3].data == "0") {
@@ -5049,11 +5257,11 @@ export default {
                                     targetLinkList.push({
                                       id: newId,
                                       startId:
-                                        blockListId[lengthblockListId - 2].id,
-                                      endId:
                                         blockListId[lengthblockListId - 1].id,
-                                      startAt: [100, 24],
-                                      endAt: [0, 25],
+                                      endId:
+                                        blockListId[lengthblockListId - 2].id,
+                                      startAt: [0, 25],
+                                      endAt: [100, 24],
                                       meta: {
                                         start:
                                           blockListId[lengthblockListId - 2]
@@ -5397,7 +5605,6 @@ export default {
       let g = list;
     },
 
-
     //网络节点连线添加
     localNetWorkAdd(list) {
       if (list.length <= 1) {
@@ -5405,9 +5612,9 @@ export default {
       } else {
         let localLinkList = this.linkList;
         for (let i = 0; i < list.length; i++) {
-          if(list[i].value.length!=0){
-            for(let j=0;j<list[i].value.length;j++){
-                this.bothWayLinkAdd(list[i].node,list[i].value[j][1]);
+          if (list[i].value.length != 0) {
+            for (let j = 0; j < list[i].value.length; j++) {
+              this.bothWayLinkAdd(list[i].node, list[i].value[j][1]);
             }
           }
           // if (list[i].neighbourOne != null) {
@@ -5435,7 +5642,7 @@ export default {
         let linksadasda = 1;
       }
     },
-    isLinkExist(start, end,localLinkList) {
+    isLinkExist(start, end, localLinkList) {
       for (let i = 0; i < localLinkList.length; i++) {
         let rqw = start === localLinkList[i].meta.start;
         let sdas = end === localLinkList[i].meta.end;
@@ -5493,7 +5700,7 @@ export default {
           }
         }
       }
-      if(this.isLinkExist(start,end,targetLinkList)){
+      if (this.isLinkExist(start, end, targetLinkList)) {
         targetLinkList.push({
           id: newId,
           startId: startuuid,
@@ -5502,26 +5709,26 @@ export default {
           endAt: [0, 15],
           meta: { start: start, end: end },
         });
-      newId = uuid("node" + start);
-      //   targetLinkList.push({
-      //         id: newId,
-      //         startId: enduuid,
-      //         endId: startuuid,
-      //         startAt: [0, 15],
-      //         endAt: targetLinkList[i].startAt,
-      //         meta: { start: start, end: end },
-      //       });
+        newId = uuid("node" + start);
+        //   targetLinkList.push({
+        //         id: newId,
+        //         startId: enduuid,
+        //         endId: startuuid,
+        //         startAt: [0, 15],
+        //         endAt: targetLinkList[i].startAt,
+        //         meta: { start: start, end: end },
+        //       });
 
-      // if (neddBoth == false) {
-      //   targetLinkList.push({
-      //     id: newId,
-      //     startId: startuuid,
-      //     endId: enduuid,
-      //     startAt: difDist[0],
-      //     endAt: [0, 15],
-      //     meta: { start: start, end: end },
-      //   });
-      // } else {
+        // if (neddBoth == false) {
+        //   targetLinkList.push({
+        //     id: newId,
+        //     startId: startuuid,
+        //     endId: enduuid,
+        //     startAt: difDist[0],
+        //     endAt: [0, 15],
+        //     meta: { start: start, end: end },
+        //   });
+        // } else {
         lengthLinklength = targetLinkList.length;
         for (var i = 0; i < lengthLinklength; i++) {
           if (
@@ -5647,6 +5854,30 @@ export default {
         this.driver.defineSteps(steps);
         this.driver.start();
       });
+    },
+    visLocalMinerNode(res) {
+      let locllen = blockListId.length;
+      if (locllen > 0) {
+        let target = blockListId;
+        let localMiner = document.getElementById(
+          "loacalBlockTraFor" + target[locllen - 1].miner
+        );
+        if (localMiner != null && localMiner.style.display == "inline-block") {
+          localMiner.style.display = "none";
+        }
+      }
+      let minNOde = document.getElementById("loacalBlockTraFor" + res.miner);
+      if (minNOde != null && minNOde.style.display == "none") {
+        minNOde.style.display = "inline-block";
+      }
+    },
+    visTargetNode(nodeId) {
+      let localMiner = document.getElementById("loacalBlockTraFor" + nodeId);
+      localMiner.style.display = "inline-block";
+    },
+    disVisTargetNode(nodeId) {
+      let localMiner = document.getElementById("loacalBlockTraFor" + nodeId);
+      localMiner.style.display = "none";
     },
     onBtnClicked() {
       this.$emit("onFloatBtnClicked");
@@ -5862,6 +6093,7 @@ export default {
   padding-left: 100px;
 }
 .icon-text {
+  color: #000000;
   font-size: 13.5px;
   line-height: 100%;
   text-align: center;
@@ -5945,5 +6177,10 @@ export default {
 }
 .switchNetwork {
   padding-right: 15px;
+}
+.loacalBlockForNode {
+  height: 100%;
+  width: 20px;
+  background-color: #878787;
 }
 </style>

@@ -44,6 +44,13 @@ import { getDataStringDay, getseparateDays } from "../../utils/utils.js";
 
 export default {
   data() {
+    const storess = useStore();
+    const auth = computed(() => {
+      return storess.getters.authGetter;
+    });
+    const getAuth = () => {
+      return auth.value;
+    };
     let dayData = reactive([
       "周一",
       "周二",
@@ -76,7 +83,6 @@ export default {
         statistics3[i] = dayDataArray[i];
       }
     };
-    const storess = useStore();
 
     const authoritysss = computed(() => {
       return storess.getters.authorityGetter;
@@ -113,6 +119,7 @@ export default {
     //   setStatistics1(targetData1);
     // });
     return {
+      getAuth,
       dayData,
       setDayData,
       statistics1,
@@ -291,7 +298,7 @@ export default {
   mounted() {
     let accountInput = reactive({
       accountName: "",
-      auth: "",
+      auth: this.getAuth(),
       nodeId: null,
       account: null,
     });
@@ -327,7 +334,7 @@ export default {
     });
     setTimeout(() => {
       this.drawEcharts(this.option[0]);
-    }, 200);
+    }, 1000);
   },
   methods: {
     callback(key, keyPath) {

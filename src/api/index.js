@@ -2,6 +2,7 @@ import axios from 'axios'
 import { getCookie } from '../utils/cookie'
 import router from '../router/index.js'
 import { ElMessageBox } from "element-plus";
+import  store  from "../store/index.js";
 
 
 
@@ -23,6 +24,8 @@ http.interceptors.request.use(function (config) {
     && config.url.indexOf("registerUser") == -1 && config.url.indexOf("findUserPage") == -1
     && config.url.indexOf("deleteUser") == -1 && config.url.indexOf("insertToVisitor") == -1) {
         config.data.token = getCookie('token');
+        config.headers['auth'] = config.data.auth;
+        config.headers['token'] = getCookie('token');
     }
     return config;
 }, function (error) {
@@ -35,6 +38,9 @@ http.interceptors.response.use(function (response) {
     const status = response.status
     const data = response.data;
     if (data.status == 8) {
+        let stores = store;
+        //用户登出时将用户名制空，仿止二次访问
+        stores.commit('updataUsername', null);
         router.replace("/login");
         ElMessageBox.alert("当前用户已登出！", "WARING", {
             confirmButtonText: "OK",
