@@ -19,10 +19,10 @@ function getScreenWidth() {
   let screenWidth = document.body.clientWidth;
   let minSize = 1366;
   if (screenWidth < minSize) {
-    console.log('setIsPhone', true)
+    // console.log('setIsPhone', true)
     store.commit('setIsPhone', true)
   } else {
-    console.log('setIsPhone', false)
+    // console.log('setIsPhone', false)
     store.commit('setIsPhone', false)
   }
 }

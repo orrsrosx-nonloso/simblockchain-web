@@ -248,6 +248,17 @@ export const manualP2pNetModift = function (data) {
 export const findUserLogMes = function (data) {
     return http('post', 'http://localhost:8081/user/findUserLogMes', data)
 }
+//修改单流程节点地域
+export const changeNodeRegion = function (data) {
+    return http('post', 'http://localhost:8081/singleNode/changeNodeRegion', data)
+}
+
+
+//初始配置全流程仿真参数
+export const configWholeSettingData = function (data) {
+    return http('post', 'http://localhost:8081/wholeSim/configSimData', data)
+}
+
 
 
 // 获取权限菜单

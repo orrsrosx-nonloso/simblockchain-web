@@ -338,7 +338,7 @@ export default {
   },
   methods: {
     callback(key, keyPath) {
-      console.log(key);
+      // console.log(key);
       this.drawEcharts(this.option[key - 1]);
     },
     drawEcharts(option) {

@@ -372,7 +372,7 @@ export default {
           {
             label: "保存",
             selected: (graph) => {
-              console.log("josn", graph.toJSON());
+              // console.log("josn", graph.toJSON());
             },
           },
         ],
@@ -388,7 +388,7 @@ export default {
           {
             label: "编辑",
             selected: (node) => {
-              console.log("关了吧");
+              // console.log("关了吧");
             },
           },
         ],
@@ -404,7 +404,7 @@ export default {
           {
             label: "编辑",
             selected: (link) => {
-              console.log("change");
+              // console.log("change");
             },
           },
         ],
@@ -433,7 +433,7 @@ export default {
   },
   methods: {
     flowNodeClick(meta) {
-      console.log(this.$refs.superFlow.graph);
+      // console.log(this.$refs.superFlow.graph);
     },
     linkStyle(link) {
       return {
@@ -467,7 +467,7 @@ export default {
     },
 
     nodeClick() {
-      console.log(arguments);
+      // console.log(arguments);
     },
 
     docMousemove({ clientX, clientY }) {

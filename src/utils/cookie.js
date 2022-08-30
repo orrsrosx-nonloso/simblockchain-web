@@ -12,7 +12,7 @@ function setCookie(c_name, value, expiredays) {
     var strsec = getsec(expiredays);
     var exp = new Date();
     exp.setTime(exp.getTime() + strsec * 1);
-    console.log(exp)
+    // console.log(exp)
     document.cookie = c_name + "=" + escape(value) + ";expires=" + exp.toGMTString();
 };
 

@@ -22,6 +22,7 @@ const getLocale = () => {
 
     // 默认语言 简体中文
     return 'zh_cn'
+    //en
 }
 // 注册i18n实例并且引入语言文件
 const i18n = createI18n({

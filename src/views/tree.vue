@@ -193,6 +193,7 @@ let params = {
   username: userName,
   password: "",
   phone: "",
+  auth:userName
 };
 
 //按升序排列

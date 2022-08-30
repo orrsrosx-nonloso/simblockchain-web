@@ -161,11 +161,11 @@ function retrievalAction(e) {
         }
       }
     });
-    console.log("查询中");
+    // console.log("查询中");
   } else if (e.type == "add") {
     dialogVisible.value = true;
   }
-  console.log(e);
+  // console.log(e);
 }
 
 // --------------------------------------------------表格配置
@@ -324,10 +324,10 @@ function handleCurrentChange(e) {
     });
   }
 
-  console.log(e);
+  // console.log(e);
 }
 function actionClick(e) {
-  console.log(e);
+  // console.log(e);
   if (e.funName === "del") {
     confirm("此操作将永久删除该用户, 是否继续?", "提示", {
       confirmButtonText: "确定",

@@ -682,11 +682,13 @@
                           "
                           v-if="meta.prop == `node`"
                         >
-                          <i class="iconfont">&#xea18;</i>
+                          <i class="iconfont" style="color: #000000"
+                            >&#xea18;</i
+                          >
                         </div>
 
                         <i
-                          style="width: 100%"
+                          style="width: 100%; color: #000000"
                           v-if="meta.prop == `node`"
                           class="iconfont"
                           >&#xe63e;<span class="icon-text">{{
@@ -694,7 +696,7 @@
                           }}</span></i
                         >
                         <i
-                          style="width: 100%"
+                          style="width: 100%; color: #000000"
                           v-if="meta.prop == `block`"
                           class="iconfont"
                           >&#xea18;<span class="icon-text">{{
@@ -730,7 +732,7 @@
                       label="fullNode"
                       size="large"
                       ><div class="fullCreateNode">
-                        <i class="iconfont"
+                        <i class="iconfont" style="color: #000000"
                           >&#xe63e;<span class="icon-text">全节点</span></i
                         >
                       </div></el-radio
@@ -747,7 +749,7 @@
                       label="lightNode"
                       size="large"
                       ><div class="lightCreateNode">
-                        <i class="iconfont"
+                        <i class="iconfont" style="color: #000000"
                           >&#xe63e;<span class="icon-text">轻节点</span></i
                         >
                       </div></el-radio
@@ -764,7 +766,7 @@
                       label="miningNode"
                       size="large"
                       ><div class="miningCreateNode">
-                        <i class="iconfont"
+                        <i class="iconfont" style="color: #000000"
                           >&#xe63e;<span class="icon-text">挖矿节点</span></i
                         >
                       </div></el-radio
@@ -781,6 +783,54 @@
               </el-dialog>
 
               <!-- 算力设置界面，无法关闭，必须设置 <-->
+              <el-dialog
+                v-model="regionIdList"
+                title="地域配置"
+                width="30%"
+                :show-close="false"
+              >
+                <div style="left: 0; padding-bottom: 20px">请选择地域类型</div>
+                <el-radio-group v-model="regionList" class="ml-4">
+                  <el-radio label="0" size="large"
+                    >0<span :v-model="regionData"
+                      >( {{ regionData[0] }} )</span
+                    ></el-radio
+                  >
+                  <el-radio label="1" size="large"
+                    >1<span :v-model="regionData"
+                      >( {{ regionData[1] }} )</span
+                    ></el-radio
+                  >
+                  <el-radio label="2" size="large"
+                    >2<span :v-model="regionData"
+                      >( {{ regionData[2] }} )</span
+                    ></el-radio
+                  >
+                  <el-radio label="3" size="large"
+                    >3<span :v-model="regionData"
+                      >( {{ regionData[3] }} )</span
+                    ></el-radio
+                  >
+                  <el-radio label="4" size="large"
+                    >4<span :v-model="regionData"
+                      >( {{ regionData[4] }} )</span
+                    ></el-radio
+                  >
+                  <el-radio label="5" size="large"
+                    >5<span :v-model="regionData"
+                      >( {{ regionData[5] }} )</span
+                    ></el-radio
+                  >
+                </el-radio-group>
+
+                <template #footer>
+                  <span class="dialog-footer">
+                    <el-button type="primary" @click="startChangeRegion()"
+                      >保存</el-button
+                    >
+                  </span>
+                </template>
+              </el-dialog>
 
               <el-dialog
                 v-model="hashRateVis"
@@ -1132,6 +1182,24 @@
                   label-align="center"
                   align="center"
                   >{{ drwaerDateNode.nodeType }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="region"
+                  label-align="center"
+                  align="center"
+                  >{{ drwaerDateNode.regionID
+                  }}<span :v-model="regionData"
+                    >( {{ regionData[drwaerDateNode.regionID] }} )</span
+                  ><el-button
+                    type="text"
+                    @click="
+                      changeRegion(
+                        drwaerDateNode.regionID,
+                        drwaerDateNode.addressId
+                      )
+                    "
+                    >修改</el-button
+                  ></el-descriptions-item
                 >
                 <el-descriptions-item
                   v-if="drwaerDateNode.nodeType == `miningNode`"
@@ -1721,6 +1789,7 @@ import {
   findAllAccountList,
   findAccountList,
   manualP2pNetModift,
+  changeNodeRegion,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId, checkNumber } from "../utils/utils";
 import { t } from "element-plus/es/locale";
@@ -1842,18 +1911,18 @@ export default {
     const block1 = reactive([]);
     const block2 = reactive([{ id: 1, name: "区块生成" }]);
     const end1 = (ev) => {
-      console.log("拖动结束1", ev);
+      // console.log("拖动结束1", ev);
     };
     const start2 = (event) => {
-      console.log("开始拖动", event);
+      // console.log("开始拖动", event);
     };
     const start1 = (event) => {
-      console.log(event.index);
-      console.log("开始拖动", event);
+      // console.log(event.index);
+      // console.log("开始拖动", event);
     };
     const end2 = (ev) => {
-      console.log(ev.index);
-      console.log("拖动结束2", ev);
+      // console.log(ev.index);
+      // console.log("拖动结束2", ev);
     };
     const handleDel = (index, id) => {
       node1.splice(index, 1);
@@ -2468,7 +2537,7 @@ export default {
           }, 100);
         });
       }
-      console.log(localData);
+      // console.log(localData);
     };
 
     const outP2pNetManualSetting = () => {
@@ -2520,7 +2589,7 @@ export default {
           }, 50);
         }, 50);
 
-        console.log("biggger");
+        // console.log("biggger");
       } else {
         state.tableChangeHisData = JSON.parse(JSON.stringify(state.tableData));
       }
@@ -3671,6 +3740,7 @@ export default {
       walletId: 0,
       transactionId: "",
       accountList: null,
+      regionID: 0,
     });
     //连线集合
     let linkList = reactive([]);
@@ -4129,7 +4199,7 @@ export default {
       return new Promise((resolve) => {
         setTimeout(() => {
           loading1.value = false;
-          console.log(Date);
+          // console.log(Date);
           return resolve(true);
         }, 1000);
       });
@@ -4158,11 +4228,49 @@ export default {
         this.removeAllNodeLink();
         ElMessage.success("Close visualization success");
       }
-      console.log(Date + "change");
-      console.log(val + "switch");
+      // console.log(Date + "change");
+      // console.log(val + "switch");
+    };
+    //地域修改
+    const regionIdList = ref(false);
+    const regionList = ref("0");
+    const localNodeId = ref("0");
+    const changeRegion = (regionId, addressId) => {
+      regionIdList.value = true;
+      localNodeId.value = addressId;
+      regionList.value = regionId+"";
+    };
+    const startChangeRegion = () => {
+      changeNodeRegion({
+        auth: getAuth(),
+        regionId: regionList.value,
+        addressId: localNodeId.value,
+        state: 1,
+        mes: "1",
+      }).then((ress) => {
+        if (ress.state == 1) {
+          ElMessage({
+            message: "修改成功！",
+            type: "success",
+          });
+          drwaerDateNode.regionID = ress.regionId;
+        }
+        else{
+          ElMessage({
+            message: "修改失败！",
+            type: "warning",
+          });
+        }
+        regionIdList.value = false;
+      });
     };
 
     return {
+      regionIdList,
+      regionList,
+      localNodeId,
+      changeRegion,
+      startChangeRegion,
       p2pSwitchChange,
       visP2pNetCheck,
       state,
@@ -4456,6 +4564,7 @@ export default {
                     drwaerDateNode.transactionId = res.transactionsId;
                     drwaerDateNode.hashRate = res.hashRate;
                     drwaerDateNode.accountList = res.accountList;
+                    drwaerDateNode.regionID = res.regionID;
                     if (res.accountList != null && res.accountList != "") {
                       accountInput.accountName = res.accountList;
                       findAccountList(accountInput).then((res) => {
@@ -4518,7 +4627,7 @@ export default {
           {
             label: "查看",
             selected: (link) => {
-              console.log("change");
+              // console.log("change");
             },
           },
         ],
@@ -4650,6 +4759,14 @@ export default {
       filterTableData,
       changeFirstStatesFor,
       simState,
+      regionData: reactive([
+        "NORTH_AMERICA",
+        "EUROPE",
+        "SOUTH_AMERICA",
+        "ASIA",
+        "AFRICA",
+        "OCEANIA",
+      ]),
     };
   },
   created() {
@@ -4675,7 +4792,7 @@ export default {
   mounted() {
     //网络配置第一次显示初始化
     this.networkForm.firstStates = false;
-    console.info(this.networkForm.firstStates);
+    // console.info(this.networkForm.firstStates);
     //s标识表示simblock页面
     let params = {
       auth: this.getAuth(),
@@ -4688,7 +4805,7 @@ export default {
     } else {
       needGuide(params).then((res) => {
         if (res == true) {
-          console.log("start guide!!");
+          // console.log("start guide!!");
           this.guide();
         }
       });
@@ -4792,7 +4909,7 @@ export default {
     },
 
     nodeClick() {
-      console.log("点击了节点 ");
+      // console.log("点击了节点 ");
     },
 
     clearCache() {
@@ -5340,7 +5457,7 @@ export default {
     },
     //模拟区块传输和交易传输时连线删除
     removeNodeLink(start, end) {
-      console.log("remove:" + start + "-" + end);
+      // console.log("remove:" + start + "-" + end);
       let startuuid = "";
       let enduuid = "";
       for (let i = 0; i < nodeListId.length; i++) {
@@ -5375,12 +5492,12 @@ export default {
           if (this.linkList[i].meta.start.indexOf("Node") == -1) {
             targetLinkList.push(this.linkList[i]);
           } else {
-            console.log(
-              "remove:" +
-                this.linkList[i].startId +
-                "-" +
-                this.linkList[i].endId
-            );
+            // console.log(
+            //   "remove:" +
+            //     this.linkList[i].startId +
+            //     "-" +
+            //     this.linkList[i].endId
+            // );
           }
         }
       }
@@ -5536,7 +5653,7 @@ export default {
 
     //添加区块连线
     addNewBlockLink(start, end) {
-      console.log("add:" + start + "-" + end);
+      // console.log("add:" + start + "-" + end);
       let startuuid = "";
       let enduuid = "";
       for (let i = 0; i < blockListId.length; i++) {

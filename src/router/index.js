@@ -48,7 +48,7 @@ const router = createRouter({
 let addRoute = false;
 
 router.onError(err => {
-    console.log('err', err)
+    // console.log('err', err)
     router.push('/404')
 })
 
@@ -57,7 +57,9 @@ router.beforeEach(async (to, from, next) => {
         delCookie('userInfo')
         const userName = store.getters.authGetter;
         if (userName != null) {
-            loginOut({ "auth": userName }).then((res) => { console.log("默认登出成功！") });
+            loginOut({ "auth": userName }).then((res) => { 
+                // console.log("默认登出成功！") 
+            });
         }
         localStorage.clear()
         next()

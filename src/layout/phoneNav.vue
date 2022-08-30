@@ -80,7 +80,7 @@ let params = {
 };
 needGuide(params).then((res) => {
   if (res == true) {
-    console.log("start guide!!");
+    // console.log("start guide!!");
     guides();
   }
 });

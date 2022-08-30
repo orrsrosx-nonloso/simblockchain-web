@@ -10,6 +10,11 @@ const user = {
             localStorage.setItem('userInfo', JSON.stringify(ctx))
             state.userInfo = ctx
             state.token = ctx.token
+        },
+        updataUsername(state,username){
+            if(state.userInfo.username!=null){
+                state.userInfo.username = username;
+            }
         }
     },
     actions: {

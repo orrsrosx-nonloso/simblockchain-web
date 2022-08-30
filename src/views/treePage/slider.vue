@@ -13,17 +13,11 @@ import { reactive, ref } from "vue";
 const wholeSimSliderValue = ref(0);
 const maxSloderValue = ref(40000);
 maxSloderValue.value = 1000;
-// let s = setInterval(() => {
-//   wholeSimSliderValue.value++;
-// }, val);
-function intervals() {
-  let a = 100;
+for (var j = 1; j <= maxSloderValue.value; j++) {
   setTimeout(() => {
     wholeSimSliderValue.value++;
-    intervals();
-  }, a);
+  }, j * 100);
 }
-intervals();
 </script>
 
 <style scoped>

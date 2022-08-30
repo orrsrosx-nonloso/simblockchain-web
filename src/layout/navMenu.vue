@@ -63,7 +63,7 @@ function toParentRes() {
   if (screenWidth < minSize) {
     emits('emitToParent', false)
   } else {
-    console.log('setIsPhone', false)
+    // console.log('setIsPhone', false)
   }
 }
 

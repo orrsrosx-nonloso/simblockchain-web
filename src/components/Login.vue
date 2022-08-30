@@ -278,7 +278,7 @@ export default {
         getLoginMes(params).then((res) => {
           if (res.status === 1) {
             store.commit("getUser", { token: res.data._id, ...res.data });
-            console.log("store", store);
+            // console.log("store", store);
             store
               .dispatch("asyncGetRoutes", res.data.username)
               .then((path) => {
@@ -290,13 +290,13 @@ export default {
                 }
                 else
                 {
-                  console.log("path", path);
+                  // console.log("path", path);
                   state.loginLoading = false;
                   router.push("/layout/" + path[0].path);
                 }
               })
               .catch(() => {
-                console.log("store2", store);
+                // console.log("store2", store);
                 state.loginLoading = false;
               });
             // console.log(store.dispatch('asyncGetRoutes'))
@@ -307,7 +307,7 @@ export default {
             });
           }
         });
-        console.log(params);
+        // console.log(params);
       }
       // JSON.parse(JSON.stringify(state.formLabelAlign));
     }
