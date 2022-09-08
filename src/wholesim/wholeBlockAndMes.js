@@ -61,11 +61,12 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
     return blockMesList;
 }
 //消息类型，，区块传输（基于邻居节点传输），贸易传输（内容传输与交易广播） 消息的接收//创立消息的同时也会将相关数据处理好
-export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, kindMesLen) {
+export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, kindMesLen, noHeapBlockMesList) {
     let haveCoinNode = [];
     let nodeCoinState = [];
     for (let i = 0; i < blockMesList.length; i++) {
         let minHeap = new MinHeap();
+        let normalMes = [];;
         let start = JSON.parse(JSON.stringify(blockMesList[i].startTimestamp))
         let end = blockMesList[i].endTimestamp;
         let blockTransmitList = getBlockTransmitList(nodeMesList, blockMesList[i].miner);
@@ -77,11 +78,20 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                 let NodeTo = getNodeto(templateNodeList, blockMesList[i].miner);
                 let timList = getAllTimeList(blockMesList[i].miner, NodeTo, WholeSimData);
                 start += timList[0];//timList[0];
-                minHeap.insert({
+                let blockCreatedmes = {
+                    id:i,
                     type: "blockCreated",
                     timestamp: start,
                     miner: JSON.parse(JSON.stringify(blockMesList[i].miner)),
                     targetBlock: blockMesList[i]
+                };
+                minHeap.insert(blockCreatedmes);
+                normalMes.push({
+                    id:i,
+                    type: "blockCreated",
+                    timestamp: start,
+                    miner: blockMesList[i].miner.id,
+                    targetBlock: blockMesList[i].id
                 });
                 //矿工节点添加交易信息
                 coinStatePush(blockMesList[i].miner.id, WholeSimData.blockReward, nodeCoinState);
@@ -99,14 +109,25 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                     from: blockMesList[i].miner,
                     to: NodeTo,
                     isBreakdown: isChurn,
-                    transCoin: enCoin,
-                    feeCoin: transCoin - enCoin,
+                    transCoin: Math.abs(enCoin),
+                    feeCoin: Math.abs(transCoin - enCoin),
                 };
                 //交易来原入
                 if (haveCoinNode.indexOf(templateNodeList[0].id) == -1) {
                     haveCoinNode.push(blockMesList[i].miner.id);
                 }
                 minHeap.insert(mes);
+                normalMes.push({
+                    id: nodeTransId,
+                    transHash: sha256("trade" + nodeTransId),
+                    type: "nodeTrade",
+                    timestamp: start,
+                    from: blockMesList[i].miner.id,
+                    to: NodeTo.id,
+                    isBreakdown: isChurn,
+                    transCoin: Math.abs(enCoin),
+                    feeCoin: Math.abs(transCoin - enCoin),
+                });
                 kindMesLen.tradeMesLen++;
                 //交易接收事务
                 start += timList[2];//timList[2];
@@ -116,17 +137,27 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                     coinStatePush(NodeTo.id, enCoin, nodeCoinState);
                 }
                 let tradeRecId = kindMesLen.RecMesLen;
-                minHeap.insert({
+                let tradeRecMes= {
                     id: tradeRecId,
                     type: "tradeRec",
                     timestamp: start,
                     from: NodeTo,
                     to: blockMesList[i].miner,
                     isBreakdown: isChurn,
-                    transCoin: enCoin,
+                    transCoin: Math.abs(enCoin),
                     recMes: mes
+                };
+                minHeap.insert(tradeRecMes);
+                normalMes.push({
+                    id: tradeRecId,
+                    type: "tradeRec",
+                    timestamp: start,
+                    from: NodeTo.id,
+                    to: blockMesList[i].miner.id,
+                    isBreakdown: isChurn,
+                    transCoin: Math.abs(enCoin),
+                    recMes: mes.id
                 });
-
                 if (haveCoinNode.indexOf(templateNodeList[0].id) == -1) {
                     haveCoinNode.push(NodeTo.id);
                 }
@@ -161,10 +192,22 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                         from: fromNode,
                         to: templateNodeList[0],
                         isBreakdown: isChurn,
-                        transCoin: enCoin,
-                        feeCoin: transCoin - enCoin,
+                        transCoin: Math.abs(enCoin),
+                        feeCoin: Math.abs(transCoin - enCoin),
                     };
                     minHeap.insert(mes);
+                    normalMes.push({
+                        id: nodeTransId,
+                        transHash: sha256("trade" + nodeTransId),
+                        type: "nodeTrade",
+                        timestamp: start,
+                        miner: blockMesList[i].miner.id,
+                        from: fromNode.id,
+                        to: templateNodeList[0].id,
+                        isBreakdown: isChurn,
+                        transCoin: Math.abs(enCoin),
+                        feeCoin: Math.abs(transCoin - enCoin),
+                    });
                     kindMesLen.tradeMesLen++;
                     //交易接收事务
                     start += timList[2];//timList[2];
@@ -174,14 +217,27 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                         coinStatePush(templateNodeList[0].id, enCoin, nodeCoinState);
                     }
                     let tradeRecId = kindMesLen.RecMesLen;
-                    minHeap.insert({
+                    let tradeRecMes= {
                         id: tradeRecId,
                         type: "tradeRec",
                         timestamp: start,
                         from: templateNodeList[0],
                         to: fromNode,
                         isBreakdown: isChurn,
+                        transCoin: Math.abs(enCoin),
                         recMes: mes
+                    };
+                    //消息插入
+                    minHeap.insert(tradeRecMes);
+                    normalMes.push({
+                        id: tradeRecId,
+                        type: "tradeRec",
+                        timestamp: start,
+                        from: templateNodeList[0].id,
+                        to: fromNode.id,
+                        isBreakdown: isChurn,
+                        transCoin: Math.abs(enCoin),
+                        recMes: mes.id
                     });
                     if (haveCoinNode.indexOf(templateNodeList[0].id) == -1) {
                         haveCoinNode.push(templateNodeList[0].id);
@@ -204,11 +260,21 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                         blockHeight: i
                     };
                     minHeap.insert(mes);
+                    normalMes.push({
+                        id: transMesLenId,
+                        type: "BlockTrade",
+                        timestamp: start,
+                        miner: blockMesList[i].miner.id,
+                        from: blockTimestamp[0].fromNode.id,
+                        to: blockTimestamp[0].toNode.id,
+                        isBreakdown: false,
+                        blockHeight: i
+                    });
                     kindMesLen.transMesLen++;
                     //区块消息接收
                     start += blockTimestamp[0].downLoad;//;
                     let tradeRecId = kindMesLen.RecMesLen;
-                    minHeap.insert({
+                    let tradeRecBlockMes = {
                         id: tradeRecId,
                         type: "tradeRecBlock",
                         timestamp: start,
@@ -217,12 +283,24 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                         isBreakdown: false,
                         recMes: mes,
                         blockHeight: i
+                    };
+                    minHeap.insert(tradeRecBlockMes);
+                    normalMes.push({
+                        id: tradeRecId,
+                        type: "tradeRecBlock",
+                        timestamp: start,
+                        from: blockTimestamp[0].toNode.id,
+                        to: blockTimestamp[0].fromNode.id,
+                        isBreakdown: false,
+                        recMes: mes.id,
+                        blockHeight: i
                     });
                     kindMesLen.RecMesLen++;
                 }
             }
 
         }
+        noHeapBlockMesList.push(normalMes);
         blockMesList[i].blockMesHeap = minHeap;
 
     }

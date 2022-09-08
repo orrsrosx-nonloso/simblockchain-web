@@ -5,6 +5,7 @@ import auth from '../views/auth.vue'
 import map from '../views/map.vue'
 import singleSim from '../views/singleSim.vue'
 import wholeSim from '../views/wholeSim.vue'
+import bugOrder from '../views/bugOrder.vue'
 
 const asnycRouters = [
     {
@@ -37,7 +38,12 @@ const asnycRouters = [
         path: 'wholeSim',
         name: 'wholeSim',
         component: wholeSim
-    }
+    },
+    {
+        path: 'bugOrder',
+        name: 'bugOrder',
+        component: bugOrder
+    },
 ]
 
 export default asnycRouters 

@@ -22,6 +22,7 @@
           <el-icon v-if="menu.title == `地图`"><MapLocation /></el-icon>
           <el-icon v-if="menu.title == `单流程仿真`"><Coordinate /></el-icon>
           <el-icon v-if="menu.title == `全流程仿真`"><Connection /></el-icon>
+          <el-icon v-if="menu.title == `问题工单`"><Notebook /></el-icon>
           <span>{{ menu.title }}</span>
         </template>
       </el-menu-item>
@@ -40,6 +41,7 @@ import {
   MapLocation,
   Coordinate,
   Connection,
+  Notebook
 } from "@element-plus/icons";
 
 const router = useRouter();

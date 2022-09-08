@@ -13,7 +13,9 @@ const en = {
     "NextStep":"Next Step",
     "create":"Create",
     "wholeSimStartMes":"Before starting the simulation, you need to configure the relevant parameters of the simulation. During the simulation, you can't operate the relevant modules, but you can view the"+
-    " data information of the relevant block nodes until the end of the simulation."
+    " data information of the relevant block nodes until the end of the simulation.",
+    "NetConfiguration":"Network generation configuration",
+    "NetworkStrategy":"Network topology generation strategy"
 
 }
 export default en

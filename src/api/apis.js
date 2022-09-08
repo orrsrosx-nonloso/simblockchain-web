@@ -253,12 +253,34 @@ export const changeNodeRegion = function (data) {
     return http('post', 'http://localhost:8081/singleNode/changeNodeRegion', data)
 }
 
-
+/*
+ * 全流程相关接口
+ */
 //初始配置全流程仿真参数
 export const configWholeSettingData = function (data) {
     return http('post', 'http://localhost:8081/wholeSim/configSimData', data)
 }
 
+//仿真结束或者终止进行数据配置
+export const configWholeSettingEndData = function (data) {
+    return http('post', 'http://localhost:8081/wholeSim/configSimEndData', data)
+}
+
+//初始配置全流程节点基本内容
+export const configWholeNodeData = function (data) {
+    return http('post', 'http://localhost:8081/wholeNode/configWholeNodeData', data)
+}
+
+//初始配置全流程节点基本内容
+export const configWholeBlockMes = function (data) {
+    return http('post', 'http://localhost:8081/wholeBlock/configWholeBlockMes', data)
+}
+
+
+//工单提交页
+export const insertToBugOrder = function (data) {
+    return http('post', 'http://localhost:8081/bugOrder/insertToBugOrder', data)
+}
 
 
 // 获取权限菜单

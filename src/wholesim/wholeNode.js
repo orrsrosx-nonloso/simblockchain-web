@@ -8,10 +8,10 @@ export function nodeCreated(WholeSimData, auth) {
     let Degree_distribution = [0.025, 0.050, 0.075, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.85, 0.90, 0.95, 0.97,
         0.97, 0.98, 0.99, 0.995, 1.0]
     let regionList = [];
-    for (let data in WholeSimData.RegionList) {
-        regionList.push(WholeSimData.RegionList[data]);
+    for (let data in WholeSimData.regionList) {
+        regionList.push(WholeSimData.regionList[data]);
     }
-    let len = WholeSimData.numOfNode;
+    let len = WholeSimData.numOfNodes;
     //节点地区分布
     const targetRegionList = getRandomListForRegion(regionList, len);
     //节点邻居分布
@@ -31,7 +31,7 @@ export function nodeCreated(WholeSimData, auth) {
     for (let i = 0; i < len; i++) {
         let hashRates = 0;
         if (targetNodeTYpeList[i] == "miningNode") {
-            hashRates = Math.max(10000 * normalRandom(0, 1.0) + WholeSimData.AverageMiningPower, 1)
+            hashRates = Math.max(10000 * normalRandom(0, 1.0) + WholeSimData.averageMiningPower, 1)
         }
         let netWorkTable = {
             numConnection: 9,

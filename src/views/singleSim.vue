@@ -861,28 +861,28 @@
 
               <el-dialog
                 v-model="centerDialogVisible"
-                title="Network generation configuration"
+                :title="t('NetConfiguration')"
                 width="30%"
                 :show-close="false"
                 :before-close="handleCloseNetConfig"
               >
                 <el-form :model="networkForm" label-width="120px">
-                  <h3>Network topology generation strategy:</h3>
+                  <h3>{{t('NetworkStrategy')}}:</h3>
                   <el-radio-group
                     v-model="networkForm.labelPosition"
                     style="margin-top: 15px"
                   >
-                    <el-radio label="Adaptive" border>Adaptive</el-radio>
-                    <el-radio label="Manual" border>Manual</el-radio>
+                    <el-radio label="Adaptive" border>自适应</el-radio>
+                    <el-radio label="Manual" border>手动</el-radio>
                   </el-radio-group>
                   <el-form-item
                     style="margin-top: 20px"
-                    label="Max Outbound"
+                    label="最大出度"
                     prop="MaxOutbound"
                     :rules="[
                       {
                         type: 'number',
-                        message: 'Max Outbound must be a number',
+                        message: '输入内容必须为数字',
                       },
                     ]"
                   >
@@ -890,17 +890,17 @@
                       v-model.number="networkForm.MaxOutbound"
                       type="text"
                       autocomplete="off"
-                      placeholder="The limit is 4 to 8(default:4)."
+                      placeholder="范围限制为4-8(默认值:4)."
                     />
                   </el-form-item>
                 </el-form>
                 <template #footer>
                   <span class="dialog-footer">
                     <el-button @click="centerDialogVisible = false"
-                      >Cancel</el-button
+                      >关闭</el-button
                     >
                     <el-button type="primary" @click="submitForm()"
-                      >Confirm</el-button
+                      >确定</el-button
                     >
                   </span>
                 </template>
@@ -1792,8 +1792,8 @@ import {
   changeNodeRegion,
 } from "../api/apis";
 import { uuid, getDataString, getNodeId, checkNumber } from "../utils/utils";
-import { t } from "element-plus/es/locale";
 import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
 import { computed, h } from "vue";
 import { Box, Edit, Phone } from "@element-plus/icons";
 import { useRouter } from "vue-router";
@@ -2172,7 +2172,7 @@ export default {
         dialog2.value = false;
       }
     };
-
+    const { t } = useI18n();  
     return {
       props: {
         // props.
@@ -2213,6 +2213,7 @@ export default {
       findTransList1,
       findTransList2,
       findLightListTransList2,
+      t,
     };
   },
   data() {
@@ -2407,16 +2408,16 @@ export default {
       if (!checkNumber(a)) {
         if (a == "") {
           ElMessageBox.alert(
-            "You can modify the related configuration again in the network configuration toolbar.",
-            "SUCCESS",
+            "您可以在网络配置工具栏中再次修改相关配置.",
+            "设置成功",
             {
               confirmButtonText: "OK",
             }
           );
           if (networkForm.labelPosition != "Adaptive") {
             ElMessageBox.alert(
-              "In the manual state, continuous configuration is required in the network configuration toolbar on the left.",
-              "NOTICE",
+              "在手动状态下，需要在左侧的网络配置工具栏中进行连续配置.",
+              "通知",
               {
                 confirmButtonText: "OK",
               }
@@ -2432,8 +2433,8 @@ export default {
           }
         } else {
           ElMessageBox.alert(
-            "Please enter the correct Max Outbound",
-            "WARING",
+            "请输出正确的最大出度数",
+            "警告",
             {
               confirmButtonText: "OK",
             }
@@ -2443,24 +2444,24 @@ export default {
         let numa = parseInt(a);
         if (numa < 4 || numa > 8) {
           ElMessageBox.alert(
-            "Please enter the correct Max Outbound(4-8)",
-            "WARING",
+            "请输出正确范围内的最大出度数(4-8)",
+            "警告",
             {
               confirmButtonText: "OK",
             }
           );
         } else {
           ElMessageBox.alert(
-            "You can modify the related configuration again in the network configuration toolbar.",
-            "SUCCESS",
+            "您可以在网络配置工具栏中再次修改相关配置.",
+            "设置成功",
             {
               confirmButtonText: "OK",
             }
           );
           if (networkForm.labelPosition != "Adaptive") {
             ElMessageBox.alert(
-              "In the manual state, continuous configuration is required in the network configuration toolbar on the left.",
-              "NOTICE",
+              "在手动状态下，需要在左侧的网络配置工具栏中进行连续配置.",
+              "通知",
               {
                 confirmButtonText: "OK",
               }
@@ -2552,7 +2553,7 @@ export default {
       }
       if (change) {
         ElMessageBox.confirm(
-          "Are you sure you want to discard the modification?",
+          "您确定要放弃修改吗?",
           "Warning",
           {
             confirmButtonText: "OK",
@@ -2580,7 +2581,7 @@ export default {
           manualDialogVisible.value = true;
           setTimeout(() => {
             ElMessageBox.alert(
-              "The selected value is greater than numConnect, please select again.",
+              "所选值大于numConnect，请重新选择.",
               "Warning",
               {
                 confirmButtonText: "OK",
