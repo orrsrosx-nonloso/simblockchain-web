@@ -679,7 +679,7 @@
                       size="small"
                     />
                   </el-form-item>
-                  <el-form-item label="矿工平均算力">
+                  <el-form-item label="矿工平均算力(kH/s)">
                     <el-input-number
                       v-model="WholeSimData.averageMiningPower"
                       :min="2000"
