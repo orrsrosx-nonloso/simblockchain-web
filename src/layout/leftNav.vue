@@ -9,16 +9,16 @@
       ></navMenu>
     </div>
     <div class="toolbar">
-      <i
+      <i style="color: #000000"
         v-if="!state.isCollapse"
         class="el-icon-s-fold"
         @click="setCollapse(true)"
-      ><i class="iconfont">&#xe676;</i></i>
-      <i
+      ><i style="color: #000000" class="iconfont">&#xe676;</i></i>
+      <i style="color: #000000"
         v-if="state.isCollapse"
         class="el-icon-s-unfold"
         @click="setCollapse(false)"
-      ><i class="iconfont">&#xe678;</i></i>
+      ><i style="color: #000000" class="iconfont">&#xe678;</i></i>
     </div>
     <!-- 用户信息，面包屑 -->
     <div :class="state.isCollapse ? 'topUser leftCollapse' : 'topUser leftNotCollapse'">

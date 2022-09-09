@@ -132,7 +132,6 @@
                   >
                   </el-option>
                 </el-select>
-                <span style="padding: 10px">TO:</span>
                 <el-select
                   v-model="valueTrans2"
                   collapse-tags
@@ -867,13 +866,13 @@
                 :before-close="handleCloseNetConfig"
               >
                 <el-form :model="networkForm" label-width="120px">
-                  <h3>{{t('NetworkStrategy')}}:</h3>
+                  <h3>{{ t("NetworkStrategy") }}:</h3>
                   <el-radio-group
                     v-model="networkForm.labelPosition"
                     style="margin-top: 15px"
                   >
                     <el-radio label="Adaptive" border>自适应</el-radio>
-                    <el-radio label="Manual" border>手动</el-radio>
+                    <el-radio label="Manual" border>手动模式</el-radio>
                   </el-radio-group>
                   <el-form-item
                     style="margin-top: 20px"
@@ -1839,10 +1838,10 @@ let summaryMesUpdata = reactive([
     tabName: "Transaction fee:  ",
     data: "0%",
   },
-  {
-    tabName: "Account quantity:  ",
-    data: "0",
-  },
+  // {
+  //   tabName: "Account quantity:  ",
+  //   data: "0",
+  // },
 ]);
 
 //节点连线数据存储集合
@@ -2172,7 +2171,7 @@ export default {
         dialog2.value = false;
       }
     };
-    const { t } = useI18n();  
+    const { t } = useI18n();
     return {
       props: {
         // props.
@@ -2432,24 +2431,16 @@ export default {
             );
           }
         } else {
-          ElMessageBox.alert(
-            "请输出正确的最大出度数",
-            "警告",
-            {
-              confirmButtonText: "OK",
-            }
-          );
+          ElMessageBox.alert("请输出正确的最大出度数", "警告", {
+            confirmButtonText: "OK",
+          });
         }
       } else {
         let numa = parseInt(a);
         if (numa < 4 || numa > 8) {
-          ElMessageBox.alert(
-            "请输出正确范围内的最大出度数(4-8)",
-            "警告",
-            {
-              confirmButtonText: "OK",
-            }
-          );
+          ElMessageBox.alert("请输出正确范围内的最大出度数(4-8)", "警告", {
+            confirmButtonText: "OK",
+          });
         } else {
           ElMessageBox.alert(
             "您可以在网络配置工具栏中再次修改相关配置.",
@@ -2552,15 +2543,11 @@ export default {
         }
       }
       if (change) {
-        ElMessageBox.confirm(
-          "您确定要放弃修改吗?",
-          "Warning",
-          {
-            confirmButtonText: "OK",
-            cancelButtonText: "Cancel",
-            type: "warning",
-          }
-        )
+        ElMessageBox.confirm("您确定要放弃修改吗?", "Warning", {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        })
           .then(() => {
             state.tableData.length = 0;
             state.tableData = JSON.parse(JSON.stringify(state.tableHisData));
@@ -2580,13 +2567,9 @@ export default {
         setTimeout(() => {
           manualDialogVisible.value = true;
           setTimeout(() => {
-            ElMessageBox.alert(
-              "所选值大于numConnect，请重新选择.",
-              "Warning",
-              {
-                confirmButtonText: "OK",
-              }
-            );
+            ElMessageBox.alert("所选值大于numConnect，请重新选择.", "Warning", {
+              confirmButtonText: "OK",
+            });
           }, 50);
         }, 50);
 
@@ -3782,10 +3765,10 @@ export default {
         tabName: "Transaction fee:  ",
         data: "0%",
       },
-      {
-        tabName: "Account quantity:  ",
-        data: "0",
-      },
+      // {
+      //   tabName: "Account quantity:  ",
+      //   data: "0",
+      // },
     ]);
     //详情信息
     let eventMes = reactive([
@@ -4239,7 +4222,7 @@ export default {
     const changeRegion = (regionId, addressId) => {
       regionIdList.value = true;
       localNodeId.value = addressId;
-      regionList.value = regionId+"";
+      regionList.value = regionId + "";
     };
     const startChangeRegion = () => {
       changeNodeRegion({
@@ -4255,8 +4238,7 @@ export default {
             type: "success",
           });
           drwaerDateNode.regionID = ress.regionId;
-        }
-        else{
+        } else {
           ElMessage({
             message: "修改失败！",
             type: "warning",
@@ -4440,7 +4422,26 @@ export default {
                 if (accountListId.length > 0 && isTargetListId() == 1) {
                   createNewBlock({ auth: getAuth() }).then((ress) => {
                     const res = ress.preData;
-                    this.visLocalMinerNode(res);
+                    // this.visLocalMinerNode(res);
+                    let locllen = blockListId.length;
+                    if (locllen > 0) {
+                      let target = blockListId;
+                      let localMiner = document.getElementById(
+                        "loacalBlockTraFor" + target[locllen - 1].miner
+                      );
+                      if (
+                        localMiner != null &&
+                        localMiner.style.display == "inline-block"
+                      ) {
+                        localMiner.style.display = "none";
+                      }
+                    }
+                    let minNOde = document.getElementById(
+                      "loacalBlockTraFor" + res.miner
+                    );
+                    if (minNOde != null && minNOde.style.display == "none") {
+                      minNOde.style.display = "inline-block";
+                    }
                     openBlockCreate(res.miner);
                     graph.addNode({
                       width: 100,
@@ -5604,7 +5605,7 @@ export default {
                             this.addNewBlockLink(start, bifBlock2.blockID);
                             const data = blockListId.length;
                             this.summaryMes[4].data =
-                              bifBlock1.blockId + " or " + bifBlock2.blockId;
+                              bifBlock1.blockID + " or " + bifBlock2.blockID;
                             this.summaryMes[2].data = data;
                             this.summaryMes[6].data =
                               1 + Number(this.summaryMes[6].data);
@@ -5972,6 +5973,9 @@ export default {
         this.driver.defineSteps(steps);
         this.driver.start();
       });
+    },
+    getVistargetBlock(res) {
+      console.log("adsadjkasghdjkasgdkajshdakjhdka");
     },
     visLocalMinerNode(res) {
       let locllen = blockListId.length;

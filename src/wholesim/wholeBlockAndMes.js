@@ -36,6 +36,7 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
         if (i > 1) {
             preHash = hashList[i - 2].hash;
         }
+        console.log(i+"-------miningNodeList[i - 1].hashRate")
         blockMesList.push({
             id: i - 1,
             blockId: "Block" + i,
@@ -47,7 +48,7 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
             confirmations: 0,//确定
             //交易量
             numOfTransac: 0,
-            difficulty: 2000 * hashList[i - 1].nonce + miningNodeList[i - 1].hashRate,
+            difficulty: 2000 * hashList[i - 1].nonce + miningNodeList[0].hashRate,
             nonce: hashList[i - 1].nonce,
             transactionVolume: 0,
             reward: WholeSimData.blockReward,

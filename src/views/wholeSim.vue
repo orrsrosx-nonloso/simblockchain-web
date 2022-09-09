@@ -635,7 +635,7 @@
                 </h2>
 
                 <div class="dataImport">
-                  <el-button type="primary" size="large">导入数据</el-button>
+                  <!-- <el-button type="primary" size="large">导入数据</el-button> -->
                 </div>
               </div>
             </div>
@@ -776,7 +776,7 @@
                       :step="0.001"
                       :max="1"
                       size="small"
-                    />%
+                    />
                   </el-form-item>
                 </el-form>
               </div>
