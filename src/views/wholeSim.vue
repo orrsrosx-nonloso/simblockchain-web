@@ -359,7 +359,7 @@
               label-align="left"
               align="left"
               min-width="100px"
-              >
+            >
               <el-date-picker
                 v-model="nodeMesData.timestamp"
                 size="large"
@@ -462,7 +462,7 @@
               label-align="left"
               align="left"
               min-width="100px"
-              >
+            >
               <el-date-picker
                 v-model="blockMesData.timestamp"
                 size="large"
@@ -512,7 +512,7 @@
               label-align="left"
               align="left"
               min-width="100px"
-              >
+            >
               <el-date-picker
                 v-model="createMesData.timestamp"
                 size="large"
@@ -532,6 +532,14 @@
                 @click="findDetailTrans(createMesData.minerReward)"
                 >{{ createMesData.minerReward }}</el-button
               >
+            </el-descriptions-item>
+            <el-descriptions-item
+              label="是否分叉块"
+              label-align="left"
+              align="left"
+              min-width="100px"
+            >
+              {{ createMesData.isOrphan }}
             </el-descriptions-item>
             <el-descriptions-item
               label="认证交易列表"
@@ -568,7 +576,8 @@
           @click="reStartSim"
           >虚拟时间进度:{{ simFlowTime.timeString }}</el-button
         > -->
-        <span>虚拟时间进度:</span><el-date-picker
+        <span>虚拟时间进度:</span
+        ><el-date-picker
           v-model="simFlowTime.timeData"
           size="large"
           type="datetime"
@@ -993,7 +1002,7 @@
                   <el-form-item label="区块生成间隔(ms)">
                     <el-input-number
                       v-model="WholeSimData.blockTime"
-                      :min="4000"
+                      :min="2000"
                       :step="1000"
                       size="small"
                       @change="
@@ -1294,6 +1303,7 @@ export default {
           content: { id: null, mes: "区块消息创建" },
           id: null,
           type: "normalMes",
+          isOrphan:"false",
           from: 1,
           to: 2,
           miner: 0,
@@ -1318,6 +1328,7 @@ export default {
           to: 2,
           miner: 0,
           confirmId: null,
+          isOrphan:"false",
           transactionId: "0",
         },
       },
@@ -1352,6 +1363,7 @@ export default {
       return auth.value;
     };
     //全流程仿真相关参数
+    //区块链分叉bitconin = 0.58% litecoin:0.30,dogecoin:0.80
     const wholeSimSliderValue = ref(0);
     const maxSloderValue = ref(40000);
     const simDataGapTime = ref(10);
@@ -1411,6 +1423,7 @@ export default {
         { name: "OA", latency: [267, 245, 254, +223, 223, 218] },
       ],
       churnNodeFailureRate: 0.27,
+      orphanBlock: 0.05,
       controllerNodeFailureRate: 0.13,
       nodeTypRate: [0.3, 0.3, 0.4],
     });
@@ -1693,6 +1706,7 @@ export default {
       to: 2,
       miner: 0,
       transactionId: "",
+      isOrphan:"false",
       minerReward: "",
       timestamp: "",
     });
@@ -1899,6 +1913,7 @@ export default {
         mes.contentMessage.type == "normalMes"
       ) {
         this.createMesData.mes = mes.mes;
+        this.createMesData.isOrphan = mes.contentMessage.isOrphan;
         this.createMesData.timestamp = new Date(mes.contentMessage.timestamp);
         this.createMesData.type = mes.contentMessage.type;
         this.createMesData.state = mes.contentMessage.state + "(成功)";
@@ -1941,6 +1956,7 @@ export default {
         mes.contentMessage.type == "normalMes"
       ) {
         this.createMesData.mes = mes.mes;
+        this.createMesData.isOrphan = mes.contentMessage.isOrphan;
         this.createMesData.timestamp = new Date(mes.contentMessage.timestamp);
         this.createMesData.state = mes.contentMessage.state + "(成功)";
         this.createMesData.miner = mes.contentMessage.miner;
@@ -2117,6 +2133,9 @@ export default {
     },
     changeMapMiner(dataGeo1) {
       this.mapOption.series[4].data = dataGeo1;
+    },
+    addMapMiner(dataGeo1) {
+      this.mapOption.series[4].data.push(dataGeo1);
     },
     changeMapLine(lineData) {
       this.mapOption.series[3].data = lineData;
@@ -2326,6 +2345,7 @@ export default {
                 let recLineList = [];
                 //需要处理的线集合
                 let lineList = [];
+                let targetI = 0;
                 for (let heap of newHeapList) {
                   if (heap != undefined || heap != null) {
                     if (
@@ -2340,13 +2360,14 @@ export default {
                         heap,
                         blocMeskList,
                         i,
-                        newtimeMesList[i]
+                        newtimeMesList[targetI]
                       );
                       if (lineMes != null) {
                         lineList.push(lineMes);
                       }
                     }
                   }
+                  targetI++;
                 }
                 this.changeMapLine(lineList);
                 this.reDrawMaps();
@@ -2362,6 +2383,7 @@ export default {
                 let recLineList = [];
                 //需要处理的线集合
                 let lineList = [];
+                let targetIL = 0;
                 for (let heap of newHeapList) {
                   if (heap != undefined || heap != null) {
                     if (
@@ -2375,13 +2397,14 @@ export default {
                         heap,
                         blocMeskList,
                         i,
-                        newtimeMesList[i]
+                        newtimeMesList[targetIL]
                       );
                       if (lineMes != null) {
                         lineList.push(lineMes);
                       }
                     }
                   }
+                  targetIL++;
                 }
                 this.changeMapLine(lineList);
                 this.reDrawMaps();
@@ -2489,6 +2512,9 @@ export default {
       timestampMes
     ) {
       timestampMes = this.dealtargetTeime(timestampMes);
+      if(timestampMes==NaN){
+        let j = 1;
+      }
       if (mes.type == "blockCreated") {
         this.summaryMes[3].data++;
         let value = blocMes.miner.regionPostion;
@@ -2541,6 +2567,7 @@ export default {
           miner: mes.miner.addressId,
           confirmId: confirmedId,
           timestamp: timestampMes,
+          isOrphan: "false",
         };
         let blockEndMes = {
           type: mes.type,
@@ -2550,6 +2577,7 @@ export default {
           miner: mes.miner.addressId,
           confirmId: confirmedId,
           timestamp: timestampMes,
+          isOrphan: "false",
         };
         titleMesBlock.push({ id: titleMesBlock.length, content: "区块创建" });
         contentMesBlock.unshift({
@@ -2566,6 +2594,87 @@ export default {
           id: contentMesBlock.length,
           contentMessage: nodeEndMes,
           mes: "节点" + mes.miner.addressId + "获取挖矿奖励",
+        });
+        return null;
+      } else if (mes.type == "blockOrphanCreated") {
+        this.summaryMes[3].data++;
+        let value = blocMes.miner.regionPostion;
+        //矿工节点高亮
+        this.addMapMiner([
+          {
+            name: blocMes.miner.addressId,
+            type: "Miner",
+            value: value,
+          },
+        ]);
+        this.reDrawMaps();
+        //矿工节点获取奖励
+        let transactionsList = this.transactionsList;
+        let minerTrans = {
+          id: transactionsList.transactions.length,
+          hash: sha256("trans" + transactionsList.transactions.length),
+          intputId: "",
+          outputId: "",
+          createdTime: getDataString(),
+          totalInput: WholeSimData.blockReward,
+          totalOutput: 0,
+          status: "confirmed",
+          utxo: WholeSimData.blockReward,
+          auth: this.getAuth(),
+          fees: 0,
+          feesTransId: "",
+          feeMark: 1,
+        };
+        //矿工节点交易载入
+        this.minerTradeDeal(nodeMesList, minerTrans, mes);
+        //区块相关交易信息载入（包含一定量级的未确定交易）
+        // let confirmedId = this.blcokCreateMesDeal(
+        //   blockMesList,
+        //   indexB,
+        //   minerTrans,
+        //   WholeSimData
+        // );
+        //信息载入
+        let titleMesBlock = this.systemMsgBlock;
+        let contentMesBlock = this.blockMesVisList;
+        let contentMes = this.nodeMesVisList;
+        transactionsList.transactions.push(minerTrans);
+        this.configChangeMes(minerTrans, "node");
+        let nodeEndMes = {
+          type: mes.type,
+          state: 0, //成功
+          kind: 0,
+          content: minerTrans,
+          miner: mes.miner.addressId,
+          confirmId: "",
+          timestamp: timestampMes,
+          isOrphan: "true",        
+        };
+        let blockEndMes = {
+          type: mes.type,
+          state: 0, //成功
+          kind: 0,
+          content: blocMes,
+          miner: mes.miner.addressId,
+          confirmId: "",
+          timestamp: timestampMes,
+          isOrphan: "true",
+        };
+        titleMesBlock.push({ id: titleMesBlock.length, content: "区块创建" });
+        contentMesBlock.unshift({
+          id: contentMesBlock.length,
+          contentMessage: blockEndMes,
+          mes:
+            "区块" +
+            blocMes.blockId +
+            "被节点" +
+            mes.miner.addressId +
+            "成功挖掘,但无法认证,链分叉,且为孤儿块",
+        });
+        contentMes.unshift({
+          id: contentMesBlock.length,
+          contentMessage: nodeEndMes,
+          mes: "节点" + mes.miner.addressId + "挖掘的区块无法认证,转变为孤儿块。",
         });
         return null;
       } else if (mes.type == "nodeTrade") {

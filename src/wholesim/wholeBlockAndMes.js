@@ -36,7 +36,6 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
         if (i > 1) {
             preHash = hashList[i - 2].hash;
         }
-        console.log(i+"-------miningNodeList[i - 1].hashRate")
         blockMesList.push({
             id: i - 1,
             blockId: "Block" + i,
@@ -65,6 +64,11 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
 export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, kindMesLen, noHeapBlockMesList) {
     let haveCoinNode = [];
     let nodeCoinState = [];
+    let targetorOrphanLen = WholeSimData.orphanBlock * WholeSimData.numOfEndBlock;
+    let OrphanLenList = [];
+    if (targetorOrphanLen > 0) {
+        getOrphanLenList(OrphanLenList, WholeSimData.numOfEndBlock, targetorOrphanLen);
+    }
     for (let i = 0; i < blockMesList.length; i++) {
         let minHeap = new MinHeap();
         let normalMes = [];;
@@ -80,7 +84,7 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                 let timList = getAllTimeList(blockMesList[i].miner, NodeTo, WholeSimData);
                 start += timList[0];//timList[0];
                 let blockCreatedmes = {
-                    id:i,
+                    id: i,
                     type: "blockCreated",
                     timestamp: start,
                     miner: JSON.parse(JSON.stringify(blockMesList[i].miner)),
@@ -88,7 +92,7 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                 };
                 minHeap.insert(blockCreatedmes);
                 normalMes.push({
-                    id:i,
+                    id: i,
                     type: "blockCreated",
                     timestamp: start,
                     miner: blockMesList[i].miner.id,
@@ -138,7 +142,7 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                     coinStatePush(NodeTo.id, enCoin, nodeCoinState);
                 }
                 let tradeRecId = kindMesLen.RecMesLen;
-                let tradeRecMes= {
+                let tradeRecMes = {
                     id: tradeRecId,
                     type: "tradeRec",
                     timestamp: start,
@@ -163,6 +167,28 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                     haveCoinNode.push(NodeTo.id);
                 }
                 kindMesLen.RecMesLen++;
+                //需要给代码及加上是否为分叉孤儿交易
+                if (targetorOrphanLen > 0 && OrphanLenList.indexOf(i) != -1) {
+                    //孤儿块的相关信息
+                    //孤儿块事务50毫秒
+                    start += 50;
+                    let miners = null;
+                    while(true){
+                        miners = nodeMesList[Math.floor(Math.random()*nodeMesList.length)];
+                        if(miners.id != blockMesList[i].miner.id){
+                            break;
+                        }
+
+                    }
+                    let blockCreatedmes = {
+                        id: i,
+                        type: "blockOrphanCreated",
+                        timestamp: start,
+                        miner: miners,
+                        targetBlock: blockMesList[i]
+                    };
+                    minHeap.insert(blockCreatedmes);
+                }
 
             }
             else {
@@ -218,7 +244,7 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                         coinStatePush(templateNodeList[0].id, enCoin, nodeCoinState);
                     }
                     let tradeRecId = kindMesLen.RecMesLen;
-                    let tradeRecMes= {
+                    let tradeRecMes = {
                         id: tradeRecId,
                         type: "tradeRec",
                         timestamp: start,
@@ -499,4 +525,18 @@ function haveTargetNode(nodeId, nodeCoinState) {
         }
     }
     return j;
+}
+
+function getOrphanLenList(OrphanLenList, nodeLen, targetorOrphanLen) {
+    let jl = OrphanLenList.length;
+    while (jl <= targetorOrphanLen) {
+        let j = Math.floor(Math.random() * nodeLen);
+        if (j < 3) {
+            j = 3;
+        }
+        if (OrphanLenList.indexOf(j) == -1) {
+            OrphanLenList.push(j);
+            jl++;
+        }
+    }
 }
