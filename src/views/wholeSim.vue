@@ -2,6 +2,35 @@
   <el-row>
     <el-col :span="24">
       <el-dialog
+        v-model="powFindVisible"
+        title="仿真流程进行中!"
+        width="40%"
+        :before-close="powFindHandleClose"
+        :show-close="false"
+      >
+        <div style="padding-left: 20%; padding-right: 20%">
+          <!-- <el-progress :percentage="percentage" :color="customColors" /> -->
+          <el-progress
+            :percentage="percentage"
+            :color="customColors"
+            :status="staus"
+            :indeterminate="true"
+            :duration="1"
+            :stroke-width="20"
+          />
+          <!-- <el-form :model="showBlockMes">
+            <el-descriptions title="">
+              <el-descriptions-item label="">
+                <span style="font-size: 18px; font-weight: bold"
+                  >仿真流程进行中！</span
+                >
+              </el-descriptions-item></el-descriptions
+            ></el-form
+          > -->
+          <div></div>
+        </div>
+      </el-dialog>
+      <el-dialog
         v-model="dialogDetailTransVisible"
         title="请选择交易id"
         width="20%"
@@ -653,6 +682,12 @@
                 <h2>
                   配置完相关参数后点击创建,全流程仿真系统会自动开始对预设仿真,当仿真区块链高度达到目标高度时会自动结束仿真。
                 </h2>
+                <div class="dataImport">
+                  <!-- <el-button type="primary" size="large">导入数据</el-button> -->
+                  <el-button type="primary" @click="nextEnd"
+                    >直接获取仿真结果</el-button
+                  >
+                </div>
               </div>
             </div>
             <div
@@ -1303,7 +1338,7 @@ export default {
           content: { id: null, mes: "区块消息创建" },
           id: null,
           type: "normalMes",
-          isOrphan:"false",
+          isOrphan: "false",
           from: 1,
           to: 2,
           miner: 0,
@@ -1328,7 +1363,7 @@ export default {
           to: 2,
           miner: 0,
           confirmId: null,
-          isOrphan:"false",
+          isOrphan: "false",
           transactionId: "0",
         },
       },
@@ -1476,7 +1511,7 @@ export default {
     let simDataId = 0; //仿真标识ID
     let nodeMesList = [];
     let blocMeskList = [];
-    const startWholeSim = (wholeSimId) => {
+    const startWholeSim = (wholeSimId, displaySimulation) => {
       //全局内容配置
       this.setSummary(WholeSimData, summaryMes);
       let loading = openFullScreen("节点创建中...");
@@ -1545,17 +1580,34 @@ export default {
                     // }
                     nodeMesData.type = "132";
                     nodeMesData.from = "132";
-                    this.startFlowSim(
-                      nodeMesList,
-                      blocMeskList,
-                      WholeSimData,
-                      wholeSimId
-                    );
-                    let loading2 = openFullScreen("仿真开始中...");
-                    let loadingSim = setTimeout(() => {
-                      loading2.close();
-                      clearTimeout(loadingSim);
-                    }, 300);
+                    if (displaySimulation == 0) {
+                      this.startFlowSim(
+                        nodeMesList,
+                        blocMeskList,
+                        WholeSimData,
+                        wholeSimId
+                      );
+                      let loading2 = openFullScreen("仿真开始中...");
+                      let loadingSim = setTimeout(() => {
+                        loading2.close();
+                        clearTimeout(loadingSim);
+                      }, 300);
+                    } else {
+                      let loading2 =
+                        openFullScreen("仿真开始中...(直接获取仿真结果)");
+                      let loadingSim = setTimeout(() => {
+                        this.startNoDisplayFlowSim(
+                          nodeMesList,
+                          blocMeskList,
+                          WholeSimData,
+                          wholeSimId
+                        );
+                        loading2.close();
+
+                        clearTimeout(loadingSim);
+                      }, 500);
+                    }
+
                     clearTimeout(endTiem5);
                   }, 1000);
                   clearTimeout(endTiem4);
@@ -1586,6 +1638,30 @@ export default {
     };
 
     const simState = ref(false);
+    //直接获取仿真结果
+    const nextEnd = () => {
+      dialogWholeSimVisible.value = false;
+      reSetSimEndTimeStr(getTargetDataStr(WholeSimData.simEndTime));
+      let data = {
+        wholeSimDataInput: JSON.parse(JSON.stringify(WholeSimData)),
+        auth: getAuth(),
+      };
+      //基本数据导入
+      configWholeSettingData(data).then((res) => {
+        // 创建结束后开始仿真;
+        if (res.status == 1) {
+          simDataId = res.wholeSimId;
+          simState.value = true;
+          startWholeSim(res.wholeSimId, 1); // 1表示不实时显示仿真流程
+        } else {
+          ElMessageBox.alert("一些错误：" + res.mes, "ALERT", {
+            // if you want to disable its autofocus
+            // autofocus: false,
+            confirmButtonText: "OK",
+          });
+        }
+      });
+    };
     //下一步
     const next = () => {
       if (activeIndex.value == 4) {
@@ -1602,7 +1678,7 @@ export default {
           if (res.status == 1) {
             simDataId = res.wholeSimId;
             simState.value = true;
-            startWholeSim(res.wholeSimId);
+            startWholeSim(res.wholeSimId, 0); //0表示实时显示仿真流程
           } else {
             ElMessageBox.alert("一些错误：" + res.mes, "ALERT", {
               // if you want to disable its autofocus
@@ -1706,7 +1782,7 @@ export default {
       to: 2,
       miner: 0,
       transactionId: "",
-      isOrphan:"false",
+      isOrphan: "false",
       minerReward: "",
       timestamp: "",
     });
@@ -1720,6 +1796,39 @@ export default {
       timestamp: "",
     });
 
+    const powFindHandleClose = () => {
+      ElMessageBox.confirm("程序运行中,无法退出当前界面!")
+        .then(() => {})
+        .catch(() => {
+          // catch error
+        });
+    };
+    const staus = ref("");
+    const setStatus = (value) => {
+      staus.value = value;
+    };
+
+    const percentage = ref(0);
+    const addPercentage = (value) => {
+      console.log(percentage.value + " + recTime +" + value);
+      if (percentage.value < 96) {
+        percentage.value += value;
+      }
+    };
+    const setPercentage = (value) => {
+      percentage.value = value;
+    };
+    const customColors = [
+      { color: "#f03030", percentage: 10 },
+      { color: "#f56c6c", percentage: 20 },
+      { color: "#f39d1d", percentage: 30 },
+      { color: "#e6a23c", percentage: 40 },
+      { color: "#f5b95e", percentage: 50 },
+      { color: "#c2f117", percentage: 60 },
+      { color: "#c1e63c", percentage: 70 },
+      { color: "#d7f763", percentage: 80 },
+      { color: "#5cb87a", percentage: 100 },
+    ];
     return {
       blockTableData: reactive([]),
       nodeMesVisList,
@@ -1755,6 +1864,7 @@ export default {
       activeIndex,
       transactionsList,
       next,
+      nextEnd,
       nodeMesList,
       blockTransmitMes,
       unconfirmedTransactions,
@@ -1815,6 +1925,15 @@ export default {
       },
       openFullScreen,
       simFlowTime,
+      powFindVisible: ref(false),
+      powFindHandleClose,
+      percentage,
+      setPercentage,
+      addPercentage,
+      customColors,
+      staus,
+      setStatus,
+      showBlockMes: reactive(["全局查找正在进行挖矿的节点!"]),
     };
   },
   setup() {
@@ -2304,6 +2423,143 @@ export default {
         },
       };
     },
+    //掠过地图流程的变化
+    startNoDisplayFlowSim(nodeMesList, blocMeskList, WholeSimData, wholeSimId) {
+      let heass = [];
+      // this.powFindVisible = true;
+      let loadingss = this.openFullScreen(
+        "仿真流程快速处理中...(预计花费" + blocMeskList.length * 0.5 + "s)"
+      );
+      let addNum = 0;
+      if (blocMeskList.length > 96) {
+        addNum = Number(96 / blocMeskList.length).toFixed(2);
+      } else {
+        addNum = parseInt(96 / blocMeskList.length);
+      }
+      for (let i = 0; i < blocMeskList.length; i++) {
+        let timeeout = setTimeout(() => {
+          // this.addPercentage(addNum);
+          let localMesStartTime =
+            i * this.simDataGapTime * 60 * 1000 + (1300 / 1000) * 60 * 1000;
+          //上一个时间
+          let preTime = 0;
+          let heapList = [];
+          let timeMesList = [];
+          let len = heapList.length;
+          let localHeap = blocMeskList[i].blockMesHeap;
+          while (localHeap.size() > 0) {
+            let mes = localHeap.pop();
+            //查看交易数量
+            // if (mes.type == "nodeTrade") {
+            //   haddNod.push(mes);
+            // }
+            heapList.push(mes);
+            len++;
+            let time = mes.timestamp - blocMeskList[i].startTimestamp;
+            timeMesList.push(localMesStartTime + (time / 1000) * 60 * 1000);
+            if (len >= 10) {
+              //发送消息与接收消息时间
+              let tradeTime = time - parseInt((time - preTime) / 2);
+              let recTime = time;
+              // console.log("i:" + recTime);
+              preTime = time;
+              const newHeapList = JSON.parse(JSON.stringify(heapList));
+              const newtimeMesList = JSON.parse(JSON.stringify(timeMesList));
+              timeMesList = [];
+              heapList = [];
+              len = 0;
+              //发送消息
+              //需要处理的线集合
+              let lineList = [];
+              let targetI = 0;
+              for (let heap of newHeapList) {
+                if (heap != undefined || heap != null) {
+                  if (
+                    heap.type == "nodeTrade" ||
+                    heap.type == "BlockTrade" ||
+                    heap.type == "blockCreated"
+                  ) {
+                    let lineMes = this.dealAllMes(
+                      nodeMesList,
+                      blocMeskList[i],
+                      WholeSimData,
+                      heap,
+                      blocMeskList,
+                      i,
+                      newtimeMesList[targetI]
+                    );
+                    if (lineMes != null) {
+                      lineList.push(lineMes);
+                    }
+                  }
+                }
+                targetI++;
+              }
+              this.setVmSimTimeChange(
+                localMesStartTime + (tradeTime / 1000) * 60 * 1000
+              );
+              //接收消息
+              //发送消息与接收消息
+              //需要处理的线集合
+              let lineList1 = [];
+              let targetIL = 0;
+              for (let heap of newHeapList) {
+                if (heap != undefined || heap != null) {
+                  if (heap.type == "tradeRec" || heap.type == "tradeRecBlock") {
+                    let lineMes = this.dealAllMes(
+                      nodeMesList,
+                      blocMeskList[i],
+                      WholeSimData,
+                      heap,
+                      blocMeskList,
+                      i,
+                      newtimeMesList[targetIL]
+                    );
+                    if (lineMes != null) {
+                      lineList1.push(lineMes);
+                    }
+                  }
+                }
+                targetIL++;
+              }
+              this.setVmSimTimeChange(
+                localMesStartTime + (recTime / 1000) * 60 * 1000
+              );
+            }
+            if (i == blocMeskList.length - 1 && localHeap.size() == 0) {
+              let lineTime = setTimeout(() => {
+                clearTimeout(lineTime);
+                let targetEnd = {
+                  wholeNodeType: nodeMesList,
+                  blockList: blocMeskList,
+                  transactionList: this.transactionsList.transactions,
+                  inputList: this.transactionsList.input,
+                  outputList: this.transactionsList.output,
+                  auth: this.getAuth(),
+                  wholeSimIds: wholeSimId,
+                };
+                configWholeSettingEndData(targetEnd).then((resnode) => {
+                  // this.setPercentage(100);
+                  setTimeout(() => {
+                    this.powFindVisible = false;
+                    loadingss.close();
+                    //加个处理完成的弹出框
+                    ElMessage({
+                      message: "流程结束！",
+                      type: "success",
+                    });
+                  }, 100);
+                });
+                //时间处理
+                this.setVmSimEndTimeChange();
+                //将相关信息存入数据库
+              }, 1000);
+            }
+          }
+          clearTimeout(timeeout);
+        }, 500 * i);
+      }
+    },
     //全体流程的开始
     startFlowSim(nodeMesList, blocMeskList, WholeSimData, wholeSimId) {
       let heass = [];
@@ -2374,7 +2630,6 @@ export default {
                 this.setVmSimTimeChange(
                   localMesStartTime + (tradeTime / 1000) * 60 * 1000
                 );
-                console.log(tradeTime + " + tradeTime");
               }, tradeTime);
               //接收消息
               setTimeout(() => {
@@ -2411,12 +2666,10 @@ export default {
                 this.setVmSimTimeChange(
                   localMesStartTime + (recTime / 1000) * 60 * 1000
                 );
-                console.log(recTime + " + recTime");
               }, recTime);
             }
             if (i == blocMeskList.length - 1 && localHeap.size() == 0) {
               let lineTime = setTimeout(() => {
-                console.log(time + "clearLine");
                 this.clearMapLine();
                 clearTimeout(lineTime);
                 let loadingss = this.openFullScreen("仿真结束中...");
@@ -2440,66 +2693,10 @@ export default {
               }, 500 + time);
             }
           }
-          //警告的关闭
-          // let a = setInterval(() => {
-          //   j++;
-          //   if (localHeap.size() <= 0) {
-          //     console.log(j);
-          //     clearInterval(a);
-          //   }
-          //   let mes = localHeap.pop();
-          //   if (mes != undefined || mes != null) {
-          //     this.dealAllMes(
-          //       nodeMesList,
-          //       blocMeskList[i],
-          //       WholeSimData,
-          //       mes,
-          //       blocMeskList,
-          //       i
-          //     );
-          //   }
-          // }, 100);
 
-          // if (localHeap.size() == 0) {
-          //   clearInterval(a);
-          //   break;
-          // }
-          // let time = mes.timestamp - blocMeskList[i].startTimestamp;
-          // if (time > WholeSimData.blockTime) {
-          //   break;
-          // } else {
-          //   // const intervals = ()=>{};
-          // let timeout =  setTimeout(() => {
-          //     //处理各类消息
-          //     // console.log(i+": "+time);
-          //     this.dealAllMes(
-          //       nodeMesList,
-          //       blocMeskList[i],
-          //       WholeSimData,
-          //       mes,
-          //       blocMeskList,
-          //       i
-          //     );
-          //     clearTimeout(timeout) && timeout;
-          //   }, time);
-
-          // }
-          // }
           clearTimeout(timeout);
         }, i * WholeSimData.blockTime + 400);
       }
-      let j = blocMeskList.length - 1;
-      let a = WholeSimData.blockTime;
-      let time = j * a + 1400;
-      // console.log(
-      //   "all:" + ((blocMeskList.length - 1) * WholeSimData.blockTime + 1400)
-      // );
-      // let endTiem = setTimeout(() => {
-      //   let lineList = null;
-      //   this.clearMapLine();
-      //   console.log("endddddd");
-      //   clearTimeout(endTiem);
-      // }, time);
     },
     //开始处理消息类型
     dealAllMes(
@@ -2512,7 +2709,7 @@ export default {
       timestampMes
     ) {
       timestampMes = this.dealtargetTeime(timestampMes);
-      if(timestampMes==NaN){
+      if (timestampMes == NaN) {
         let j = 1;
       }
       if (mes.type == "blockCreated") {
@@ -2648,7 +2845,7 @@ export default {
           miner: mes.miner.addressId,
           confirmId: "",
           timestamp: timestampMes,
-          isOrphan: "true",        
+          isOrphan: "true",
         };
         let blockEndMes = {
           type: mes.type,
@@ -2674,7 +2871,8 @@ export default {
         contentMes.unshift({
           id: contentMesBlock.length,
           contentMessage: nodeEndMes,
-          mes: "节点" + mes.miner.addressId + "挖掘的区块无法认证,转变为孤儿块。",
+          mes:
+            "节点" + mes.miner.addressId + "挖掘的区块无法认证,转变为孤儿块。",
         });
         return null;
       } else if (mes.type == "nodeTrade") {
