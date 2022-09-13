@@ -593,6 +593,191 @@
           </span>
         </template>
       </el-dialog>
+      <el-dialog v-model="dialogNodeDetailVisible" title="节点详情" width="50%">
+        <el-form :model="dodeDetailMesData">
+          <div
+            style="
+              height: 100%;
+              width: 100%;
+              display: flex;
+              justify-content: center;
+            "
+          >
+            <div class="nodeDetail1">
+              <el-descriptions :column="1" border title="节点详情">
+                <el-descriptions-item
+                  label="节点ID"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{ dodeDetailMesData.addressId }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="节点类型"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{ dodeDetailMesData.nodeType }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="节点地域"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  v-model="regionData"
+                  >{{
+                    regionData[dodeDetailMesData.regionId]
+                  }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  v-if="dodeDetailMesData.nodeType == `miningNode`"
+                  label="节点算力"
+                  label-align="center"
+                  align="center"
+                  >{{ dodeDetailMesData.hashRate }} kH/s</el-descriptions-item
+                >
+              </el-descriptions>
+            </div>
+            <div class="nodeDetail1Account">
+              <el-descriptions :column="2" border title="账户详情">
+                <el-descriptions-item
+                  label="账户ID"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{
+                    dodeDetailMesData.accountList.accountId
+                  }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Transactions"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{
+                    dodeDetailMesData.accountList.transactions
+                  }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  label="Total Received"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{
+                    dodeDetailMesData.accountList.totalReceived
+                  }}</el-descriptions-item
+                ><el-descriptions-item
+                  label="Total Sent"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{
+                    dodeDetailMesData.accountList.totalSent
+                  }}</el-descriptions-item
+                ><el-descriptions-item
+                  label="Final Balance"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{
+                    dodeDetailMesData.accountList.balance
+                  }}</el-descriptions-item
+                ><el-descriptions-item
+                  label="Wallet Id"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  >{{ dodeDetailMesData.accountList.walletId.walletId
+                  }}<el-button type="text" @click="checkWallet(dodeDetailMesData.accountList.walletId,
+                  dodeDetailMesData.accountList.address)"
+                    >查看</el-button
+                  ></el-descriptions-item
+                ><el-descriptions-item
+                  label="交易列表ID"
+                  label-align="left"
+                  align="left"
+                  min-width="100px"
+                  ><div
+                    v-if="dodeDetailMesData.accountList.transactionsId != ``"
+                  >
+                    <el-tooltip
+                      v-if="dodeDetailMesData.nodeType == `lightNode`"
+                      content="轻节点内账户的交易信息需要通过其他全节点查询!"
+                      placement="top"
+                      ><el-button
+                        size="small"
+                        @click="
+                          findDetailTrans(
+                            dodeDetailMesData.accountList.transactionsId
+                          )
+                        "
+                        round
+                        >查询交易
+                      </el-button>
+                    </el-tooltip>
+                  </div>
+                  <el-button
+                    v-if="dodeDetailMesData.nodeType != `lightNode`"
+                    type="text"
+                    @click="
+                      findDetailTrans(
+                        dodeDetailMesData.accountList.transactionsId
+                      )
+                    "
+                    >{{
+                      dodeDetailMesData.accountList.transactionsId
+                    }}</el-button
+                  ></el-descriptions-item
+                >
+              </el-descriptions>
+            </div>
+          </div>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogNodeDetailVisible = false">Cancel</el-button>
+            <!-- <el-button type="primary" @click="dialogBlockVisible = false"
+            >Confirm</el-button
+          > -->
+          </span>
+        </template>
+      </el-dialog>
+      <el-dialog v-model="dialogWalletVisible" width="440px">
+        <c-scrollbar maxWidth="400" trigger="hover">
+          <el-form :model="walletData">
+            <el-descriptions title="钱包结构信息" :column="1" border>
+              <el-descriptions-item
+                label="wallet_id"
+                label-align="left"
+                align="left"
+                min-width="100px"
+                ><el-tag size="small">{{
+                  walletData.id
+                }}</el-tag></el-descriptions-item
+              >
+              <el-descriptions-item
+                label="publicKkey"
+                label-align="left"
+                align="left"
+                >{{ walletData.publicKkey }}</el-descriptions-item
+              >
+              <el-descriptions-item
+                label="Address"
+                label-align="left"
+                align="left"
+                >{{ walletData.address }}</el-descriptions-item
+              >
+              <el-descriptions-item
+                label="privateKey"
+                label-align="left"
+                align="left"
+              >
+                {{ walletData.privateKey }}
+              </el-descriptions-item>
+            </el-descriptions></el-form
+          ></c-scrollbar
+        >
+      </el-dialog>
       <div class="reStarteSim">
         <el-button type="primary" @click="reStartSim" plain>再次仿真</el-button>
       </div>
@@ -613,6 +798,22 @@
           placeholder="选择结束时间"
           :disabled="true"
         />
+      </div>
+      <div class="wholeSimNodeMes" style="color: #916b0a">
+        <el-select
+          v-model="valueNode"
+          :disabled="valueNodeStatue"
+          filterable
+          placeholder="节点详情"
+          @change="optionsNodeChange"
+        >
+          <el-option
+            v-for="item in optionsNode"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
       </div>
       <div class="bs-sysMsg-summary">
         <span style="font-weight: bold">总览</span>
@@ -1259,7 +1460,7 @@
 import * as echarts from "echarts";
 import JSONMAP from "../assets/mapRow/world.json";
 import { useI18n } from "vue-i18n";
-import { Edit, MoreFilled } from "@element-plus/icons";
+import { Edit, MoreFilled, View } from "@element-plus/icons";
 import { useStore } from "vuex";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { reactive, ref } from "vue";
@@ -1287,6 +1488,7 @@ import { config } from "mathjs";
 export default {
   components: {
     Edit,
+    View,
     MoreFilled,
   },
   data() {
@@ -1829,7 +2031,115 @@ export default {
       { color: "#d7f763", percentage: 80 },
       { color: "#5cb87a", percentage: 100 },
     ];
+    const dialogNodeDetailVisible = ref(false);
+    const dodeDetailMesData = reactive({
+      id: 0,
+      addressId: "Node1",
+      transactions: 0,
+      totalReceived: 0,
+      totalSent: 0,
+      balance: 0,
+      nodeType: "fullNode",
+      walletId: {
+        walletId: 0,
+        privateKey:
+          "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgEsY2KmIjmib67wwekmLRV3L99WrJPlNDyl4obT6cdxK3x1Mvfx0sIjs4U2D7n7eRG3svzVPiuzCTxtkP45fCPzWPOjD0o+oD4HPqyablAnhmwYk3349EE842BCa7SV5hSJVBm6EjvUl6oKTYQ99utLF3",
+        publicKey:
+          "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaOKZgHVKwHdoHqXRaTrGHpRVvzpKr6sGU2R7QUgKdqCYPbnOJkZJylvVwAxYY7CWgLRcnlJBQ04awF3gmnqRCe==",
+        auth: "admin",
+      },
+      transactionsId: "",
+      auth: "admin",
+      hashRate: 0,
+      accountList: {
+        address: "1mKfv1KWUphwwPkYJMl55oc6UxHdsirUyW",
+        accountId: 1,
+        transactions: 0,
+        totalReceived: 0,
+        totalSent: 0,
+        balance: 0,
+        walletId: {
+          walletId: 0,
+          privateKey:
+            "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgEsY2KmIjmib67wwekmLRV3L99WrJPlNDyl4obT6cdxK3x1Mvfx0sIjs4U2D7n7eRG3svzVPiuzCTxtkP45fCPzWPOjD0o+oD4HPqyablAnhmwYk3349EE842BCa7SV5hSJVBm6EjvUl6oKTYQ99utLF3",
+          publicKey:
+            "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaOKZgHVKwHdoHqXRaTrGHpRVvzpKr6sGU2R7QUgKdqCYPbnOJkZJylvVwAxYY7CWgLRcnlJBQ04awF3gmnqRCe==",
+          auth: "admin",
+        },
+        transactionsId: "",
+        auth: "admin",
+        accountName: "account1cYu0qMtbbWgRbu1G",
+        nodeId: "Node1",
+      },
+      minerAccountName: "account1cYu0qMtbbWgRbu1G",
+      regionId: 0,
+      regionPostion: [-106.83853872929289, 47.14434616746079],
+      isChurn: true,
+      numConnection: 1,
+      netWorkTable: {
+        numConnection: 1,
+        inBound: ["Node20", "Node54", "Node71", "Node74", "Node91", "Node95"],
+        outBound: ["Node5"],
+      },
+      chainBlockHeightState: 10,
+    });
+    const optionsNodeChange = (value) => {
+      let targetNode = nodeMesList[value];
+      dodeDetailMesData.addressId = targetNode.addressId;
+      dodeDetailMesData.nodeType = targetNode.nodeType;
+      dodeDetailMesData.regionId = targetNode.regionId;
+      dodeDetailMesData.hashRate = targetNode.hashRate;
+      dodeDetailMesData.accountList.accountId =
+        targetNode.accountList.accountId;
+      dodeDetailMesData.accountList.totalReceived =
+        targetNode.accountList.totalReceived;
+      dodeDetailMesData.accountList.totalSent =
+        targetNode.accountList.totalSent;
+      dodeDetailMesData.accountList.balance = targetNode.accountList.balance;
+      dodeDetailMesData.accountList.walletId.walletId =
+        targetNode.accountList.walletId.walletId;
+      dodeDetailMesData.accountList.transactionsId =
+        targetNode.accountList.transactionsId;
+      //交易存入
+      dodeDetailMesData.accountList.walletId.privateKey =
+        targetNode.accountList.walletId.privateKey;
+      dodeDetailMesData.accountList.walletId.publicKey =
+        targetNode.accountList.walletId.publicKey;
+      dodeDetailMesData.accountList.address =
+        targetNode.accountList.address;
+      dialogNodeDetailVisible.value = true;
+    };
+    const dialogWalletVisible = ref(false);
+    let walletData = reactive({
+      id: "1",
+      address: "122o4YRDAJGYJEPUGcT6RMamKRWdvStnPv",
+      publicKkey:
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAECFGthZ5/pFz6eRNr1UX+HuqE9Aa/bsyFOxnlvaJLICIAzlrqFRdQ3TrGkDfuX6JGPzpgeHNKHXuu/gLXNQqAVA==",
+      privateKey:
+        "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgVdVHyHHTZXHuL2wRbXhKseA+edBkwxhnkyh8ZUopXeOgCgYIKoZIzj0DAQehRANCAAQIUa2Fnn+kXPp5E2vVRf4e6oT0Br9uzIU7GeW9oksgIgDOWuoVF1DdOsaQN+5fokY/OmB4c0ode67+Atc1CoBU",
+    });
+    const checkWallet = (res,address) => {
+      walletData.id = res.walletId;
+      walletData.publicKkey = res.publicKey;
+      walletData.privateKey = res.privateKey;
+      walletData.address = address;
+      dialogWalletVisible.value = true;
+    };
     return {
+      checkWallet,
+      walletData,
+      dialogWalletVisible,
+      dialogNodeDetailVisible,
+      dodeDetailMesData,
+      regionData: reactive([
+        "NORTH_AMERICA",
+        "EUROPE",
+        "SOUTH_AMERICA",
+        "ASIA",
+        "AFRICA",
+        "OCEANIA",
+      ]),
+      optionsNodeChange,
       blockTableData: reactive([]),
       nodeMesVisList,
       blockMesVisList,
@@ -1934,6 +2244,14 @@ export default {
       staus,
       setStatus,
       showBlockMes: reactive(["全局查找正在进行挖矿的节点!"]),
+      valueNode: ref(""),
+      valueNodeStatue: ref(false),
+      optionsNode: reactive([
+        {
+          value: "1",
+          label: "Option1",
+        },
+      ]),
     };
   },
   setup() {
@@ -2162,20 +2480,26 @@ export default {
         if (nodeMesList[i].nodeType == "fullNode") {
           mapPointData1.push({
             name: nodeMesList[i].addressId,
+            id: i,
             type: "fullNode",
             value: nodeMesList[i].regionPostion,
+            nodeDetail: nodeMesList[i],
           });
         } else if (nodeMesList[i].nodeType == "lightNode") {
           mapPointData2.push({
             name: nodeMesList[i].addressId,
+            id: i,
             type: "lightNode",
             value: nodeMesList[i].regionPostion,
+            nodeDetail: nodeMesList[i],
           });
         } else if (nodeMesList[i].nodeType == "miningNode") {
           mapPointData3.push({
             name: nodeMesList[i].addressId,
+            id: i,
             type: "miningNode",
             value: nodeMesList[i].regionPostion,
+            nodeDetail: nodeMesList[i],
           });
         }
       }
@@ -2298,7 +2622,8 @@ export default {
               color: "#000",
               formatter(d) {
                 // console.log(d);
-                return `<div style="padding: 5px 10px;">【name:${d.data.name},type:${d.data.type}】</div>`;
+                return `<div style="padding: 5px 10px;">【名称:${d.data.name},类型:${d.data.type},网络链接数:${d.data.nodeDetail.netWorkTable.numConnection}】
+                </div>`;
               },
             },
             data: dataGeo,
@@ -2313,7 +2638,8 @@ export default {
               color: "#000",
               formatter(d) {
                 // console.log(d);
-                return `<div style="padding: 5px 10px;">【name:${d.data.name},type:${d.data.type}】</div>`;
+                return `<div style="padding: 5px 10px;">【名称:${d.data.name},类型:${d.data.type},网络链接数:${d.data.nodeDetail.netWorkTable.numConnection}】
+                </div>`;
               },
             },
             data: dataGeo2,
@@ -2328,7 +2654,9 @@ export default {
               color: "#000",
               formatter(d) {
                 // console.log(d);
-                return `<div style="padding: 5px 10px;">【name:${d.data.name},type:${d.data.type}】</div>`;
+                return `<div style="padding: 5px 10px;">【名称:${d.data.name},类型:${d.data.type},网络链接数:${d.data.nodeDetail.netWorkTable.numConnection}】
+                </div>`;
+                // return `<div style="padding: 5px 10px;">【name:${d.data.name},type:${d.data.type}】</div>`;
               },
             },
             data: dataGeo3,
@@ -2370,7 +2698,8 @@ export default {
               position: "right",
               color: "#000",
               formatter(d) {
-                return `<div style="padding: 5px 10px;">【name:${d.data.name},state:miner】</div>`;
+                return `<div style="padding: 5px 10px;">【名称:${d.data.name},state:记账权拥有者 ,网络链接数:${d.data.nodeDetail.netWorkTable.numConnection}】
+                </div>`;
               },
             },
             data: [],
@@ -2428,7 +2757,9 @@ export default {
       let heass = [];
       // this.powFindVisible = true;
       let loadingss = this.openFullScreen(
-        "仿真流程快速处理中...(预计花费" + blocMeskList.length * 0.5 + "s)"
+        "仿真流程快速处理中...(预计花费" +
+          (blocMeskList.length * 0.5 + 1) +
+          "s)"
       );
       let addNum = 0;
       if (blocMeskList.length > 96) {
@@ -2539,6 +2870,7 @@ export default {
                   wholeSimIds: wholeSimId,
                 };
                 configWholeSettingEndData(targetEnd).then((resnode) => {
+                  this.setoptionsNode(nodeMesList);
                   // this.setPercentage(100);
                   setTimeout(() => {
                     this.powFindVisible = false;
@@ -2686,6 +3018,7 @@ export default {
                 //时间处理
                 this.setVmSimEndTimeChange();
                 //将相关信息存入数据库
+                this.setoptionsNode(nodeMesList);
                 let lineTimes = setTimeout(() => {
                   loadingss.close();
                   clearTimeout(lineTimes);
@@ -2721,6 +3054,8 @@ export default {
             name: blocMes.miner.addressId,
             type: "Miner",
             value: value,
+            id: blocMes.miner.id,
+            nodeDetail: blocMes.miner,
           },
         ]);
         this.reDrawMaps();
@@ -3851,6 +4186,16 @@ export default {
       let localTime = this.simFlowTime.startTimeData.getTime() + timestampMes;
       return localTime;
     },
+    setoptionsNode(nodeMesLists) {
+      this.optionsNode.length = 0;
+      this.valueNodeStatue = false;
+      for (let i = 0; i < nodeMesLists.length; i++) {
+        this.optionsNode.push({
+          value: nodeMesLists[i].id,
+          label: nodeMesLists[i].addressId,
+        });
+      }
+    },
   },
 };
 </script>
@@ -3888,7 +4233,7 @@ export default {
   margin-top: 1%;
   position: absolute;
   background-color: #fff;
-  right: 0px;
+  right: 2%;
   width: 8%;
   height: auto;
   z-index: 999;
@@ -3908,6 +4253,15 @@ export default {
 }
 .wholeSimTeamstamp .el-input.is-disabled .el-input__inner {
   color: rgb(120, 114, 0);
+}
+.wholeSimNodeMes {
+  margin-top: 4%;
+  position: absolute;
+  background-color: #fff;
+  right: 4%;
+  width: 10%;
+  z-index: 999;
+  opacity: 0.8;
 }
 .map-content {
   position: relative;
@@ -4005,5 +4359,20 @@ summary-content {
 .dataImport {
   margin-top: 20px;
   margin-left: 43%;
+}
+.nodeDetail1 {
+  /* display: flex; */
+  padding-right: 10px;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+  height: auto;
+}
+.nodeDetail1Account {
+  /* display: flex; */
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  height: auto;
 }
 </style>                                                  
