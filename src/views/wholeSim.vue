@@ -295,7 +295,8 @@
               </el-carousel>
               <!-- <span>点击查看节点消息</span> -->
             </template>
-            <el-scrollbar height="280px">
+            <!-- <c-scrollbar maxHeight="100%" trigger="hover"> -->
+            <c-scrollbar maxHeight="280px" height="280px" trigger="hover">
               <div v-for="item in nodeMesVisList" class="event-content">
                 <div class="event-mes-block-node">
                   {{ item.mes }}
@@ -307,7 +308,7 @@
                   <el-icon class="event-detail-buttom"><MoreFilled /></el-icon>
                 </div>
               </div>
-            </el-scrollbar>
+            </c-scrollbar>
           </el-collapse-item>
           <el-collapse-item name="2">
             <template #title>
@@ -328,7 +329,7 @@
               </el-carousel>
               <!-- <span>点击查看区块消息</span> -->
             </template>
-            <el-scrollbar height="280px">
+            <c-scrollbar maxHeight="280px" height="280px" trigger="hover">
               <div v-for="item in blockMesVisList" class="event-content">
                 <div class="event-mes-block-node">
                   {{ item.mes }}
@@ -340,7 +341,7 @@
                   <el-icon class="event-detail-buttom"><MoreFilled /></el-icon>
                 </div>
               </div>
-            </el-scrollbar>
+            </c-scrollbar>
           </el-collapse-item>
         </el-collapse>
       </div>
