@@ -172,7 +172,6 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                 if (targetorOrphanLen > 0 && OrphanLenList.indexOf(i) != -1) {
                     //孤儿块的相关信息
                     //孤儿块事务50毫秒
-                    console.log(i);
                     start += 50;
                     let miners = null;
                     while (true) {

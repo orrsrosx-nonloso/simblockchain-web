@@ -23,11 +23,6 @@
             </el-dropdown>
             <el-dialog v-model="accountCreateVis" title="账户创建" width="30%">
               <div>
-                <!-- <span
-                  >账户名:<el-input
-                    v-model="accountNameC"
-                    placeholder="输入为空时会随机生成账户名"
-                /></span> -->
                 <el-form
                   :inline="true"
                   :model="accountNameC"
