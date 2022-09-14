@@ -18,7 +18,7 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
         if (hash.substr(0, 2) == "00") {
             hashList.push({
                 hash: hash,
-                nonce: JSON.parse(JSON.stringify(nonce))*(Math.floor(Math.random()*20))
+                nonce: JSON.parse(JSON.stringify(nonce)) * (Math.floor(Math.random() * 20))
             });
             targeId++;
 
@@ -61,7 +61,8 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
     return blockMesList;
 }
 //消息类型，，区块传输（基于邻居节点传输），贸易传输（内容传输与交易广播） 消息的接收//创立消息的同时也会将相关数据处理好
-export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, kindMesLen, noHeapBlockMesList) {
+export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, kindMesLen,
+    noHeapBlockMesList, OrphanBlockList) {
     let haveCoinNode = [];
     let nodeCoinState = [];
     let targetorOrphanLen = WholeSimData.orphanBlock * WholeSimData.numOfEndBlock;
@@ -171,11 +172,12 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                 if (targetorOrphanLen > 0 && OrphanLenList.indexOf(i) != -1) {
                     //孤儿块的相关信息
                     //孤儿块事务50毫秒
+                    console.log(i);
                     start += 50;
                     let miners = null;
-                    while(true){
-                        miners = nodeMesList[Math.floor(Math.random()*nodeMesList.length)];
-                        if(miners.id != blockMesList[i].miner.id){
+                    while (true) {
+                        miners = nodeMesList[Math.floor(Math.random() * nodeMesList.length)];
+                        if (miners.id != blockMesList[i].miner.id) {
                             break;
                         }
 
@@ -188,6 +190,26 @@ export function affairsMesListCreate(WholeSimData, nodeMesList, blockMesList, ki
                         targetBlock: blockMesList[i]
                     };
                     minHeap.insert(blockCreatedmes);
+                    OrphanBlockList.push({
+                        id: i,
+                        blockId: "Block" + (i + 1),
+                        startTimestamp: blockMesList[i].startTimestamp,
+                        endTimestamp: blockMesList[i].endTimestamp,
+                        miner: miners,
+                        height: blockMesList[i].height,
+                        hash: blockMesList[i].hash,
+                        confirmations: 0,//确定
+                        //交易量
+                        numOfTransac: 0,
+                        difficulty: blockMesList[i].difficulty,
+                        nonce: blockMesList[i].nonce,
+                        transactionVolume: 0,
+                        reward: WholeSimData.blockReward,
+                        prevBlockHash: blockMesList[i].preHash,
+                        feeReward: WholeSimData.transRePer,
+                        transactions: [],
+                        blockMesHeap: null
+                    });//孤儿块获取
                 }
 
             }

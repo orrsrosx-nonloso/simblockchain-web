@@ -1014,12 +1014,21 @@
                       />
                     </el-select>
                   </el-form-item>
-                  <el-form-item label="交易手续费">
+                  <el-form-item label="交易手续费占比">
                     <el-input-number
                       v-model="WholeSimData.transRePer"
                       :min="0.001"
                       :step="0.001"
                       :max="1"
+                      size="small"
+                    />
+                  </el-form-item>
+                  <el-form-item label="分叉率">
+                    <el-input-number
+                      v-model="WholeSimData.orphanBlock"
+                      :min="0.0001"
+                      :max="0.05"
+                      :step="0.0001"
                       size="small"
                     />
                   </el-form-item>
@@ -1713,6 +1722,7 @@ export default {
     let simDataId = 0; //仿真标识ID
     let nodeMesList = [];
     let blocMeskList = [];
+    let OrphanBlockList  = [];//孤儿块不参与任何事务，仅显示一次的分叉事件
     const startWholeSim = (wholeSimId, displaySimulation) => {
       //全局内容配置
       this.setSummary(WholeSimData, summaryMes);
@@ -1757,7 +1767,8 @@ export default {
               nodeMesList,
               blocMeskList,
               kindMesLen,
-              noHeapBlockMesList
+              noHeapBlockMesList,
+              OrphanBlockList
             );
             let asd = JSON.stringify(noHeapBlockMesList);
             let sdsd = {
@@ -2012,7 +2023,6 @@ export default {
 
     const percentage = ref(0);
     const addPercentage = (value) => {
-      console.log(percentage.value + " + recTime +" + value);
       if (percentage.value < 96) {
         percentage.value += value;
       }
@@ -2621,7 +2631,6 @@ export default {
               position: "right",
               color: "#000",
               formatter(d) {
-                // console.log(d);
                 return `<div style="padding: 5px 10px;">【名称:${d.data.name},类型:${d.data.type},网络链接数:${d.data.nodeDetail.netWorkTable.numConnection}】
                 </div>`;
               },
@@ -2637,7 +2646,6 @@ export default {
               position: "right",
               color: "#000",
               formatter(d) {
-                // console.log(d);
                 return `<div style="padding: 5px 10px;">【名称:${d.data.name},类型:${d.data.type},网络链接数:${d.data.nodeDetail.netWorkTable.numConnection}】
                 </div>`;
               },
@@ -2653,7 +2661,6 @@ export default {
               position: "right",
               color: "#000",
               formatter(d) {
-                // console.log(d);
                 return `<div style="padding: 5px 10px;">【名称:${d.data.name},类型:${d.data.type},网络链接数:${d.data.nodeDetail.netWorkTable.numConnection}】
                 </div>`;
                 // return `<div style="padding: 5px 10px;">【name:${d.data.name},type:${d.data.type}】</div>`;
@@ -2792,7 +2799,6 @@ export default {
               //发送消息与接收消息时间
               let tradeTime = time - parseInt((time - preTime) / 2);
               let recTime = time;
-              // console.log("i:" + recTime);
               preTime = time;
               const newHeapList = JSON.parse(JSON.stringify(heapList));
               const newtimeMesList = JSON.parse(JSON.stringify(timeMesList));
@@ -2919,7 +2925,6 @@ export default {
               //发送消息与接收消息时间
               let tradeTime = time - parseInt((time - preTime) / 2);
               let recTime = time;
-              // console.log("i:" + recTime);
               preTime = time;
               const newHeapList = JSON.parse(JSON.stringify(heapList));
               const newtimeMesList = JSON.parse(JSON.stringify(timeMesList));
@@ -3808,9 +3813,7 @@ export default {
       });
     },
     addRecBreakenMes(mes, kind, content, timestampMes) {
-      // console.log(
-      //   this.blockTransmitMes[0].nodeTo + "nodeTo+++from" + mes.from.addressId
-      // );
+      
       if (
         this.unconfirmedTransactions.transactions.length >= 1 &&
         this.unconfirmedTransactions.transactions[0].isBreakdownn != 0
@@ -3884,9 +3887,7 @@ export default {
     },
     //区块传输接收消息处理
     addBlockTrRecBreakenMes(mes, kind, content, timestampMes) {
-      // console.log(
-      //   this.blockTransmitMes[0].nodeTo + "nodeTo+++from" + mes.from.addressId
-      // );
+      
       if (
         this.blockTransmitMes.length >= 1 &&
         this.blockTransmitMes[0].isBreakdownn != 0 &&
@@ -4117,7 +4118,6 @@ export default {
       }
     },
     getDataContain(val) {
-      // console.log(val+"++getDataContain")
       if (val.indexOf(",") == -1) {
         return true;
       } else {
@@ -4305,7 +4305,7 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 300px;
+  height: 315px;
 }
 .cardSeting {
   margin-left: 1%;
