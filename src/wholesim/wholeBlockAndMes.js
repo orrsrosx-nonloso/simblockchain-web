@@ -15,10 +15,10 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
     let hashList = [];
     while (true) {
         let hash = sha256("block" + nonce);
-        if (hash.substr(0, 1) == "0") {
+        if (hash.substr(0, 2) == "00") {
             hashList.push({
                 hash: hash,
-                nonce: JSON.parse(JSON.stringify(targeId))
+                nonce: JSON.parse(JSON.stringify(nonce))*(Math.floor(Math.random()*20))
             });
             targeId++;
 

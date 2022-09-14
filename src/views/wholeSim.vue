@@ -3937,7 +3937,9 @@ export default {
         //交易列表内存在信息时选择信息载入
         let index = 0;
         blockMesList[indexB].numOfTransac =
-          blockMesList[indexB].numOfTransac + minerTrans.totalInput;
+          blockMesList[indexB].numOfTransac + 1;
+          blockMesList[indexB].transactionVolume =
+          blockMesList[indexB].transactionVolume + minerTrans.totalInput;
         blockMesList[indexB].transactions.push(minerTrans.id);
         for (let i = 0; i < transactionsList.transactions.length; i++) {
           if (
