@@ -1,7 +1,7 @@
 <template>
   <el-container style="width: 100vw; height: 100vh">
     <el-header>
-      <el-menu  mode="horizontal">
+      <el-menu mode="horizontal">
         <!-- :default-active="1" -->
         <el-menu-item>
           <img
@@ -21,7 +21,7 @@
         </el-menu-item>
       </el-menu>
     </el-header>
-    <el-main>
+    <el-main v-show="isNeedPc() == false">
       <slot name="main">
         <el-carousel indicator-position="outside" height="55vh" arrow="never">
           <!-- 临时列表 -->
@@ -44,11 +44,43 @@
                     @click="LoginWithP"
                     >开始仿真实验</el-button
                   >
-                    <!-- :dark="isDark" -->
+                  <!-- :dark="isDark" -->
                 </div>
               </div>
               <div class="boxPage">
                 <img src="../assets/study.png" alt="" style="width: 460px" />
+              </div>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </slot>
+    </el-main>
+    <el-main v-show="isNeedPc() == true">
+      <slot name="main">
+        <el-carousel indicator-position="outside" height="70vh" arrow="never">
+          <!-- 临时列表 -->
+          <el-carousel-item v-for="item in 1" :key="item">
+            <div class="boxContentPc">
+              <div class="boxPagePc">
+                <img src="../assets/study.png" alt="" style="width: 100%" />
+              </div>
+              <div class="boxTextPc">
+                <div class="textShowPc">SIMBLOCKCHAIN</div>
+                <div class="textShowPc">区块链虚拟仿真实验平台</div>
+                <div class="textCoPc">基于多流程化的区块链虚拟仿真实验平台，
+                  为区块链学习与科研者提供单流程与全流程仿真等多样仿真模块，
+                  并提供丰富的数据和学习资源，服务课程学习、科研实验等场景，
+                  并面向高校提供在线教学、科研开发的一站式解决方案</div>
+                <div class="textButtonPc">
+                  <el-button
+                    class="buttons"
+                    color="#626aef"
+                    size="large"
+                    @click="LoginWithP"
+                    >开始仿真实验</el-button
+                  >
+                  <!-- :dark="isDark" -->
+                </div>
               </div>
             </div>
           </el-carousel-item>
@@ -73,6 +105,15 @@ import { insertToVisitor } from "../api/apis.js";
 
 export default {
   data() {
+    const isNeedPc = () => {
+      let screenWidth = document.body.clientWidth;
+      let minSize = 1200;
+      if (screenWidth < minSize) {
+        return true;
+      } else {
+        return false;
+      }
+    };
     const store = useStore();
     const authoritys = computed(() => {
       return store.getters.authGetter;
@@ -93,9 +134,7 @@ export default {
       let minSize = 1200;
       if (screenWidth < minSize) {
         router.push("/needUserPc");
-      }
-      else
-      {
+      } else {
         let j = getAuth();
         if (j != null) {
           router.replace("/layout/tree");
@@ -104,7 +143,7 @@ export default {
         }
       }
     }
-    return { LoginWithP, LoginWithSub };
+    return { LoginWithP, LoginWithSub, isNeedPc };
   },
   created() {
     insertToVisitor(null);
@@ -136,8 +175,20 @@ export default {
   height: 100%;
   margin: 0px auto;
 }
+.boxContentPc {
+  overflow: hidden;
+  width: 90%;
+  height: 100%;
+  margin: 0px auto;
+}
 .boxText {
   width: 45%;
+  height: 70%;
+  margin: 0px auto;
+  text-align: left;
+}
+.boxTextPc{
+  width: 100%;
   height: 70%;
   margin: 0px auto;
   text-align: left;
@@ -147,13 +198,26 @@ export default {
   height: 216px;
   margin: 0px auto;
 }
+.boxPagePc {
+  width: 100%;
+  height: 50%;
+  margin: 0px auto;
+}
 .textShow {
   padding-top: 1%;
   font-size: 42px;
 }
+.textShowPc{
+  padding-top: 1%;
+  font-size: 25px;
+}
 .textCo {
   padding-top: 2%;
   font-size: 16px;
+}
+.textCoPc {
+  padding-top: 2%;
+  font-size: 14px;
 }
 .textButton {
   padding-top: 5%;
