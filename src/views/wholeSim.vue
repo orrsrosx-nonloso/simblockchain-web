@@ -311,17 +311,17 @@
             v-model="sysMesStatesContent"
             style="width: 65%"
             placeholder="输入想搜索的内容" />
-          <el-button
+          <!-- <el-button
             v-show="sysMesStates == false"
             type="text"
             size="small"
             round
             @click="sysMesStates = true"
-          >
-            <el-icon :size="20" class="iconfont">
+          > -->
+            <el-icon  v-show="sysMesStates == false" @click="sysMesStates = true" :size="20" class="searchStartButton">
               <Search />
             </el-icon>
-          </el-button>
+          <!-- </el-button> -->
           <el-button
             v-show="sysMesStates == true"
             type="text"
@@ -329,9 +329,7 @@
             round
             @click="searTargetMesList"
           >
-            <el-icon :size="20" class="iconfont">
-              <Search />
-            </el-icon> </el-button
+            搜索 </el-button
           ><el-icon
             v-show="sysMesStates == true"
             @click="sysMesStates = false"
@@ -4434,7 +4432,7 @@ export default {
   margin-top: 4%;
   position: absolute;
   background-color: #fff;
-  right: 4%;
+  right: 3%;
   width: 10%;
   z-index: 999;
   opacity: 0.8;
@@ -4535,6 +4533,13 @@ summary-content {
 /* .closebold {
 } */
 .closebold:hover {
+  cursor: pointer;
+}
+.searchStartButton {
+  padding-left: 20%;
+  padding-top: 2px;
+}
+.searchStartButton:hover {
   cursor: pointer;
 }
 .dataImport {
