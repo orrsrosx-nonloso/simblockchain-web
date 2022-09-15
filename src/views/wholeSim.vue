@@ -156,6 +156,35 @@
             ></c-scrollbar
           >
         </el-dialog>
+        <el-dialog
+          v-model="dialogSearchDataVisible"
+          width="840px"
+          title="查询结果"
+        >
+          <el-table :data="searchMesList" height="300" style="width: 100%">
+            <el-table-column prop="type" label="消息类型" width="200" />
+            <el-table-column prop="mes" label="消息内容" width="200" />
+            <el-table-column label="操作">
+              <template #default="scope">
+                <el-button
+                  v-if="
+                    scope.row.type == 'tradeRecBlock' ||
+                    scope.row.type == 'BlockTrade'
+                  "
+                  size="small"
+                  @click="showBlockDetial(scope.row)"
+                  >Check</el-button
+                >
+                <el-button
+                  v-else
+                  size="small"
+                  @click="showNodeDetial(scope.row)"
+                  >Check</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-dialog>
         <el-dialog v-model="dialogOutPutVisible" width="440px">
           <c-scrollbar maxWidth="400" trigger="hover">
             <el-form :model="outputData">
@@ -274,7 +303,41 @@
         </el-dialog>
       </div>
       <div class="bs-sysMsg">
-        <span style="font-weight: bold">区块和节点事件</span>
+        <span style="font-weight: bold"
+          ><span v-show="sysMesStates == false">区块和节点事件</span>
+          <el-input
+            v-show="sysMesStates == true"
+            size="small"
+            v-model="sysMesStatesContent"
+            style="width: 65%"
+            placeholder="输入想搜索的内容" />
+          <el-button
+            v-show="sysMesStates == false"
+            type="text"
+            size="small"
+            round
+            @click="sysMesStates = true"
+          >
+            <el-icon :size="20" class="iconfont">
+              <Search />
+            </el-icon>
+          </el-button>
+          <el-button
+            v-show="sysMesStates == true"
+            type="text"
+            size="small"
+            round
+            @click="searTargetMesList"
+          >
+            <el-icon :size="20" class="iconfont">
+              <Search />
+            </el-icon> </el-button
+          ><el-icon
+            v-show="sysMesStates == true"
+            @click="sysMesStates = false"
+            class="closebold"
+            ><CloseBold /></el-icon
+        ></span>
         <el-collapse v-model="activeName" accordion>
           <el-collapse-item name="1">
             <template #title>
@@ -689,8 +752,14 @@
                   align="left"
                   min-width="100px"
                   >{{ dodeDetailMesData.accountList.walletId.walletId
-                  }}<el-button type="text" @click="checkWallet(dodeDetailMesData.accountList.walletId,
-                  dodeDetailMesData.accountList.address)"
+                  }}<el-button
+                    type="text"
+                    @click="
+                      checkWallet(
+                        dodeDetailMesData.accountList.walletId,
+                        dodeDetailMesData.accountList.address
+                      )
+                    "
                     >查看</el-button
                   ></el-descriptions-item
                 ><el-descriptions-item
@@ -736,7 +805,9 @@
         </el-form>
         <template #footer>
           <span class="dialog-footer">
-            <el-button @click="dialogNodeDetailVisible = false">Cancel</el-button>
+            <el-button @click="dialogNodeDetailVisible = false"
+              >Cancel</el-button
+            >
             <!-- <el-button type="primary" @click="dialogBlockVisible = false"
             >Confirm</el-button
           > -->
@@ -1470,7 +1541,7 @@
 import * as echarts from "echarts";
 import JSONMAP from "../assets/mapRow/world.json";
 import { useI18n } from "vue-i18n";
-import { Edit, MoreFilled, View } from "@element-plus/icons";
+import { Edit, MoreFilled, View, Search, CloseBold } from "@element-plus/icons";
 import { useStore } from "vuex";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { reactive, ref } from "vue";
@@ -1500,6 +1571,8 @@ export default {
     Edit,
     View,
     MoreFilled,
+    Search,
+    CloseBold,
   },
   data() {
     //数据总览
@@ -1551,9 +1624,9 @@ export default {
           id: null,
           type: "normalMes",
           isOrphan: "false",
-          from: 1,
-          to: 2,
-          miner: 0,
+          from: "1",
+          to: "2",
+          miner: "0",
           confirmId: null,
           transactionId: "0",
         },
@@ -1568,12 +1641,12 @@ export default {
         contentMessage: {
           blockDetail: { blockId: "", blockHeight: "", blockHash: "" },
           tradeTime: "",
-          content: { id: null, mes: "区块消息创建" },
+          content: { id: null, mes: "区块消息创建",blockId:"" },
           id: null,
           type: "normalMes",
-          from: 1,
-          to: 2,
-          miner: 0,
+          from: "1",
+          to: "2",
+          miner: "0",
           confirmId: null,
           isOrphan: "false",
           transactionId: "0",
@@ -1723,7 +1796,7 @@ export default {
     let simDataId = 0; //仿真标识ID
     let nodeMesList = [];
     let blocMeskList = [];
-    let OrphanBlockList  = [];//孤儿块不参与任何事务，仅显示一次的分叉事件
+    let OrphanBlockList = []; //孤儿块不参与任何事务，仅显示一次的分叉事件
     const startWholeSim = (wholeSimId, displaySimulation) => {
       //全局内容配置
       this.setSummary(WholeSimData, summaryMes);
@@ -2116,8 +2189,7 @@ export default {
         targetNode.accountList.walletId.privateKey;
       dodeDetailMesData.accountList.walletId.publicKey =
         targetNode.accountList.walletId.publicKey;
-      dodeDetailMesData.accountList.address =
-        targetNode.accountList.address;
+      dodeDetailMesData.accountList.address = targetNode.accountList.address;
       dialogNodeDetailVisible.value = true;
     };
     const dialogWalletVisible = ref(false);
@@ -2129,7 +2201,7 @@ export default {
       privateKey:
         "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgVdVHyHHTZXHuL2wRbXhKseA+edBkwxhnkyh8ZUopXeOgCgYIKoZIzj0DAQehRANCAAQIUa2Fnn+kXPp5E2vVRf4e6oT0Br9uzIU7GeW9oksgIgDOWuoVF1DdOsaQN+5fokY/OmB4c0ode67+Atc1CoBU",
     });
-    const checkWallet = (res,address) => {
+    const checkWallet = (res, address) => {
       walletData.id = res.walletId;
       walletData.publicKkey = res.publicKey;
       walletData.privateKey = res.privateKey;
@@ -2263,6 +2335,30 @@ export default {
           label: "Option1",
         },
       ]),
+      sysMesStates: ref(false),
+      sysMesStatesContent: ref(""),
+      searchMesList: reactive([
+        {
+          id: 0,
+          content: { mes: "区块消息创建" },
+          mes: "节点消息创建",
+          type: "normalMes",
+          contentMessage: {
+            blockDetail: { blockId: "", blockHeight: "", blockHash: "" },
+            tradeTime: "",
+            content: { id: null, mes: "区块消息创建" },
+            id: null,
+            type: "normalMes",
+            from: "1",
+            to: "2",
+            miner: "0",
+            confirmId: null,
+            isOrphan: "false",
+            transactionId: "0",
+          },
+        },
+      ]),
+      dialogSearchDataVisible: ref(false),
     };
   },
   setup() {
@@ -3130,6 +3226,7 @@ export default {
         });
         contentMes.unshift({
           id: contentMesBlock.length,
+          type: mes.type,
           contentMessage: nodeEndMes,
           mes: "节点" + mes.miner.addressId + "获取挖矿奖励",
         });
@@ -3211,6 +3308,7 @@ export default {
         });
         contentMes.unshift({
           id: contentMesBlock.length,
+          type: mes.type,
           contentMessage: nodeEndMes,
           mes:
             "节点" + mes.miner.addressId + "挖掘的区块无法认证,转变为孤儿块。",
@@ -3292,6 +3390,7 @@ export default {
           contentMesNode.unshift({
             id: contentMesNode.length,
             contentMessage: nodeEndMes,
+            type: mes.type,
             mes:
               "节点" +
               from.addressId +
@@ -3430,6 +3529,7 @@ export default {
             contentMesNode.unshift({
               id: contentMesNode.length,
               contentMessage: nodeEndMes,
+              type: mes.type,
               mes:
                 "节点" +
                 mes.from.addressId +
@@ -3503,6 +3603,7 @@ export default {
           contentMesNode.unshift({
             id: contentMesNode.length,
             contentMessage: blockEndMes,
+            type: mes.type,
             mes:
               "节点" +
               mes.from.addressId +
@@ -3572,6 +3673,7 @@ export default {
           });
           contentMesNode.unshift({
             id: contentMesNode.length,
+            type: mes.type,
             contentMessage: blockEndMes,
             mes:
               "节点" +
@@ -3805,6 +3907,7 @@ export default {
       contentMesNode.unshift({
         id: contentMesNode.length,
         contentMessage: nodeEndMes,
+        type: mes.type,
         mes:
           "节点" +
           mes.from.addressId +
@@ -3814,7 +3917,6 @@ export default {
       });
     },
     addRecBreakenMes(mes, kind, content, timestampMes) {
-      
       if (
         this.unconfirmedTransactions.transactions.length >= 1 &&
         this.unconfirmedTransactions.transactions[0].isBreakdownn != 0
@@ -3842,6 +3944,7 @@ export default {
         contentMesNode.unshift({
           id: contentMesNode.length,
           contentMessage: nodeEndMes,
+          type: mes.type,
           mes:
             "节点" +
             mes.from.addressId +
@@ -3876,6 +3979,7 @@ export default {
       contentMesNode.unshift({
         id: contentMesNode.length,
         contentMessage: blockEndMes,
+        type: mes.type,
         mes:
           "节点" +
           mes.from.addressId +
@@ -3888,7 +3992,6 @@ export default {
     },
     //区块传输接收消息处理
     addBlockTrRecBreakenMes(mes, kind, content, timestampMes) {
-      
       if (
         this.blockTransmitMes.length >= 1 &&
         this.blockTransmitMes[0].isBreakdownn != 0 &&
@@ -3917,6 +4020,7 @@ export default {
         contentMesNode.unshift({
           id: contentMesNode.length,
           contentMessage: blockEndMes,
+          type: mes.type,
           mes:
             "节点" +
             mes.from.addressId +
@@ -3940,7 +4044,7 @@ export default {
         let index = 0;
         blockMesList[indexB].numOfTransac =
           blockMesList[indexB].numOfTransac + 1;
-          blockMesList[indexB].transactionVolume =
+        blockMesList[indexB].transactionVolume =
           blockMesList[indexB].transactionVolume + minerTrans.totalInput;
         blockMesList[indexB].transactions.push(minerTrans.id);
         for (let i = 0; i < transactionsList.transactions.length; i++) {
@@ -4199,6 +4303,75 @@ export default {
         });
       }
     },
+    searTargetMesList() {
+      let is=1
+      let contents = this.sysMesStatesContent
+      let content = contents.toLowerCase();
+      let mesList1 = this.blockMesVisList;
+      let mesList2 = this.nodeMesVisList;
+      this.searchMesList.length = 0;
+      if (content.indexOf("node") != -1) {
+        for (let i = 0; i < mesList2.length; i++) {
+          console.log(i);
+          if (
+            mesList2[i].contentMessage.type == "blockCreated" ||
+            mesList2[i].contentMessage.type == "blockOrphanCreated"
+          ) {
+            let targetminer = mesList2[i].contentMessage.miner;
+            if (targetminer.toLowerCase().indexOf(content) != -1) {
+              this.searchMesList.push(mesList2[i]);
+            }
+          } else {
+            let targetfrom = mesList2[i].contentMessage.from;
+            let targetto = mesList2[i].contentMessage.to;
+            if (
+              targetfrom.toLowerCase().indexOf(content) != -1 ||
+              targetto.toLowerCase().indexOf(content) != -1
+            ) {
+              this.searchMesList.push(mesList2[i]);
+            }
+          }
+        }
+        this.dialogSearchDataVisible = true;
+      } else if (content.indexOf("block") != -1) {
+        for (let i = 0; i < mesList1.length; i++) {
+          if (
+            mesList1[i].contentMessage.type == "blockCreated" ||
+            mesList1[i].contentMessage.type == "blockOrphanCreated"
+          ) {
+            let targetminer = mesList1[i].contentMessage.content.blockId;
+            if (targetminer.toLowerCase().indexOf(content) != -1) {
+              this.searchMesList.push(mesList1[i]);
+            }
+          } else {
+            let targetfrom = mesList1[i].contentMessage.blockDetail.blockId;
+            if (
+              targetfrom.toLowerCase().indexOf(content) != -1
+            ) {
+              this.searchMesList.push(mesList1[i]);
+            }
+          }
+        }
+        this.dialogSearchDataVisible = true;
+      } else if (content.indexOf("挖掘") != -1) {
+        for (let i = 0; i < mesList2.length; i++) {
+          if (mesList2[i].mes.indexOf(content) != -1) {
+            this.searchMesList.push(mesList2[i]);
+          }
+        }
+        this.dialogSearchDataVisible = true;
+      } else {
+        ElMessageBox.alert(
+          "请输入正确形式的搜索内容,形式分为节点ID(node1)、区块ID(block1)、挖掘等",
+          "通知",
+          {
+            // if you want to disable its autofocus
+            // autofocus: false,
+            confirmButtonText: "OK",
+          }
+        );
+      }
+    },
   },
 };
 </script>
@@ -4357,6 +4530,11 @@ summary-content {
   font-size: 18px;
 }
 .event-detail-buttom:hover {
+  cursor: pointer;
+}
+/* .closebold {
+} */
+.closebold:hover {
   cursor: pointer;
 }
 .dataImport {
