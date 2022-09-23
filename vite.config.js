@@ -14,7 +14,8 @@ export default defineConfig({
   ],
   // 在文件中添加以下内容
   server: {
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    port: 80
   },
   css: {
     postcss: {
