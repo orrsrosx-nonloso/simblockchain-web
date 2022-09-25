@@ -1,6 +1,6 @@
 
 ## 介绍
-本项目为构建区块链仿真工具创建可视化界面，该项目采用前后端分离构建，后端代码地址如下[simblockchains](https://github.com/orrsrosx-nonloso/simblockchain),计划毕业之后开源
+本项目为构建区块链仿真工具创建可视化界面，该项目采用前后端分离构建，后端代码地址如下[simblockchains](https://github.com/orrsrosx-nonloso/simblockchain),计划毕业之后进行完全开源
 ## 软件架构
 [vite 2.0.1](https://cn.vitejs.dev/guide/)  
 [vue 3.0.5](https://vue3js.cn/docs/zh/)  
@@ -15,7 +15,7 @@ node v12.18.3
 
 ## 安装教程
 
-#### 1. git clone ssh
+#### 1. git clone target-ssh
 #### 2. cd simblockchain-web  
 #### 3. npm install  
 #### 4. npm run dev:dev  
@@ -23,7 +23,7 @@ node v12.18.3
 ## 使用说明
 
 #### 1. 访问路径必须为localhost:3000才可以登录
-#### 2. 用户名：（admin）（user）密码：（111111）
+#### 2. 用户名：（#####）（user）密码：（#####）
 
 ## 参与贡献
 
@@ -199,7 +199,6 @@ function retrievalAction(e) {
   console.log(e.type) // 点击的按钮类型
   console.log(e.form) // 检索数据列表
 }
-```
 LGTM  —  Looks good to me，表示认可这次PR，同意merge 合并代码到远程仓库
 ASAP -— as soon as possible! 尽快
 ACK  —  acknowledgement, i.e. agreed/accepted change
