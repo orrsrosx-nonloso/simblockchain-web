@@ -88,12 +88,40 @@
               </el-icon>
             </el-col>
             <el-col :span="22">
-              <el-input
-                class="inps"
-                placeholder="密码"
-                v-model="registState.formLabelAlign.password"
-                :type="registState.passwordType"
-              ></el-input>
+              <el-popover placement="right" :width="400" trigger="click">
+                <template #reference>
+                  <el-input
+                    class="inps"
+                    placeholder="密码"
+                    v-model="registState.formLabelAlign.password"
+                    :type="registState.passwordType"
+                    show-password
+                  ></el-input>
+                </template>
+                <div style="content-box">
+                  <div class="content-box">
+                    <el-icon :size="18" class="iconfontRemove">
+                      <Remove /> </el-icon
+                    ><span style="padding-left: 5px"
+                      >6-20个字符,密码不能是相同的用户名</span
+                    >
+                  </div>
+                  <div class="content-box">
+                    <el-icon :size="18" class="iconfontRemove">
+                      <Remove /> </el-icon
+                    ><span style="padding-left: 5px"
+                      >只能包含字母、数字以及标点符号(除空格)</span
+                    >
+                  </div>
+                  <div class="content-box">
+                    <el-icon :size="18" class="iconfontRemove">
+                      <Remove /> </el-icon
+                    ><span style="padding-left: 5px"
+                      >字母、数字和标点符号至少包含2种</span
+                    >
+                  </div>
+                </div>
+              </el-popover>
             </el-col>
           </el-row>
         </el-form-item>
@@ -137,7 +165,7 @@
 </template>
 
 <script>
-import { User, Edit, Phone } from "@element-plus/icons";
+import { User, Edit, Phone, Remove } from "@element-plus/icons";
 import { onMounted, reactive, computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
@@ -145,7 +173,7 @@ import { getDate } from "../utils/utils";
 import { useRouter } from "vue-router";
 import { getLoginMes, registerUser } from "../api/apis";
 import { ElMessageBox, ElMessage } from "element-plus";
-import { judgePhone } from "../utils/utils";
+import { judgePhone, judgePassWord } from "../utils/utils";
 import { insertToVisitor } from "../api/apis.js";
 
 export default {
@@ -153,6 +181,7 @@ export default {
     User,
     Edit,
     Phone,
+    Remove,
   },
   data() {
     const status = ref(1); //状态，1为登录，2为注册，3为忘记密码，4为忘记密码之后重置密码
@@ -203,24 +232,31 @@ export default {
       let params = registState.formLabelAlign;
       if (params.username != "" || params.password != "") {
         if (judgePhone(params.phone)) {
-          registerUser({
-            username: params.username,
-            password: params.password,
-            phone: params.phone,
-          }).then((res) => {
-            if (res.status == 1) {
-              ElMessage({
-                message: "用户注册成功！",
-                type: "success",
-              });
-              status.value = 1;
-            } else {
-              ElMessage({
-                message: res.msg,
-                type: "warning",
-              });
-            }
-          });
+          let passWordjs = judgePassWord(params);
+          if (passWordjs.state == 0) {
+            registerUser({
+              username: params.username,
+              password: params.password,
+              phone: params.phone,
+            }).then((res) => {
+              if (res.status == 1) {
+                ElMessage({
+                  message: "用户注册成功！",
+                  type: "success",
+                });
+                status.value = 1;
+              } else {
+                ElMessage({
+                  message: res.msg,
+                  type: "warning",
+                });
+              }
+            });
+          } else {
+            ElMessageBox.alert(passWordjs.mes, "WARING", {
+              confirmButtonText: "OK",
+            });
+          }
         } else {
           ElMessageBox.alert("请输入正确的手机号！", "WARING", {
             confirmButtonText: "OK",
@@ -259,8 +295,8 @@ export default {
       const params = JSON.parse(JSON.stringify(state.formLabelAlign));
       if (params.username == "" || params.password == "") {
         ElMessageBox.alert("请输入账户名或密码！", "WARING", {
-              confirmButtonText: "OK",
-            });
+          confirmButtonText: "OK",
+        });
       } else {
         state.loginLoading = true;
         const res = {
@@ -287,9 +323,7 @@ export default {
                 let minSize = 1200;
                 if (screenWidth < minSize) {
                   router.push("/needUserPc");
-                }
-                else
-                {
+                } else {
                   // console.log("path", path);
                   state.loginLoading = false;
                   router.push("/layout/" + path[0].path);
@@ -427,6 +461,8 @@ export default {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+    background-image: url(../assets/blockchain.png);
+    background-repeat: no-repeat;
   }
   #loginBox {
     width: 240px;
@@ -504,5 +540,15 @@ export default {
   font-size: 12px;
   line-height: 27px;
   text-align: center;
+}
+.content-box {
+  padding-left: 10px;
+  height: 30px;
+  line-height: 30px;
+  white-space: nowrap;
+}
+.iconfontRemove {
+  vertical-align: -10%;
+  color: rgb(255, 140, 0);
 }
 </style>

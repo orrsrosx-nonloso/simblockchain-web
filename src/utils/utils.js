@@ -152,7 +152,80 @@ export function judgePhone(i) {
         return false;
     }
 }
+function haveNumIs(password) {
+    let passwords = password.split("");
+    var re = /^[0-9]+.?[0-9]*$/;
+    for (let i = 0; i < passwords.length; i++) {
+        if (re.test(passwords[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+function haveStrIs(password) {
+    let passwords = password.split("");
+    var re = /^[0-9]+.?[0-9]*$/;
+    var re2 = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]")
+    for (let i = 0; i < passwords.length; i++) {
+        if (!re.test(passwords[i]) && !re2.test(passwords[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+function havePunIs(password) {
+    let passwords = password.split("");
+    var re = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]")
+    for (let i = 0; i < passwords.length; i++) {
+        if (re.test(passwords[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+/**
+密码格式判断
+parame{{
+        username: "",
+        password: "",
+        phone: "",
+      }}
+6-20个字符,密码不能是相同的用户名
+只能包含字母、数字以及标点符号(除空格)
+字母、数字和标点符号至少包含2种
+*/
+export function judgePassWord(parame) {
+    let end = { mes: "waring!", state: 1 }//1表示密码格式错误，0表示正常
+    let passwords = parame.password;
+    const passwordSize = passwords.split("").length;
+    let passwordSatLen = 0;
+    //获取类型长度
+    if (haveNumIs(passwords)) {
+        passwordSatLen++;
+    }
+    if (haveStrIs(passwords)) {
+        passwordSatLen++;
+    }
+    if (havePunIs(passwords)) {
+        passwordSatLen++;
+    }
+    //最终结果
+    if (parame.username == parame.password) {
+        end.mes = "账户和密码不能相同！"
+    } else if (passwordSize < 6 || passwordSize > 20) {
+        end.mes = "密码长度不符合要求！"
+    } else if (passwords.indexOf(" ") != -1) {
+        end.mes = "密码内蒙不应该包含空格！"
+    }
+    else if(passwordSatLen<2){
+        end.mes = "字母、数字和标点符号至少包含2种!"
+    }else{
+        end.mes = "ok";
+        end.state = 0;
+    }
 
+    return end;
+}
 /**
 判断是否为数字
 */

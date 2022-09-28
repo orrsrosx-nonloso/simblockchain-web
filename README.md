@@ -199,6 +199,9 @@ function retrievalAction(e) {
   console.log(e.type) // 点击的按钮类型
   console.log(e.form) // 检索数据列表
 }
+```
+#### git协作术语
+```javascript
 LGTM  —  Looks good to me，表示认可这次PR，同意merge 合并代码到远程仓库
 ASAP -— as soon as possible! 尽快
 ACK  —  acknowledgement, i.e. agreed/accepted change
@@ -217,3 +220,4 @@ TBR  —  To Be Reviewed. 提示维护者进行 review
 TBD  —  To Be Done(or Defined/Discussed/Decided/Determined). 根据语境不同意义有所区别，但一般都是还没搞定的意思。
 TBH  —  To be honest 「老实说」
 atm  —  at the moment 「现阶段」，
+```
