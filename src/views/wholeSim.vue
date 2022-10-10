@@ -4310,7 +4310,6 @@ export default {
       this.searchMesList.length = 0;
       if (content.indexOf("node") != -1) {
         for (let i = 0; i < mesList2.length; i++) {
-          console.log(i);
           if (
             mesList2[i].contentMessage.type == "blockCreated" ||
             mesList2[i].contentMessage.type == "blockOrphanCreated"

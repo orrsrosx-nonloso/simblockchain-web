@@ -52,7 +52,7 @@ http.interceptors.response.use(function (response) {
 
 }, function (error) {
     // 对响应错误做点什么
-    console.log('拦截器报错');
+    console.log('拦截器报错......');
     return Promise.reject(error);
 });
 
