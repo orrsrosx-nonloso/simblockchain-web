@@ -54,8 +54,19 @@ java.lang.NullPointerException: null
 ### 12
 全流程信息搜索功能✔
 
-### 13
+### 13✔
 全流程时间机制的优化设计，当使用包含流程线性创建时，可以对所有时间进行优化创建，及事务的实际发生时间发生改变，虚拟发生时间不边，（仅优化wholesim页面的3065与3101）
 
-### 14
+### 14✔
 用户密码注册强口令限制的增加
+
+### 15中文账户问题✔
+账户名称与账户ID分开
+
+### 16区块创建请求超时 ✔暂时处理
+修改了后端数据循环问题，限制数据处理时间（10s）
+
+### 17全流程请求数据过大(非管理员账户区块创建失败:同16) 
+Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level
+ https://www.jianshu.com/p/5577ae4615d8
