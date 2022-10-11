@@ -39,9 +39,10 @@
       width="30%"
       :before-close="handleClose"
     >
-      <el-input v-model="useAdd.username" placeholder="输入用户名" />
-      <el-input v-model="useAdd.password" placeholder="输入预设密码" />
-      <el-input v-model="useAdd.phone" placeholder="输入手机号" />
+      <el-input  v-model="useAdd.authname" placeholder="输入用户名" />
+      <el-input style="padding-top:10px" v-model="useAdd.username" placeholder="输入用户ID" />
+      <el-input style="padding-top:10px" v-model="useAdd.password" placeholder="输入预设密码" />
+      <el-input style="padding-top:10px" v-model="useAdd.phone" placeholder="输入手机号" />
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">关闭</el-button>
@@ -77,6 +78,7 @@ const confirm = getCurrentInstance()?.appContext.config.globalProperties.$confir
 
 let useAdd = reactive({
   username: "",
+  authname:"",
   password: "",
   phone:"",
   auth: auth,
@@ -389,6 +391,7 @@ function resetPassword(e){
 function addUsers() {
   registerUser({
     username: useAdd.username,
+    authname: useAdd.authname,
     password: useAdd.password,
     phone:useAdd.phone,
     auth: useAdd.auth,

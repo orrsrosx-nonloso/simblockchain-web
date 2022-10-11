@@ -27,10 +27,12 @@ const router = useRouter();
 //获取当前用户
 
 const store = useStore();
-const userName = store.getters.authGetter;
+const userName = store.getters.authnameGetter;
+const targetUserName = store.getters.authGetter;
+
 
 function logOut() {
-  let user = userName;
+  let user = targetUserName;
   loginOut({ "auth": user }).then((res) => {
     if (res.status == 1) {
       ElMessageBox.alert(res.msg, "Success", {

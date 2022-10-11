@@ -34,6 +34,15 @@ const user = {
         authorityGetter(state) {
             return state.userInfo.authority
         },
+        authnameGetter(state) {
+            let targetName = state.userInfo.username+"(用户ID)"
+            if(state.userInfo.authname==""||state.userInfo.authname==null){
+                targetName = state.userInfo.username+"(用户ID)";
+            }else{
+                targetName = state.userInfo.authname; 
+            }
+            return targetName
+        },
     }
 }
 export default user

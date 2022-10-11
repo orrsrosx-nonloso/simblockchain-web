@@ -16,7 +16,7 @@
             <el-col :span="22">
               <el-input
                 class="inps"
-                placeholder="用户名"
+                placeholder="用户ID"
                 v-model="state.formLabelAlign.username"
               ></el-input>
             </el-col>
@@ -64,7 +64,7 @@
     <div v-else-if="status == 2" id="registBox">
       <h4>用户注册</h4>
       <el-form label-width="0px" :model="state.formLabelAlign">
-        <el-form-item label="" prop="userName" style="margin-top: 40px">
+        <el-form-item label="" prop="authName" style="margin-top: 30px">
           <el-row>
             <el-col :span="2">
               <el-icon :size="18" class="iconfont">
@@ -75,6 +75,22 @@
               <el-input
                 class="inps"
                 placeholder="用户名"
+                v-model="registState.formLabelAlign.authname"
+              ></el-input>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item label="" prop="userName">
+          <el-row>
+            <el-col :span="2">
+              <el-icon :size="18" class="iconfont">
+                <Postcard />
+              </el-icon>
+            </el-col>
+            <el-col :span="22">
+              <el-input
+                class="inps"
+                placeholder="用户ID(英文或英文数字组合)"
                 v-model="registState.formLabelAlign.username"
               ></el-input>
             </el-col>
@@ -143,7 +159,7 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item style="margin-top: 55px">
+        <el-form-item style="margin-top: 45px">
           <el-button
             type="primary"
             round
@@ -165,7 +181,7 @@
 </template>
 
 <script>
-import { User, Edit, Phone, Remove } from "@element-plus/icons";
+import { User, Edit, Phone, Remove, Postcard } from "@element-plus/icons";
 import { onMounted, reactive, computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useStore } from "vuex";
@@ -182,6 +198,7 @@ export default {
     Edit,
     Phone,
     Remove,
+    Postcard,
   },
   data() {
     const status = ref(1); //状态，1为登录，2为注册，3为忘记密码，4为忘记密码之后重置密码
@@ -199,6 +216,7 @@ export default {
       localTime: getDate(),
       labelPosition: "right",
       formLabelAlign: {
+        authname: "",
         username: "",
         password: "",
         phone: "",
@@ -213,6 +231,7 @@ export default {
       localTime: getDate(),
       labelPosition: "right",
       formLabelAlign: {
+        authname: "",
         username: "",
         password: "",
         phone: "",
@@ -234,24 +253,33 @@ export default {
         if (judgePhone(params.phone)) {
           let passWordjs = judgePassWord(params);
           if (passWordjs.state == 0) {
-            registerUser({
-              username: params.username,
-              password: params.password,
-              phone: params.phone,
-            }).then((res) => {
-              if (res.status == 1) {
-                ElMessage({
-                  message: "用户注册成功！",
-                  type: "success",
-                });
-                status.value = 1;
-              } else {
-                ElMessage({
-                  message: res.msg,
-                  type: "warning",
-                });
-              }
+            let chain = /[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/gi;
+            let endss = chain.test(params.username);
+            if (!endss) {
+              registerUser({
+                authname: params.authname,
+                username: params.username,
+                password: params.password,
+                phone: params.phone,
+              }).then((res) => {
+                if (res.status == 1) {
+                  ElMessage({
+                    message: "用户注册成功！",
+                    type: "success",
+                  });
+                  status.value = 1;
+                } else {
+                  ElMessage({
+                    message: res.msg,
+                    type: "warning",
+                  });
+                }
+              });
+            } else {
+              ElMessageBox.alert("用户ID标准错误!", "WARING", {
+              confirmButtonText: "OK",
             });
+            }
           } else {
             ElMessageBox.alert(passWordjs.mes, "WARING", {
               confirmButtonText: "OK",
@@ -500,7 +528,7 @@ export default {
   }
   #registBox {
     width: 240px;
-    height: 340px;
+    height: 400px;
     position: absolute;
     top: 0;
     left: 0;
