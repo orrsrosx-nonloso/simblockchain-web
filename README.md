@@ -44,6 +44,7 @@ orrsrosx
 │   ├───—utils       #常用方法目录
 │   ├───—views       #视图文件目录
 │   ├───—App.vue     #项目入口文件
+│   ├───—wholeSim     #全流程仿真相关文件
 │   └────main.js     #项目的核心配置文件
 ├── vite.config.js   #vite配置文件
 ├── .env.development #开发环境下配置文件
