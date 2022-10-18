@@ -1,6 +1,7 @@
 <template>
   <div id="login">
     <div id="bgd">
+      <el-alert center show-icon title="10月18号之前已注册的账户在登陆时,可能会出现密码错误的情况,在此情况下尝试使用初始密码(用户名+123456)进行登录" type="warning alert" effect="dark" />
       <canvas id="myCanvas" :width="width" :height="height"> </canvas>
     </div>
     <div v-if="status == 1" id="loginBox">
@@ -578,5 +579,11 @@ export default {
 .iconfontRemove {
   vertical-align: -10%;
   color: rgb(255, 140, 0);
+}
+.el-alert {
+  margin: 20px 0 0;
+}
+.el-alert:first-child {
+  margin: 0;
 }
 </style>
