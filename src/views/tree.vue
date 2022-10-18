@@ -56,17 +56,30 @@
               min-width="100px"
               ><el-tag size="small">SIMBLOCKCHAIN</el-tag></el-descriptions-item
             >
-            <el-descriptions-item label="项目开始时间" label-align="left" align="left"
+            <el-descriptions-item
+              label="项目开始时间"
+              label-align="left"
+              align="left"
               >2021-11-18</el-descriptions-item
             >
-            <el-descriptions-item label="技术栈" label-align="left" align="left">
+            <el-descriptions-item
+              label="技术栈"
+              label-align="left"
+              align="left"
+            >
               SpringBoot+Redis+Mysql+Vue
             </el-descriptions-item>
 
-            <el-descriptions-item label="基本描述" label-align="left" align="left"
+            <el-descriptions-item
+              label="基本描述"
+              label-align="left"
+              align="left"
               >本项目主要为区块链的仿真实验平台,仿真内容包括单流程仿真和全流程仿真</el-descriptions-item
             >
-            <el-descriptions-item label="推荐浏览器" label-align="left" align="left"
+            <el-descriptions-item
+              label="推荐浏览器"
+              label-align="left"
+              align="left"
               >Google Chrome/Microsoft Edge</el-descriptions-item
             >
           </el-descriptions></el-form
@@ -75,7 +88,6 @@
     </el-col>
     <el-col :span="10">
       <chartUser></chartUser>
-    
     </el-col>
     <el-col :span="6">
       <el-card class="box-card">
@@ -118,12 +130,20 @@
             <div class="leftMes">{{ item.message }}</div>
             <div class="leftMes">
               <div class="leftMesb1">{{ item.data }}</div>
-              <div class="leftMesb2" style="color: #0de61b">{{ item.auth }}</div>
+              <div class="leftMesb2" style="color: #0de61b">
+                {{ item.auth }}
+              </div>
             </div>
           </div>
         </div>
       </el-card>
       <el-drawer v-model="drawer" direction="rtl" title="日志" size="40%">
+        <el-input
+          v-model="userIdInput"
+          @change="inputChange"
+          placeholder="输入用户唯一ID查询"
+          clearable
+        />
         <el-scrollbar v-if="screenWidth < 1366" height="38%">
           <div v-for="use in userLogMesAll" class="logMes">
             <div class="leftMes">{{ use.message }}</div>
@@ -156,12 +176,10 @@ import { ElMessage } from "element-plus";
 import chartUser from "../views/treePage/chartUser.vue";
 import { ElNotification } from "element-plus";
 
-
 //图表的使用
 
-
 let onlineUserMes = ref("");
-const openOnlineUser = () => {
+const change = () => {
   ElNotification({
     title: "在线用户列表",
     dangerouslyUseHTMLString: true,
@@ -171,7 +189,6 @@ const openOnlineUser = () => {
 
 //数据统计功能模块
 const activeIndex = ref("1");
-
 
 const drawer = ref(false);
 const router = useRouter();
@@ -188,12 +205,13 @@ let userOnlines = reactive([]);
 let userLogMes = reactive([]);
 let userLogMesSimple = reactive([]);
 let userLogMesAll = reactive([]);
+let hostUserLogMesAll = reactive([]);
 let userLogMesDataDay = reactive([]);
 let params = {
   username: userName,
   password: "",
   phone: "",
-  auth:userName
+  auth: userName,
 };
 
 //按升序排列
@@ -212,6 +230,7 @@ function sortList(data) {
 findUserLogMes(params).then((res) => {
   userLogMesSimple.length = 0;
   userLogMesAll.length = 0;
+  hostUserLogMesAll.length = 0;
   if (res.status == 1) {
     userLastLogin.value = res.lastLogin;
     userLastSim.value = res.lastSim;
@@ -222,7 +241,7 @@ findUserLogMes(params).then((res) => {
     userLogMes.sort(desc);
     onlineUserMes = "";
     userOnlines.forEach(function (element) {
-      onlineUserMes=onlineUserMes+"<strong>"+element+"<strong> <br>"
+      onlineUserMes = onlineUserMes + "<strong>" + element + "<strong> <br>";
     });
     // for(let i = 0; i < userOnlines.length; i++){
     //   if(i=userOnlines.length-1){
@@ -232,7 +251,7 @@ findUserLogMes(params).then((res) => {
     //     onlineUserMes=onlineUserMes+"<strong>"+userOnlines[i]+"<strong> <br>"
     //   }
     // }
-    userLogMesDataDay.length=0;
+    userLogMesDataDay.length = 0;
     userLogMesDataDay = res.userLogMesDataDay;
     let sadsdaas = onlineUserMes;
     for (let i = 0; i < userLogMes.length; i++) {
@@ -240,11 +259,28 @@ findUserLogMes(params).then((res) => {
         userLogMesSimple.push(userLogMes[i]);
       }
       userLogMesAll.push(userLogMes[i]);
+      hostUserLogMesAll.push(userLogMes[i]);
     }
   } else {
     ElMessage.error("日志错误:" + res.status);
   }
 });
+const userIdInput = ref("");
+const inputChange = (value) => {
+  if (value == "") {
+    userLogMesAll.length = 0;
+    for (let i = 0; i < hostUserLogMesAll.length; i++) {
+      userLogMesAll.push(hostUserLogMesAll[i]);
+    }
+  } else {
+    userLogMesAll.length = 0;
+    for (let i = 0; i < hostUserLogMesAll.length; i++) {
+      if (hostUserLogMesAll[i].auth == value) {
+        userLogMesAll.push(hostUserLogMesAll[i]);
+      }
+    }
+  }
+};
 
 //获取当前用户
 </script>
@@ -359,7 +395,7 @@ findUserLogMes(params).then((res) => {
 .box-cards {
   height: 97px;
 }
-.chart-box{
+.chart-box {
   width: 100%;
   height: auto;
   border: 1px solid #bfcbd9;

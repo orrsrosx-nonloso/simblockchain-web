@@ -74,7 +74,7 @@
             <el-col :span="22">
               <el-input
                 class="inps"
-                placeholder="用户名"
+                placeholder="用户名(学号)"
                 v-model="registState.formLabelAlign.authname"
               ></el-input>
             </el-col>
