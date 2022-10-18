@@ -234,15 +234,19 @@ findUserLogMes(params).then((res) => {
   if (res.status == 1) {
     userLastLogin.value = res.lastLogin;
     userLastSim.value = res.lastSim;
-    userOnlineNum.value = res.onlineUser.length;
+    if (res.onlineUser != null) {
+      userOnlineNum.value = res.onlineUser.length;
+    }
     userOnlines = res.onlineUser;
     userLogMes = res.logMes;
-    let dsada = userOnlines;
     userLogMes.sort(desc);
     onlineUserMes = "";
-    userOnlines.forEach(function (element) {
-      onlineUserMes = onlineUserMes + "<strong>" + element + "<strong> <br>";
-    });
+    if (res.onlineUser != null) {
+      userOnlines.forEach(function (element) {
+        onlineUserMes = onlineUserMes + "<strong>" + element + "<strong> <br>";
+      });
+    }
+
     // for(let i = 0; i < userOnlines.length; i++){
     //   if(i=userOnlines.length-1){
     //     onlineUserMes=onlineUserMes+"<strong>"+userOnlines[i]+"<strong>"
