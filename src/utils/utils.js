@@ -215,10 +215,10 @@ export function judgePassWord(parame) {
     } else if (passwordSize < 6 || passwordSize > 20) {
         end.mes = "密码长度不符合要求！"
     } else if (passwords.indexOf(" ") != -1) {
-        end.mes = "密码内蒙不应该包含空格！"
+        end.mes = "密码内容不应该包含空格！"
     }
     else if(passwordSatLen<2){
-        end.mes = "字母、数字和标点符号至少包含2种!"
+        end.mes = "密码内容中字母、数字和标点符号至少包含2种!"
     }else{
         end.mes = "ok";
         end.state = 0;
