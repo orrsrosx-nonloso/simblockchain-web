@@ -318,9 +318,14 @@
             round
             @click="sysMesStates = true"
           > -->
-            <el-icon  v-show="sysMesStates == false" @click="sysMesStates = true" :size="20" class="searchStartButton">
-              <Search />
-            </el-icon>
+          <el-icon
+            v-show="sysMesStates == false"
+            @click="sysMesStates = true"
+            :size="20"
+            class="searchStartButton"
+          >
+            <Search />
+          </el-icon>
           <!-- </el-button> -->
           <el-button
             v-show="sysMesStates == true"
@@ -1639,7 +1644,7 @@ export default {
         contentMessage: {
           blockDetail: { blockId: "", blockHeight: "", blockHash: "" },
           tradeTime: "",
-          content: { id: null, mes: "区块消息创建",blockId:"" },
+          content: { id: null, mes: "区块消息创建", blockId: "" },
           id: null,
           type: "normalMes",
           from: "1",
@@ -2970,19 +2975,18 @@ export default {
                   auth: this.getAuth(),
                   wholeSimIds: wholeSimId,
                 };
-                configWholeSettingEndData(targetEnd).then((resnode) => {
-                  this.setoptionsNode(nodeMesList);
-                  // this.setPercentage(100);
-                  setTimeout(() => {
-                    this.powFindVisible = false;
-                    loadingss.close();
-                    //加个处理完成的弹出框
-                    ElMessage({
-                      message: "流程结束！",
-                      type: "success",
-                    });
-                  }, 100);
-                });
+                configWholeSettingEndData(targetEnd).then((resnode) => {});
+                this.setoptionsNode(nodeMesList);
+                // this.setPercentage(100);
+                setTimeout(() => {
+                  this.powFindVisible = false;
+                  loadingss.close();
+                  //加个处理完成的弹出框
+                  ElMessage({
+                    message: "流程结束！",
+                    type: "success",
+                  });
+                }, 100);
                 //时间处理
                 this.setVmSimEndTimeChange();
                 //将相关信息存入数据库
@@ -4302,8 +4306,8 @@ export default {
       }
     },
     searTargetMesList() {
-      let is=1
-      let contents = this.sysMesStatesContent
+      let is = 1;
+      let contents = this.sysMesStatesContent;
       let content = contents.toLowerCase();
       let mesList1 = this.blockMesVisList;
       let mesList2 = this.nodeMesVisList;
@@ -4342,9 +4346,7 @@ export default {
             }
           } else {
             let targetfrom = mesList1[i].contentMessage.blockDetail.blockId;
-            if (
-              targetfrom.toLowerCase().indexOf(content) != -1
-            ) {
+            if (targetfrom.toLowerCase().indexOf(content) != -1) {
               this.searchMesList.push(mesList1[i]);
             }
           }
