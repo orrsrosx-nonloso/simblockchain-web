@@ -85,3 +85,10 @@ Error parsing HTTP request header
 
 		Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.dao.IncorrectResultSizeDataAccessException: query did not return a unique result: 2; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 2] with root cause
 
+### 20 Index 0 out of bounds for length 0] with root cause
+r servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0] with root cause
+
+java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+        at com.simblockchain.service.impl.LogMesDataServiceImpl.insertLogMesVisitor(LogMesDataServiceImpl.java:61) ~[classes!/:0.9.3]
+        at com.simblockchain.controller.LogMesDataController.insertToVisitor(LogMesDataController.java:29) ~[classes!/:0.9.3]
+    
