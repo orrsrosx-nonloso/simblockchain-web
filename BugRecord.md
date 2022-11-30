@@ -92,3 +92,14 @@ java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
         at com.simblockchain.service.impl.LogMesDataServiceImpl.insertLogMesVisitor(LogMesDataServiceImpl.java:61) ~[classes!/:0.9.3]
         at com.simblockchain.controller.LogMesDataController.insertToVisitor(LogMesDataController.java:29) ~[classes!/:0.9.3]
     
+
+    Connection initialization timed out. Command timed out after 100 second(s)
+        at io.lettuce.core.internal.ExceptionFactory.createTimeoutException(ExceptionFactory.java:65) ~[lettuce-core-6.1.5.RELEASE.jar!/:6.1.5.RELEASE]
+        at io.lettuce.core.protocol.RedisHandshakeHandler.lambda$channelRegistered$0(RedisHandshakeHandler.java:62) ~[lettuce-core-6.1.5.RELEASE.jar!/:6.1.5.RELEASE]
+        at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98) ~[netty-common-4.1.70.Final.jar!/:4.1.70.Final]
+        at io.netty.util.concurrent.PromiseTask.run(PromiseTask.java:106) ~[netty-common-4.1.70.Final.jar!/:4.1.70.Final]
+        at io.netty.util.concurrent.DefaultEventExecutor.run(DefaultEventExecutor.java:66) ~[netty-common-4.1.70.Final.jar!/:4.1.70.Final]
+        at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:986) ~[netty-common-4.1.70.Final.jar!/:4.1.70.Final]
+        at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.70.Final.jar!/:4.1.70.Final]
+        at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.70.Final.jar!/:4.1.70.Final]
+        at java.base/java.lang.Thread.run(Thread.java:834) ~[na:na]
