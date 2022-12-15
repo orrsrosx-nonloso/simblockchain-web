@@ -309,3 +309,23 @@ export function getSign() {
     }
     return imitationKey.join('') + "";
 }
+
+export function textEditFun() {
+    let textLuanxu = "1234567890-=!@#$%^&*()_+qwertyuiop[]\;lkjhgfdsazxcvbnm,./QWASERTYUIOP{}|:LKJHGFDSAZXCVBNM<>?"
+    let chars = textLuanxu.split('');
+    var aNumber = 10 * Math.random() + 5;
+    var result = Math.floor(aNumber);
+    //随机化
+    if (!Array.prototype.shuffle) {
+        Array.prototype.shuffle = function () {
+            for (var j, x, i = this.length; i; j = parseInt(Math.random() * i), x = this[--i], this[i] = this[j], this[j] = x);
+            return this;
+        };
+    }
+    let end = "";
+    for (let i=0;i<result;i++){
+        chars.shuffle();
+        end += chars[0];
+    }
+    return end;
+}

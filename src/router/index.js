@@ -4,6 +4,7 @@ import Login from '../components/Login.vue'
 import Index from '../components/Index.vue'
 import layout from '../layout/layout.vue'
 import ErrPage from '../components/ErrPage.vue'
+import textChangePage from '../components/textChangePage.vue'
 import needUserPc from '../components/needUserPc.vue'
 import { delCookie, getCookie } from '../utils/cookie.js'
 import { loginOut } from "../api/apis";
@@ -37,6 +38,12 @@ const routes = [
         path: '/needUserPc',
         name: 'needUserPc',
         component: needUserPc
+    }
+    ,
+    {//needPC
+        path: '/textChangePage',
+        name: 'textChangePage',
+        component: textChangePage
     }
 ]
 
@@ -78,7 +85,7 @@ router.beforeEach(async (to, from, next) => {
                 }
             }
         } else { // 未登录
-            if (to.name == 'index' || to.path == '/') {
+            if (to.name == 'index' || to.path == '/' || to.name == "textChangePage") {
                 next()
             }
             else {
