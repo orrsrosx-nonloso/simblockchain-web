@@ -3336,7 +3336,7 @@ export default {
 
     const startTransactionSimVis = () => {
       transactionSimVis.value = true;
-      const graph = this.flowNodeGraph();
+      // const graph = this.flowNodeGraph();
       const nodelistSize = accountListId.length;
       if (nodelistSize <= 1) {
         setTimeout(() => {
@@ -4125,7 +4125,7 @@ export default {
         UtxoBalance: "2",
       },
     ]);
-
+    //账户不为空
     const isTargetListId = () => {
       let acList = accountListId;
       for (let i = 0; i < acList.length; i++) {

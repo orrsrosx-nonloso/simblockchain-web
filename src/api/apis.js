@@ -107,7 +107,6 @@ export const FindTransListBYid = function (data) {
 }
 
 
-
 //获取当前账本拥有者
 export const findpresentMin = function (data) {
     return http('post', 'http://localhost:8081/singleBlock/findpresentMin', data)

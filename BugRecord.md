@@ -22,15 +22,15 @@ java.lang.NullPointerException: null
 
 
 ### 4
-主界面添加用户登录状态判断
+主界面添加用户登录状态判断✔
 
 
 ### 5
-单流程仿真清除数据之后网络仿真状态恢复
+单流程仿真清除数据之后网络仿真状态恢复✔
 
 
 ### 6
-网络仿真策略修改后直接关闭界面未恢复原样
+网络仿真策略修改后直接关闭界面未恢复原样✔
 
 
 ### 7 
@@ -72,28 +72,24 @@ Error parsing HTTP request header
  https://www.jianshu.com/p/5577ae4615d8
 
 
-### 18 Index 1 out of bounds for length 1
+### 18 Index 1 out of bounds for length 1✔
  at com.simblockchain.Utils.IpUtils.getStringData(IpUtils.java:22) ~[classes!/:0.9.3]
         at com.simblockchain.service.impl.LogMesDataServiceImpl.insertLogMesVisitor(LogMesDataServiceImpl.java:43) ~[classes!/:0.9.3]
         at com.simblockchain.controller.LogMesDataController.insertToVisitor(LogMesDataController.java:29) ~[classes!/:0.9.3]
 
-### 19 query did not return a unique result: 2
+### 19 query did not return a unique result: 2✔
  at com.simblockchain.service.impl.SingleP2PNetServiceImpl.createNewP2pNet(SingleP2PNetServiceImpl.java:53) ~[classes!/:0.9.3]
         at com.simblockchain.controller.SingleP2PNetController.addNewP2pNet(SingleP2PNetController.java:44) ~[classes!/:0.9.3]
-
-
-
 		Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.dao.IncorrectResultSizeDataAccessException: query did not return a unique result: 2; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 2] with root cause
 
-### 20 Index 0 out of bounds for length 0] with root cause
+### 20 Index 0 out of bounds for length 0] with root cause✔
 r servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0] with root cause
 
 java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
         at com.simblockchain.service.impl.LogMesDataServiceImpl.insertLogMesVisitor(LogMesDataServiceImpl.java:61) ~[classes!/:0.9.3]
         at com.simblockchain.controller.LogMesDataController.insertToVisitor(LogMesDataController.java:29) ~[classes!/:0.9.3]
     
-
-  ### Connection initialization timed out. Command timed out after 100 second(s)🐕✔
+### 21 Connection initialization timed out. Command timed out after 100 second(s)🐕✔
         at io.lettuce.core.internal.ExceptionFactory.createTimeoutException(ExceptionFactory.java:65) ~[lettuce-core-6.1.5.RELEASE.jar!/:6.1.5.RELEASE]
         at io.lettuce.core.protocol.RedisHandshakeHandler.lambda$channelRegistered$0(RedisHandshakeHandler.java:62) ~[lettuce-core-6.1.5.RELEASE.jar!/:6.1.5.RELEASE]
         at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98) ~[netty-common-4.1.70.Final.jar!/:4.1.70.Final]
