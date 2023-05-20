@@ -412,6 +412,23 @@
         </el-collapse>
       </div>
 
+      <!-- 当前用户仿真数据获取 -->
+      <el-dialog v-model="simDataeVisible" title="仿真记录" width="40%">
+        <el-table :data="blockDataTableData" style="width: 100%">
+          <el-table-column prop="id" label="Id" width="60" />
+          <el-table-column prop="numOfNodes" label="NumOfNode" width="130" />
+          <el-table-column prop="numOfBlocks" label="NumOfBlock" width="130" />
+          <el-table-column prop="simEndTime" label="EndTime" width="200" />
+        </el-table>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="simDataeVisible = false">Cancel</el-button>
+            <!-- <el-button type="primary" @click="dialogNodeVisible = false"
+            >Confirm</el-button
+          > -->
+          </span>
+        </template>
+      </el-dialog>
       <el-dialog v-model="dialogNodeVisible" title="详情" width="30%">
         <el-form :model="nodeMesData">
           <el-descriptions :column="1" border>
@@ -855,6 +872,9 @@
       </el-dialog>
       <div class="reStarteSim">
         <el-button type="primary" @click="reStartSim" plain>再次仿真</el-button>
+      </div>
+      <div class="simDataGet">
+        <el-button @click="simDataGetlist5" plain>仿真记录</el-button>
       </div>
       <div class="wholeSimTeamstamp" style="color: #916b0a">
         <!-- <el-button
@@ -1560,6 +1580,7 @@ import {
   configWholeNodeData,
   configWholeSettingEndData,
   configWholeBlockMes,
+  getConfigSimData,
 } from "../api/apis";
 // import * as  bitcoin from 'bitcoinjs-lib';
 import { nodeCreated } from "../wholesim/wholeNode";
@@ -2227,6 +2248,7 @@ export default {
       ]),
       optionsNodeChange,
       blockTableData: reactive([]),
+      blockDataTableData: reactive([]),
       nodeMesVisList,
       blockMesVisList,
       dateTimeChange,
@@ -2240,6 +2262,7 @@ export default {
       startWholeSim,
       simDataId,
       dialogNodeVisible: ref(false),
+      simDataeVisible: ref(false),
       dialogBlockVisible: ref(false),
       dialogCreateVisible: ref(false),
       activeName,
@@ -4273,6 +4296,32 @@ export default {
       // this.simFlowTime.timeData = new Date(localTime);
       // this.simFlowTime.timeString = getDataString(this.simFlowTime.timeData);
     },
+    simDataGetlist5() {
+      let targetEnd = {
+        wholeNodeType: null,
+        blockList:null ,
+        transactionList: null,
+        inputList: null,
+        outputList: null,
+        auth: this.getAuth(),
+        wholeSimIds: 0,
+      };
+      getConfigSimData(targetEnd).then((resnode) => {
+          this.blockDataTableData.length=0;
+          if(resnode.length>0){
+            for(let i =0;i<resnode.length;i++){
+              this.blockDataTableData.push({
+                id:resnode[i].id,
+                numOfNodes:resnode[i].numOfNodes,
+                numOfBlocks:resnode[i].numOfBlocks,
+                simEndTime:resnode[i].simEndTime
+              })
+            }
+          }
+          this.simDataeVisible = true;
+      });
+      
+    },
     setVmSimTimeChange(time) {
       let localTime = this.simFlowTime.startTimeData.getTime() + time;
       // let target = localTime + time;
@@ -4406,6 +4455,17 @@ export default {
 
 .reStarteSim {
   margin-top: 1%;
+  position: absolute;
+  background-color: #fff;
+  right: 2%;
+  width: 8%;
+  height: auto;
+  z-index: 999;
+  padding: 0 1%;
+  opacity: 0.8;
+}
+.simDataGet {
+  margin-top: 43%;
   position: absolute;
   background-color: #fff;
   right: 2%;
