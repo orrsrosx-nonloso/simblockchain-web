@@ -15,6 +15,7 @@ const zh_cn = {
     "create":"创建",
     "NetConfiguration":"网络生成配置",
     "NetworkStrategy":"网络拓扑生成策略",
+    "teamSimDataConfig":"协作式全局仿真配置",
     "wholeSimStartMes":"在全流程仿真之前，您需要配置模拟的相关目标参数。在仿真过程中，您不能操作相关功能模块，但可以查看相关区块与节点的数据信息，直到仿真结束。"
 }
 export default zh_cn
