@@ -6,6 +6,7 @@ import map from '../views/map.vue'
 import singleSim from '../views/singleSim.vue'
 import wholeSim from '../views/wholeSim.vue'
 import bugOrder from '../views/bugOrder.vue'
+import teamSim from '../views/teamSim.vue'
 
 const asnycRouters = [
     {
@@ -43,6 +44,11 @@ const asnycRouters = [
         path: 'bugOrder',
         name: 'bugOrder',
         component: bugOrder
+    },
+    {
+        path: 'teamSim',
+        name: 'teamSim',
+        component: teamSim
     },
 ]
 
