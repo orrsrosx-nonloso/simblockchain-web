@@ -1326,74 +1326,6 @@
                   </el-collapse>
                 </c-scrollbar>
               </div>
-              <!-- <el-descriptions :column="1" border width="50px">
-                <el-descriptions-item
-                  width="50px"
-                  label="AddressID"
-                  label-align="center"
-                  align="center"
-                  >{{ drwaerDateNode.addressId }}</el-descriptions-item
-                >
-                <el-descriptions-item
-                  label="Transactions"
-                  label-align="center"
-                  align="center"
-                  >{{ drwaerDateNode.transactions }}</el-descriptions-item
-                >
-                <el-descriptions-item
-                  label="Total Received"
-                  label-align="center"
-                  align="center"
-                >
-                  {{ drwaerDateNode.totalReceived }}</el-descriptions-item
-                >
-                <el-descriptions-item
-                  label="Total Sent"
-                  label-align="center"
-                  align="center"
-                >
-                  {{ drwaerDateNode.totalSent }}
-                </el-descriptions-item>
-                <el-descriptions-item
-                  label="Final Balance"
-                  label-align="center"
-                  align="center"
-                  >{{ drwaerDateNode.balance }}</el-descriptions-item
-                >
-                <el-descriptions-item
-                  label="Wallet Id"
-                  label-align="center"
-                  align="center"
-                  >{{ drwaerDateNode.walletId
-                  }}<el-button type="text" @click="checkWallet(drwaerDateNode.walletId)"
-                    >查看</el-button
-                  ></el-descriptions-item
-                >
-                <el-descriptions-item
-                  label="交易列表ID"
-                  label-align="center"
-                  align="center"
-                >
-                  <el-tooltip
-                    v-if="drwaerDateNode.nodeType == `lightNode`"
-                    content="轻节点的交易信息需要通过其他全节点查询!"
-                    placement="top"
-                    ><el-button
-                      size="small"
-                      @click="findLightListTransList2(drwaerDateNode.transactionId)"
-                      round
-                      >查询交易
-                    </el-button>
-                  </el-tooltip>
-
-                  <el-button
-                    v-if="drwaerDateNode.nodeType != `lightNode`"
-                    type="text"
-                    @click="findTransList2(drwaerDateNode.transactionId)"
-                    >{{ drwaerDateNode.transactionId }}</el-button
-                  >
-                </el-descriptions-item>
-              </el-descriptions> -->
 
               <el-drawer
                 v-model="innerDrawer2"
@@ -2890,15 +2822,6 @@ export default {
             );
           }
 
-          // for (let i = 0; i < 4; i++) {
-          //   (function (j) {
-          //     setTimeout(function timer() {
-          //       ElMessageBox.alert("请创建新区块!" + i, "WARING", {
-          //         confirmButtonText: "OK",
-          //       });
-          //     }, j * 1000);
-          //   })(i);
-          // }
         }
       });
     };
@@ -2981,134 +2904,12 @@ export default {
             } else {
               break;
             }
-            //     targetLen++;
-            // let id = 0;
-            // if(targetLen<res.length){
-            //   if (spreadNode.length > 0) {
-            //     if(spreadNode[0]=="Node1"&&node1vis==true){
-            //       node1vis=false;
-            //       id = getNodeId(spreadNode[0]) - 1;
-            //       spreadNode.shift();
-            //     }else{
-            //       if(outNode.indexOf(spreadNode[0])==-1){
-            //         id = getNodeId(spreadNode[0]) - 1;
-            //         spreadNode.shift();
-            //       }
-            //       else{
-            //         spreadNode.shift();
-            //         if(spreadNode.length==0){
-            //           spreadNode.push(allNode[0]);
-            //         }
-            //         continue;
-            //       }
-            //     }
-
-            //   } else {
-            //     if(allNode.length==res.length){
-            //       id = getNodeId(miner) - 1;
-            //     }
-            //     else{
-            //       if(spreadNode.length==0){
-            //         spreadNode.push(allNode[0]);
-            //       }
-            //       continue;
-            //     }
-            //   }
-            // }else{
-            //     id = getNodeId(allNode[0]) - 1;
-            // }
-            // let minerNodes = res[id].outbound;
-            // if(minerNodes!=null&&minerNodes!=""){
-            //   localOutbound = minerNodes.split(",");
-            // }
-            // for (let i = 0; i < allNode.length; i++) {
-            //   if (allNode[i] == res[id].nodeAddress) {
-            //     if (i == 0) {
-            //       outNode.push(allNode[i]);
-            //       allNode.shift();
-            //     } else {
-            //       outNode.push(allNode[i]);
-            //       allNode.splice(i, 1);
-            //     }
-            //   }
-            // }
-            // for (let i = 0; i < allNode.length; i++) {
-            //   if(localOutbound.length!=0){
-            //     for(let k = 0;k<localOutbound.length;k++){
-            //       if(localOutbound[k]==allNode[i]){
-            //         spreadNode.push(localOutbound[k]);
-            //         if (i == 0) {
-            //           outNode.push(allNode[i]);
-            //           allNode.shift();
-            //         } else {
-            //           outNode.push(allNode[i]);
-            //           allNode.splice(i, i);
-            //         }
-            //       }
-            //     }
-            //   }
-            //   else{
-            //     break;
-            //   }
-            // if (allNode[i] == res[id].nodeAddress) {
-            //   if (i == 0) {
-            //     allNode.shift();
-            //   } else {
-            //     allNode.splice(i, i);
-            //   }
-            // } else if (allNode[i] == res[id].neighbourOne) {
-            //   if (i == 0) {
-            //     allNode.shift();
-            //   } else {
-            //     allNode.splice(i, i);
-            //   }
-            // } else if (allNode[i] == res[id].neighbourTwo) {
-            //   if (i == 0) {
-            //     allNode.shift();
-            //   } else {
-            //     allNode.splice(i, i);
-            //   }
-            // } else if (allNode[i] == res[id].neighbourThree) {
-            //   if (i == 0) {
-            //     allNode.shift();
-            //   } else {
-            //     allNode.splice(i, i);
-            //   }
-            // }
           }
           flowNode.push({
             nodeAddress: res[id].nodeAddress,
             ouboundList: JSON.parse(JSON.stringify(localOutbound)),
           });
 
-          // if (
-          //   res[id].nodeAddress != null &&
-          //   oldSpreadNode.indexOf(res[id].nodeAddress) == -1
-          // ) {
-          //   spreadNode.push(res[id].nodeAddress);
-          //   oldSpreadNode.push(res[id].nodeAddress);
-          // }
-          // if (
-          //   res[id].neighbourOne != null &&
-          //   oldSpreadNode.indexOf(res[id].neighbourOne) == -1
-          // ) {
-          //   spreadNode.push(res[id].neighbourOne);
-          //   oldSpreadNode.push(res[id].neighbourOne);
-          // }
-          // if (
-          //   res[id].neighbourTwo != null &&
-          //   oldSpreadNode.indexOf(res[id].neighbourTwo) == -1
-          // ) {
-          //   spreadNode.push(res[id].neighbourTwo);
-          //   oldSpreadNode.push(res[id].neighbourTwo);
-          // }
-          // if (
-          //   res[id].neighbourThree != null &&
-          //   oldSpreadNode.indexOf(res[id].neighbourThree) == -1
-          // ) {
-          //   spreadNode.push(res[id].neighbourThree);
-          //   oldSpreadNode.push(res[id].neighbourThree);
-          // }
         }
         //开始模拟传输
         analogueTransmission(flowNode, miner);
@@ -4327,83 +4128,6 @@ export default {
               nodeType.value = true;
             },
           },
-          // {
-          //   label: "新键区块",
-          //   selected(graph, coordinate) {
-          //     let dsad = graph.nodelist;
-          //     if (graph.nodeList.length > 0) {
-          //       createNewBlock(null).then((res) => {
-          //         graph.addNode({
-          //           width: 100,
-          //           height: 30,
-          //           coordinate,
-          //           meta: {
-          //             label: res.blockID,
-          //             name: res.blockID,
-          //             prop: "block",
-          //           },
-          //         });
-          //         const newBlocklist = graph.nodeList;
-          //         const presentBlock = newBlocklist[newBlocklist.length - 1];
-          //         presentBlock.meta.name = res.blockID;
-          //         if (presentBlock.meta.prop == "block") {
-          //           // let presentNodsd=presentNode.id;
-          //           blockListId.push({
-          //             lable: presentBlock.meta.label,
-          //             id: presentBlock.id,
-          //           });
-          //         }
-
-          //         const newId = uuid("link");
-          //         const lengthblockListId = blockListId.length;
-          //         if (lengthblockListId >= 2) {
-          //           const lengthLinklength = linkList.length;
-          //           const targetLinkList = [];
-          //           if (lengthLinklength > 0) {
-          //             for (var i = 0; i < lengthLinklength; i++) {
-          //               targetLinkList.push(linkList[i]);
-          //             }
-          //           }
-          //           targetLinkList.push({
-          //             id: newId,
-          //             startId: blockListId[lengthblockListId - 2].id,
-          //             endId: blockListId[lengthblockListId - 1].id,
-          //             startAt: [100, 24],
-          //             endAt: [0, 25],
-          //             meta: "block",
-          //           });
-          //           linkList = targetLinkList;
-          //         }
-          // const data = blockListId.length;
-          // this.summaryMes[2].data = data;
-          // const newId = uuid("link");
-          // const lengthLink = blockListId.length;
-
-          // if (lengthLink >= 2) {
-          //   const dsaadf = totalLinkList;
-          //   totalLinkList.push({
-          //     id: newId,
-          //     startId: blockListId[lengthLink-2].id,
-          //     endId: blockListId[lengthLink-1].id,
-          //     startAt: [160, 40],
-          //     endAt: [0, 25],
-          //     meta: null,
-          //   });
-          // }
-
-          // this.$refs.superFlow.addNode({
-          //   coordinate,
-          //   ...conf.info,
-          // });
-          //       });
-          //     } else {
-          //       ElMessage({
-          //         message: "创建区块前请先创建节点.",
-          //         type: "warning",
-          //       });
-          //     }
-          //   },
-          // },
           {
             label: "创世块",
             disable(graph) {
