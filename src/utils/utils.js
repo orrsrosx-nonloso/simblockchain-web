@@ -165,7 +165,7 @@ function haveNumIs(password) {
 function haveStrIs(password) {
     let passwords = password.split("");
     var re = /^[0-9]+.?[0-9]*$/;
-    var re2 = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]")
+    var re2 = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥......&*（）——|{}【】‘；：”“'。，、？ ]")
     for (let i = 0; i < passwords.length; i++) {
         if (!re.test(passwords[i]) && !re2.test(passwords[i])) {
             return true;
@@ -175,7 +175,7 @@ function haveStrIs(password) {
 }
 function havePunIs(password) {
     let passwords = password.split("");
-    var re = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]")
+    var re = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥......&*（）——|{}【】‘；：”“'。，、？ ]")
     for (let i = 0; i < passwords.length; i++) {
         if (re.test(passwords[i])) {
             return true;
@@ -311,7 +311,7 @@ export function getSign() {
 }
 
 export function textEditFun() {
-    let textLuanxu = "1234567890-=!@#$%^&*()_+qwertyuiop[]\;lkjhgfdsazxcvbnm,./QWASERTYUIOP{}|:LKJHGFDSAZXCVBNM<>?"
+    let textLuanxu = "1234567890qwertyuioplkjhgfdsazxcvbnmQWASERTYUIOPLKJHGFDSAZXCVBNM"
     let chars = textLuanxu.split('');
     var aNumber = 10 * Math.random() + 5;
     var result = Math.floor(aNumber);
@@ -323,7 +323,7 @@ export function textEditFun() {
         };
     }
     let end = "";
-    for (let i=0;i<result;i++){
+    for (let i=0;i<4;i++){
         chars.shuffle();
         end += chars[0];
     }
