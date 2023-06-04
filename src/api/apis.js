@@ -281,6 +281,10 @@ export const insertToBugOrder = function (data) {
     return http('post', 'http://localhost:8081/bugOrder/insertToBugOrder', data)
 }
 
+//仿真信息获取页
+export const getConfigSimData = function (data) {
+    return http('post', 'http://localhost:8081/wholeSim/getConfigSimData', data)
+}
 
 // 获取权限菜单
 export const getRolesApi = function (data) {
