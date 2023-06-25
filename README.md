@@ -1,6 +1,6 @@
 
 ## 介绍
-本项目为构建区块链仿真工具创建可视化界面，该项目采用前后端分离构建，后端代码地址如下[simblockchains](https://github.com/orrsrosx-nonloso/simblockchain),后端代码还未公开,计划成功毕业之后进行完全开源
+本项目为构建区块链仿真工具创建可视化界面，该项目采用前后端分离构建，后端代码地址如下[simblockchains(未毕业暂时不开源)](https://github.com/orrsrosx-nonloso/simblockchain),后端代码还未公开,计划成功毕业之后进行完全开源
 ## 软件架构
 [vite 2.0.1](https://cn.vitejs.dev/guide/)  
 [vue 3.0.5](https://vue3js.cn/docs/zh/)  
