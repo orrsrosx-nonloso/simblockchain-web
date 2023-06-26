@@ -2840,7 +2840,7 @@ export default {
           map: "world",
           type: "map",
           mapType: "world",
-          roam: false,
+          roam: true,
           zoom: 1.2,
           label: {
             normal: {
