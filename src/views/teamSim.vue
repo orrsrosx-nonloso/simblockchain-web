@@ -1,7 +1,76 @@
 <template>
-  <div class="leftUserControl">仿真用户列表
-    <div class="simUserList">1</div>
+  <div class="leftUserControl">
+    仿真用户列表
+    <el-tooltip
+      class="box-item"
+      effect="dark"
+      content="刷新用户状态"
+      placement="top-start"
+    >
+      <el-icon @click="refreshUserStatus()" :size="20" class="iconUtils"
+        ><Refresh
+      /></el-icon>
+    </el-tooltip>
+    <div class="simUserList">
+
+      <div v-for="item in teamSimUserList" class="targetSimUser">
+        <div class="textTop-team">
+          <div class="textTop-team-left"><el-icon v-if="item.staus==1" color="#26f545" :size="20" class="buttonUserIcon"
+          ><UserFilled 
+          /></el-icon>
+          <el-icon v-if="item.staus==0" color="#8f8f8f" :size="20" class="buttonUserIcon"
+          ><UserFilled 
+          /></el-icon>
+          </div>
+          <div class="textTop-team-right">{{item.userName}}
+            <div class="detail-team-mes">
+              <el-icon v-if="item.staus==0" color="#9dbeae" :size="20" class="buttonUserIcon"
+              ><More
+              /></el-icon>
+              <el-icon v-if="item.staus==1" @click="getUserDetailMes()" color="#26f545" :size="20" class="buttonUserIcon"
+              ><More
+              /></el-icon>
+            </div>
+            <div class="detail-team-del">
+              <el-icon :size="17" class="buttonUserIcon" @click="deleteTeamSimUser(item.id,item.userName)"
+              ><Delete
+              /></el-icon>
+            </div>
+          </div>
+        </div>
+        <div class="textBton-team" :model="item">最近消息：{{ item.mes }}</div>
+      </div>
+    </div>
+
+    <div class="teamSimUserReq">
+      <span class="teamSimUserReqText" @click="findUserReuList()">仿真申请列表</span>
+    </div>
   </div>
+  <el-dialog v-model="simReqDataeVisible" title="仿真申请信息" width="38%">
+          <el-table :data="blockSimReqTableData" style="width: 100%">
+            <el-table-column prop="id" label="Id" width="60" />
+            <el-table-column prop="userName" label="UserName" width="130" />
+            <el-table-column prop="userStatue" label="UserStatue" width="130" />
+            <el-table-column label="Operations" width="180">
+              <template #default="scope">
+                <el-button size="small" @click="teamSimReqAccept(scope.$index,scope.row.id,scope.row.userName)"
+                  >Accpet</el-button
+                >
+                <el-button
+                  size="small"
+                  type="danger"
+                  @click="teamSimReqReject(scope.$index,scope.row.id,scope.row.userName)"
+                  >Reject</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="simReqDataeVisible = false">Cancel</el-button>
+            </span>
+          </template>
+        </el-dialog>
   <div class="rightMapControl">
     <el-row>
       <el-col :span="24">
@@ -1582,7 +1651,19 @@
 import * as echarts from "echarts";
 import JSONMAP from "../assets/mapRow/world.json";
 import { useI18n } from "vue-i18n";
-import { Edit, MoreFilled, View, Search, CloseBold } from "@element-plus/icons";
+import {
+  Edit,
+  MoreFilled,
+  View,
+  Search,
+  CloseBold,
+  Refresh,
+  UserFilled,
+  More,
+  Delete,
+  Check,
+  Close
+} from "@element-plus/icons";
 import { useStore } from "vuex";
 import { ElMessageBox, ElMessage } from "element-plus";
 import { reactive, ref } from "vue";
@@ -1615,6 +1696,12 @@ export default {
     MoreFilled,
     Search,
     CloseBold,
+    Refresh,
+    UserFilled,
+    More,
+    Delete,
+    Check,
+    Close
   },
   data() {
     //数据总览
@@ -2267,6 +2354,7 @@ export default {
       optionsNodeChange,
       blockTableData: reactive([]),
       blockDataTableData: reactive([]),
+      blockSimReqTableData:ref([]),
       nodeMesVisList,
       blockMesVisList,
       dateTimeChange,
@@ -2281,6 +2369,7 @@ export default {
       simDataId,
       dialogNodeVisible: ref(false),
       simDataeVisible: ref(false),
+      simReqDataeVisible:ref(false),
       dialogBlockVisible: ref(false),
       dialogCreateVisible: ref(false),
       activeName,
@@ -2401,6 +2490,50 @@ export default {
             transactionId: "0",
           },
         },
+      ]),
+      teamSimUserList: ref([
+        {
+          id:1,
+          userName: "user1",
+          staus: 1,//1在线，0不在线
+          mes: "区块创建",//最新行为消息
+        },
+        {
+          id:2,
+          userName: "user2",
+          staus: 0,//1在线，0不在线
+          mes: "区块消息创建",//最新行为消息
+        },
+        {
+          id:3,
+          userName: "usaser3",
+          staus: 1,//1在线，0不在线
+          mes: "交易消息创建",//最新行为消息
+        },
+        {
+          id:4,
+          userName: "usaser4",
+          staus: 1,//1在线，0不在线
+          mes: "交易消息创建",
+        },
+        {
+          id:5,
+          userName: "usaser5",
+          staus: 1,//1在线，0不在线
+          mes: "节点消息创建",
+        },
+        {
+          id:6,
+          userName: "usedr6",
+          staus: 1,//1在线，0不在线
+          mes: "节点消息创建",
+        },
+        {
+          id:7,
+          userName: "usser7",
+          staus: 1,//1在线，0不在线
+          mes: "节点消息创建",
+        }
       ]),
       dialogSearchDataVisible: ref(false),
     };
@@ -4437,6 +4570,88 @@ export default {
         );
       }
     },
+    refreshUserStatus() {
+      //数据获取
+      let teamSimUserListChange = [
+        {
+          id:1,
+          userName: "user1",
+          staus: 1,//1在线，0不在线
+          mes: "节点消撒大大阿萨大大是息创建",//最新行为消息
+        },
+        {
+          id:2,
+          userName: "user2",
+          staus: 0,//1在线，0不在线
+          mes: "区块消息创建",//最新行为消息
+        },
+        {
+          id:3,
+          userName: "usaser3",
+          staus: 1,//1在线，0不在线
+          mes: "交易消息创建",//最新行为消息
+        },
+        {
+          id:4,
+          userName: "usaser4",
+          staus: 0,//1在线，0不在线
+          mes: "掉线消息创建",
+        }
+      ]
+      //数据导入
+      this.teamSimUserList.length=0;//清空表
+      for(let i=0;i<teamSimUserListChange.length;i++){
+        this.teamSimUserList.push(teamSimUserListChange[i]);
+      }
+      console.log("您刷新了用户信息状态");
+    },
+    getUserDetailMes() {
+      console.log("您获取了最新事务信息");
+    },
+    deleteTeamSimUser(id,name){
+      ElMessageBox.alert(
+        "您确定要删除该协作仿真用户吗？",
+        "Alert",
+        {
+          // if you want to disable its autofocus
+          // autofocus: false,
+          confirmButtonText: "OK",
+          cancelButtonText: 'Cancel',
+          callback: (action) => {
+            let deStatue = 0;
+            for(let i=0;i<this.teamSimUserList.length;i++){
+              if(this.teamSimUserList[i].id==id&&this.teamSimUserList[i].userName==name){
+                this.teamSimUserList.splice(i,1);
+                deStatue =1;
+              }
+            }
+            if(deStatue==1){
+              ElMessage({
+                message: '成功删除.',
+                type: 'success',
+              })
+            }
+            else{
+              ElMessage.error('未知错误删除失败.')
+            }
+          },
+        }
+      );
+      
+    },
+    //每次点击都会获取新的列表
+    findUserReuList(){
+      this.blockSimReqTableData.length = 0;
+          for (let i = 0; i < 2; i++) {
+            this.blockSimReqTableData.push({
+              id: i+1,
+              userName: "userName"+i,
+              userStatue: "userStatue"+i,
+            });
+          }
+      this.simReqDataeVisible = true;
+    },
+    
   },
 };
 </script>
@@ -4485,7 +4700,113 @@ export default {
   padding: 0 1%;
   opacity: 0.8;
 }
-
+.simUserList {
+  margin-top: 4px;
+  border-top: 1px solid #cecec0;
+  height: 92.5%;
+}
+.targetSimUser {
+  margin: 2px;
+  border: 1px solid #e9e9e3;
+  border-radius: 4px;
+  height: 11%;
+}
+.box-cards-team {
+  height: 100%;
+}
+.textTop-team {
+  width: 100%;
+  text-align: center;
+  word-break: break-all;
+  white-space: nowrap;
+  color: rgba(39, 39, 39, 0.45);
+  margin-top: 2px;
+  margin-bottom: 0;
+  font-size: 14px;
+  line-height: 14px;
+  height: 50%;
+}
+.textTop-team-left {
+  height: 100%;
+  width: 20%;
+  line-height: 100%;
+  text-align: center;
+  float: left;
+}
+.textTop-team-right {
+  float: right;
+  width: 75%;
+  text-align: left;
+  word-break: break-all;
+  white-space: nowrap;
+  color: rgba(39, 39, 39, 0.45);
+  font-size: 16px;
+  line-height: 30px;
+  height: 100%;
+}
+.textBton-team {
+  width: 85%;
+  text-align: center;
+  word-break: break-all;
+  white-space: nowrap;
+  color: rgba(39, 39, 39, 0.45);
+  padding-top: 3px;
+  margin-bottom: 0;
+  margin-left:10px;
+  margin-right:10px;
+  font-size: 14px;
+  line-height: 14px;
+  height: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.iconUtils {
+  padding-right: 10px;
+  color: #908484;
+  float: right;
+}
+.buttonUserIcon{
+  padding-top: 5px;
+  padding-right: 10px;
+  padding-left: 10px;
+  color: #404441;
+}
+.buttonUserIcon :hover{
+  cursor: pointer;
+  color: #6cdc39;
+}
+.iconUtils :hover {
+  cursor: pointer;
+  color: #6cdc39;
+}
+.detail-team-mes{
+  position: relative;
+  right: 2%;
+  height: 100%;
+  width: 20%;
+  line-height: 100%;
+  text-align: center;
+  float: right;
+}
+.detail-team-del{
+  height: 100%;
+  width: 20%;
+  text-align: center;
+  float: right;
+}
+.teamSimUserReq{
+  position: relative;
+  bottom: 0;
+  height: 3%;
+  padding-left: 20%;
+  padding-right: 20%;
+  font-size: 13px;
+}
+.teamSimUserReqText:hover{
+  cursor: pointer;
+  color: #6cdc39;
+}
 
 .reStarteSim {
   margin-top: 1%;
