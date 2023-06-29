@@ -28,6 +28,7 @@ const router = useRouter();
 
 const store = useStore();
 const userName = store.getters.authnameGetter;
+const userId = store.getters.authIdGetter;
 const targetUserName = store.getters.authGetter;
 
 

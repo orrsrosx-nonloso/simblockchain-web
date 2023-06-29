@@ -31,6 +31,9 @@ const user = {
         authGetter(state) {
             return state.userInfo.username
         },
+        authIdGetter(state) {
+            return state.userInfo.id
+        },
         authorityGetter(state) {
             return state.userInfo.authority
         },
