@@ -4651,7 +4651,45 @@ export default {
           }
       this.simReqDataeVisible = true;
     },
-    
+    teamSimReqAccept(index,id,userName){
+      ElMessageBox.alert(
+        "您确定要接受该用户仿真接入请求吗？",
+        "Alert",
+        {
+          // if you want to disable its autofocus
+          // autofocus: false,
+          confirmButtonText: "OK",
+          cancelButtonText: 'Cancel',
+          callback: (action) => {
+            this.teamSimUserList.push({
+              id:id,
+              userName: userName,
+              staus: 1,//1在线，0不在线
+              mes: "加入仿真",//最新行为消息
+            })  
+            this.blockSimReqTableData.splice(index, 1);
+            this.simReqDataeVisible = false;
+          },
+        }
+      ); 
+      console.log("Accept"+id+"-"+userName)
+    },
+    teamSimReqReject(index,id,userName){
+      ElMessageBox.alert(
+        "您确定要拒绝该用户仿真接入请求吗？",
+        "Alert",
+        {
+          // if you want to disable its autofocus
+          // autofocus: false,
+          confirmButtonText: "OK",
+          cancelButtonText: 'Cancel',
+          callback: (action) => {
+            this.blockSimReqTableData.splice(index, 1);
+          },
+        }
+      );
+      console.log("Reject"+id+"-"+userName)
+    }
   },
 };
 </script>
