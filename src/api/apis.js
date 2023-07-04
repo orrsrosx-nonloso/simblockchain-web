@@ -293,3 +293,28 @@ export const getRolesApi = function (data) {
         ...data
     })
 }
+
+//teamAgent sim api list
+export const configWholeSettingDataTeam = function (data) {
+    return http('post', 'http://localhost:8082/wholeSim/configSimData', data)
+}
+
+
+export const configWholeNodeDataTeam = function (data) {
+    return http('post', 'http://localhost:8082/wholeNode/configWholeNodeData', data)
+}
+
+//仿真结束或者终止进行数据配置
+export const configWholeSettingEndDataTeam = function (data) {
+    return http('post', 'http://localhost:8082/wholeSim/configSimEndData', data)
+}
+
+//初始配置全流程节点基本内容
+export const configWholeBlockMesTeam = function (data) {
+    return http('post', 'http://localhost:8082/wholeBlock/configWholeBlockMes', data)
+}
+
+//仿真信息获取页
+export const getConfigSimDataTeam = function (data) {
+    return http('post', 'http://localhost:8082/wholeSim/getConfigSimData', data)
+}

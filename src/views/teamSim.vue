@@ -1675,11 +1675,11 @@ import { sha256 } from "js-sha256";
 import { getTargetDataStr, getDataString, getSign } from "../utils/utils";
 
 import {
-  configWholeSettingData,
-  configWholeNodeData,
-  configWholeSettingEndData,
-  configWholeBlockMes,
-  getConfigSimData,
+  configWholeSettingDataTeam,
+  configWholeNodeDataTeam,
+  configWholeSettingEndDataTeam,
+  configWholeBlockMesTeam,
+  getConfigSimDataTeam,
 } from "../api/apis";
 // import * as  bitcoin from 'bitcoinjs-lib';
 import { nodeCreated } from "../wholesim/wholeNode";
@@ -1827,49 +1827,49 @@ export default {
       numOfMaxOutBound: 4,
       averageMiningPower: 40000,
       regionList: {
-        na: 0.3412,
-        eu: 0.4194,
-        sa: 0.0257,
-        as: 0.1861,
-        af: 0.006,
-        oa: 0.0216,
+        na: 0.3012,
+        eu: 0.555,
+        sa: 0.015,
+        as: 0.1025,
+        af: 0.0047,
+        oa: 0.0261,
       },
       defaultAccount: 1,
       neighborDiscoveryInterval: 100,
       nodeChurnRate: 0.976,
       simEndTime: new Date(2023, 10, 10, 10, 10),
       simEndTimeString: "",
-      numOfEndBlock: 10,
+      numOfEndBlock: 1000,
       numOfTransInblock: 10,
       consensusAlgorithm: "POW",
-      maxBlockSize: 535000,
+      maxBlockSize: 1048000,
       blockTime: 10000,
       blockReward: 12,
       transRePer: 0.001,
       wholeDownloadBandwidth: {
-        na: 52000000,
-        eu: 40000000,
-        sa: 18000000,
-        as: 22800000,
-        af: 22800000,
-        oa: 29900000,
+        na: 92000000,
+        eu: 104000000,
+        sa: 35000000,
+        as: 47000000,
+        af: 12000000,
+        oa: 30000000,
       },
       wholeUploadBandwidth: {
-        na: 19200000,
-        eu: 20700000,
-        sa: 5800000,
-        as: 15700000,
-        af: 10200000,
-        oa: 11300000,
+        na: 34000000,
+        eu: 53800000,
+        sa: 11300000, 
+        as: 32400000,
+        af: 5400000,
+        oa: 11400000,
       },
-      transRegionalBandwidth: 8000000,
+      transRegionalBandwidth: 12000000,
       regionLatency: [
-        { name: "NA", latency: [221, 236, 246, 244, 234, 233] },
-        { name: "EU", latency: [234, 218, 245, 254, 254, 255] },
-        { name: "SA", latency: [242, 245, 243, 264, 232, 232] },
-        { name: "AS", latency: [234, 222, 212, 221, 232, 234] },
-        { name: "AF", latency: [212, 245, 234, 212, 217, 234] },
-        { name: "OA", latency: [267, 245, 254, +223, 223, 218] },
+        { name: "NA", latency: [26, 105, 159, 183, 181, 215] },
+        { name: "EU", latency: [105, 10, 215, 217, 194, 274] },
+        { name: "SA", latency: [159, 215, 33, 316, 292, 292] },
+        { name: "AS", latency: [183, 217, 316, 49, 302, 166] },
+        { name: "AF", latency: [181, 194, 292, 302, 50, 254] },
+        { name: "OA", latency: [215, 274, 292, 166, 254, 28] },
       ],
       churnNodeFailureRate: 0.27,
       orphanBlock: 0.05,
@@ -1936,7 +1936,7 @@ export default {
       blocMeskList = [];
       let time = (WholeSimData.numOfNodes / 100) * 1000 + 1000;
       //节点数据导入迁移到仿真结束或者异常中值终止
-      // configWholeNodeData({
+      // configWholeNodeDataTeam({
       //   wholeNodeType: nodeMesList,
       //   auth: getAuth(),
       //   wholeSimIds: wholeSimId,
@@ -1980,7 +1980,7 @@ export default {
               wholeSimIds: wholeSimId,
               noHeapBlockMesList: noHeapBlockMesList,
             };
-            configWholeBlockMes(sdsd).then((resblock) => {
+            configWholeBlockMesTeam(sdsd).then((resblock) => {
               if (resblock.status == 1) {
                 let endTiem4 = setTimeout(() => {
                   //开始仿真流程
@@ -2063,7 +2063,7 @@ export default {
         auth: getAuth(),
       };
       //基本数据导入
-      configWholeSettingData(data).then((res) => {
+      configWholeSettingDataTeam(data).then((res) => {
         // 创建结束后开始仿真;
         if (res.status == 1) {
           simDataId = res.wholeSimId;
@@ -2089,7 +2089,7 @@ export default {
           auth: getAuth(),
         };
         //基本数据导入
-        configWholeSettingData(data).then((res) => {
+        configWholeSettingDataTeam(data).then((res) => {
           // 创建结束后开始仿真;
           if (res.status == 1) {
             simDataId = res.wholeSimId;
@@ -3149,7 +3149,7 @@ export default {
                   auth: this.getAuth(),
                   wholeSimIds: wholeSimId,
                 };
-                configWholeSettingEndData(targetEnd).then((resnode) => {});
+                configWholeSettingEndDataTeam(targetEnd).then((resnode) => {});
                 this.setoptionsNode(nodeMesList);
                 // this.setPercentage(100);
                 setTimeout(() => {
@@ -3292,7 +3292,7 @@ export default {
                   auth: this.getAuth(),
                   wholeSimIds: wholeSimId,
                 };
-                configWholeSettingEndData(targetEnd).then((resnode) => {});
+                configWholeSettingEndDataTeam(targetEnd).then((resnode) => {});
                 //时间处理
                 this.setVmSimEndTimeChange();
                 //将相关信息存入数据库
@@ -4457,7 +4457,7 @@ export default {
         auth: this.getAuth(),
         wholeSimIds: 0,
       };
-      getConfigSimData(targetEnd).then((resnode) => {
+      getConfigSimDataTeam(targetEnd).then((resnode) => {
         this.blockDataTableData.length = 0;
         if (resnode.length > 0) {
           for (let i = 0; i < resnode.length; i++) {
