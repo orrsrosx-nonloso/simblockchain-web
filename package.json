@@ -1,6 +1,6 @@
 {
   "name": "SBC",
-  "version": "0.9.3",
+  "version": "0.9.31",
   "author": "Orrsrosx",
   "scripts": {
     "dev": "vite --host",
