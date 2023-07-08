@@ -71,6 +71,26 @@
             </span>
           </template>
         </el-dialog>
+        <el-dialog v-model="simDataUserListVisible" title="仿真记录" width="34%">
+          <el-table :data="blockSimUserTableData" style="width: 100%">
+            <el-table-column prop="id" label="SimID
+              " width="60" />
+            <el-table-column prop="userName" label="UserName" width="130" />
+            <el-table-column prop="userStatue" label="UserStatue" width="130" />
+            <el-table-column label="Operations" width="140">
+              <template #default="scope">
+                <el-button size="small" @click="teamSimAgain(scope.row.id,scope.row.userName)"
+                  >继续仿真</el-button
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="simDataUserListVisible = false">Cancel</el-button>
+            </span>
+          </template>
+        </el-dialog>
   <div class="rightMapControl">
     <el-row>
       <el-col :span="24">
@@ -1056,7 +1076,7 @@
                   </h2>
 
                   <div class="dataImport">
-                    <!-- <el-button type="primary" size="large">导入数据</el-button> -->
+                    <el-button type="primary" @click="findUserSimList" size="large">查看仿真记录</el-button>
                   </div>
                 </div>
               </div>
@@ -1680,6 +1700,7 @@ import {
   configWholeSettingEndDataTeam,
   configWholeBlockMesTeam,
   getConfigSimDataTeam,
+  getUserisOnSimState
 } from "../api/apis";
 // import * as  bitcoin from 'bitcoinjs-lib';
 import { nodeCreated } from "../wholesim/wholeNode";
@@ -1808,8 +1829,14 @@ export default {
     const auth = computed(() => {
       return store.getters.authGetter;
     });
+    const authId = computed(() => {
+      return store.getters.authIdGetter;
+    });
     const getAuth = () => {
       return auth.value;
+    };
+    const getAuthId = () => {
+      return authId.value;
     };
     //全流程仿真相关参数
     //区块链分叉bitconin = 0.58% litecoin:0.30,dogecoin:0.80
@@ -2061,6 +2088,7 @@ export default {
       let data = {
         wholeSimDataInput: JSON.parse(JSON.stringify(WholeSimData)),
         auth: getAuth(),
+        id:getAuthId()
       };
       //基本数据导入
       configWholeSettingDataTeam(data).then((res) => {
@@ -2087,6 +2115,7 @@ export default {
         let data = {
           wholeSimDataInput: JSON.parse(JSON.stringify(WholeSimData)),
           auth: getAuth(),
+          id:getAuthId()
         };
         //基本数据导入
         configWholeSettingDataTeam(data).then((res) => {
@@ -2094,7 +2123,7 @@ export default {
           if (res.status == 1) {
             simDataId = res.wholeSimId;
             simState.value = true;
-            startWholeSim(res.wholeSimId, 0); //0表示实时显示仿真流程
+            // startWholeSim(res.wholeSimId, 0); //0表示实时显示仿真流程
           } else {
             ElMessageBox.alert("一些错误：" + res.mes, "ALERT", {
               // if you want to disable its autofocus
@@ -2355,6 +2384,7 @@ export default {
       blockTableData: reactive([]),
       blockDataTableData: reactive([]),
       blockSimReqTableData:ref([]),
+      blockSimUserTableData:ref([]),
       nodeMesVisList,
       blockMesVisList,
       dateTimeChange,
@@ -2372,10 +2402,12 @@ export default {
       simReqDataeVisible:ref(false),
       dialogBlockVisible: ref(false),
       dialogCreateVisible: ref(false),
+      simDataUserListVisible:ref(false),
       activeName,
       activeSumName,
       reSetSimEndTimeStr,
       getAuth,
+      getAuthId,
       wholeSimSliderValue,
       maxSloderValue,
       mapOption: {},
@@ -4627,7 +4659,7 @@ export default {
             }
             if(deStatue==1){
               ElMessage({
-                message: '成功删除.',
+                message: '删除成功.',
                 type: 'success',
               })
             }
@@ -4689,6 +4721,32 @@ export default {
         }
       );
       console.log("Reject"+id+"-"+userName)
+    },
+    //继续仿真
+    teamSimAgain(id,userName){
+      console.log("again success!")
+    },
+    //查看仿真记录
+    findUserSimList(){
+      let data = {
+        wholeSimDataInput: null,
+        auth: this.getAuth(),
+        id:this.getAuthId()
+      };
+      getUserisOnSimState(data).then((resnode) => {
+        this.blockSimUserTableData.length = 0;
+        if (resnode.userList.length > 0) {
+          for (let i = 0; i < resnode.userList.length; i++) {
+            this.blockSimUserTableData.push({
+              id: resnode.userList[i].simDataConfigId,
+              userName: resnode.userList[i].teamUserName,
+              userStatue: resnode.userList[i].controller,
+            });
+          }
+        }
+        this.simDataUserListVisible = true;
+      });
+      console.log("查看仿真记录")
     }
   },
 };
