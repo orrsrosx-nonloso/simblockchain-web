@@ -71,7 +71,7 @@
             </span>
           </template>
         </el-dialog>
-        <el-dialog v-model="simDataUserListVisible" title="仿真记录" width="34%">
+        <el-dialog v-model="simDataUserListVisible" title="仿真记录" width="30%">
           <el-table :data="blockSimUserTableData" style="width: 100%">
             <el-table-column prop="id" label="SimID
               " width="60" />
