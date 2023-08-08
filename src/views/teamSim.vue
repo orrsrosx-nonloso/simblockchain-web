@@ -13,7 +13,7 @@
     </el-tooltip>
     <div class="simUserList">
 
-      <div v-for="item in teamSimUserList" class="targetSimUser">
+      <div v-for="item in teamSimUserList" class="targetSimUser" :key="item">
         <div class="textTop-team">
           <div class="textTop-team-left"><el-icon v-if="item.staus==1" color="#26f545" :size="20" class="buttonUserIcon"
           ><UserFilled 
@@ -131,7 +131,8 @@
           <el-button
             v-for="item in targetTransData"
             type="text"
-            @click="getOutputData(item)"
+            @click="getOutputData(item)" 
+            :key="item"
             >{{ item }}</el-button
           >
         </el-dialog>
@@ -169,6 +170,7 @@
                         v-for="item in targetTransData"
                         type="text"
                         @click="getOutputData(item)"
+                        :key="item"
                         >{{ item }}</el-button
                       >
                     </div>
@@ -236,6 +238,7 @@
                       v-for="item in inputData.transId"
                       type="text"
                       @click="getTransData(item)"
+                      :key="item"
                       >{{ item }}</el-button
                     >
                   </el-descriptions-item>
@@ -312,6 +315,7 @@
                       v-for="item in outputData.transId"
                       type="text"
                       @click="getTransData(item)"
+                      :key="item"
                       >{{ item }}</el-button
                     >
                   </el-descriptions-item>
@@ -456,7 +460,7 @@
               </template>
               <!-- <c-scrollbar maxHeight="100%" trigger="hover"> -->
               <c-scrollbar maxHeight="280px" height="280px" trigger="hover">
-                <div v-for="item in nodeMesVisList" class="event-content">
+                <div v-for="item in nodeMesVisList" :key="item" class="event-content">
                   <div class="event-mes-block-node">
                     {{ item.mes }}
                   </div>
@@ -491,7 +495,7 @@
                 <!-- <span>点击查看区块消息</span> -->
               </template>
               <c-scrollbar maxHeight="280px" height="280px" trigger="hover">
-                <div v-for="item in blockMesVisList" class="event-content">
+                <div v-for="item in blockMesVisList" :key="item" class="event-content">
                   <div class="event-mes-block-node">
                     {{ item.mes }}
                   </div>
@@ -1039,7 +1043,7 @@
               </template>
               <el-scrollbar height="280px">
                 <div class="summary-content">
-                  <div v-for="o in summaryMes">
+                  <div v-for="o in summaryMes" :key="o">
                     {{ o.tabName + o.data }}
                   </div>
                 </div>
