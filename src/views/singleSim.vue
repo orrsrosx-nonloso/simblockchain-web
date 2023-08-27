@@ -103,7 +103,7 @@
                     content="模拟双花问题情况下的交易!"
                     placement="top"
                   >
-                    <el-dropdown-item @click="doubleSpent"
+                    <el-dropdown-item @click="doubleSpent" disabled
                       >双花问题模拟</el-dropdown-item
                     >
                   </el-tooltip>
@@ -113,11 +113,11 @@
             <el-dialog
               v-model="transactionSimVis"
               title="模拟交易(交易账户为节点内默认账户)"
-              width="50%"
+              width="40%"
               :before-close="transSimVisHandleClose"
             >
               <div>
-                <el-select v-model="valueTrans1" placeholder="交易发起者">
+                <el-select v-model="valueTrans1" placeholder="交易发起者" class="transLeftContent"> 
                   <el-option
                     v-for="item in NodeTrans"
                     :fit-input-width="true"
@@ -128,6 +128,7 @@
                   </el-option>
                 </el-select>
                 <el-select
+                  class="transRightContent"
                   v-model="valueTrans2"
                   collapse-tags
                   style="margin-left: 20px"
@@ -142,8 +143,9 @@
                   </el-option>
                 </el-select>
               </div>
+              <br>  
               <div style="padding-top: 20px">
-                交易金额 :<el-input-number
+                交易量级 :<el-input-number
                   v-model="numTrans"
                   :precision="2"
                   :step="0.01"
@@ -438,6 +440,7 @@
               <div style="padding-left: 20%; padding-right: 20%">
                 <!-- <el-progress :percentage="percentage" :color="customColors" /> -->
                 <el-progress
+                  style="width:110%"
                   :percentage="percentage"
                   :color="customColors"
                   :status="staus"
@@ -481,6 +484,7 @@
                   ></el-form
                 >
                 <el-progress
+                  style="width:110%"
                   v-for="item in miningList"
                   :color="customColors"
                   :percentage="item.minPercentage"
@@ -947,7 +951,7 @@
                 <span>SUMMARY</span>
               </div>
             </template>
-            <div v-for="o in summaryMes" class="text item">
+            <div v-for="o in summaryMes" class="text item" style="font-weight:bold">
               {{ o.tabName + o.data }}
               <span
                 @click="rewardFindVisible = true"
@@ -968,11 +972,11 @@
                 <span>EVENT</span>
               </div>
             </template>
-            <c-scrollbar maxHeight="237px" maxWidth="280px" trigger="hover">
+            <c-scrollbar maxHeight="237px" maxWidth="100%" trigger="hover">
               <el-collapse height="110%" accordion>
                 <el-collapse-item v-for="item in eventMes" :name="item.name">
                   <template #title>
-                    <div style="margin-left = 10px">{{ item.eventName }}</div>
+                    <div style="margin-left = 10px;font-weight: bold;">{{ item.eventName }}</div>
                   </template>
                   <p class="textEvent">{{ item.data }}</p>
                 </el-collapse-item>
@@ -1653,8 +1657,8 @@
     </el-dialog>
     <el-dialog
       v-model="rewardFindVisible"
-      title="您可以配置交易手续费费比例"
-      width="40%"
+      title="您可以配置交易手续费用比例"
+      width="37%"
       :before-close="rewardFindHandleClose"
       :show-close="false"
     >
@@ -1667,7 +1671,7 @@
           :precision="2"
           :step="0.1"
           :max="10"
-        />(%)
+        /><span class="baifenhao">(%)</span>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -3778,7 +3782,9 @@ export default {
       let nowNodeType1 = presentTypeNode;
       let nowNodeType2 = nowNodeType.value;
       if (nowNodeType.value == "miningNode") {
-        hashRateVis.value = true;
+        setTimeout(() => {
+          hashRateVis.value = true;
+        }, 1500);
       }
 
       let params = {
@@ -3943,7 +3949,7 @@ export default {
         const res = ress.preData;
         if (res.length == 0) {
           ElMessage({
-            message: "相关交易未创建,请先创建交易或区块!",
+            message: "相关交易未创建或不存在,请先创建交易或区块!",
             type: "warning",
           });
         } else {
@@ -5899,6 +5905,7 @@ export default {
   width: 100%;
   height: 20px;
   margin-bottom: 10px;
+  font-weight: bold;
 }
 .opButton {
   margin-bottom: 10px;
@@ -5929,7 +5936,7 @@ export default {
   height: 1400px;
 }
 .feeEdit {
-  color: rgba(255, 255, 255, 0);
+  color: #4080cf;
   cursor: pointer;
   padding-left: 100px;
 }
@@ -6023,5 +6030,16 @@ export default {
   height: 100%;
   width: 20px;
   background-color: #878787;
+}
+.transLeftContent {
+  width: 40%;
+}
+.transRightContent {
+  width: 40%;
+}
+.baifenhao{
+  font-weight: bold;
+  font-size: 17px;
+  padding-left: 7px;
 }
 </style>
