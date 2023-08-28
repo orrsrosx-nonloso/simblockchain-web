@@ -29,6 +29,21 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
         nonce++;
     }
     let blockMesList = [];
+    let predif1data = 2000 * hashList[0].nonce + miningNodeList[0].hashRate;
+    let predif = [];
+    for (let i = 1; i <= blockSize; i++) {
+        if(i==1){
+            predif[i-1] = predif1data;
+        }
+        else{
+            if((i+1)%5==0){
+                predif[i-1]= predif[i-2]*randomNum(0.7,1.4,4)
+            }
+            else{
+                predif[i-1]= predif[i-2];
+            }
+        }
+    }
     for (let i = 1; i <= blockSize; i++) {
         //随机产生挖矿的矿工节点
         miningNodeList.shuffle();
@@ -47,7 +62,7 @@ export function blockMesListCreate(WholeSimData, nodeMesList, blockTime, blockSi
             confirmations: 0,//确定
             //交易量
             numOfTransac: 0,
-            difficulty: 2000 * hashList[i - 1].nonce + miningNodeList[0].hashRate,
+            difficulty: predif[i-1],
             nonce: hashList[i - 1].nonce,
             transactionVolume: 0,
             reward: WholeSimData.blockReward,
@@ -559,5 +574,47 @@ function getOrphanLenList(OrphanLenList, nodeLen, targetorOrphanLen) {
             OrphanLenList.push(j);
             jl++;
         }
+    }
+}
+
+function adDifForNextBlock(height, preDif) {
+    let timeBlocks = 2;//每3个块调整一次，每个块默认10分钟；
+    let normalTime =10;
+    if((height+1)%2==0){
+        if((height+1)%2==0){//达到目标值
+            let sumTime = 0;
+            for (let i=0;i<timeBlocks;i++){
+                let min = normalTime-2;
+                let max = normalTime+3;
+                let nDif = randomNum(min,max,4);
+                var nDifI = Number(nDif);
+                sumTime+=nDifI;
+            }
+            let a = sumTime/(normalTime*timeBlocks);
+            return  (preDif*a);
+        }
+        else {
+            return preDif;
+        }
+    }
+}
+function randomNum(maxNum, minNum, decimalNum) {
+    // 获取指定范围内的随机数, decimalNum指小数保留多少位
+    var max = 0,
+        min = 0;
+    minNum <= maxNum ? (min = minNum, max = maxNum) : (min = maxNum, max = minNum);
+    switch (arguments.length) {
+        case 1:
+            return Math.floor(Math.random() * (max + 1));
+            break;
+        case 2:
+            return Math.floor(Math.random() * (max - min + 1) + min);
+            break;
+        case 3:
+            return (Math.random() * (max - min) + min).toFixed(decimalNum);
+            break;
+        default:
+            return Math.random();
+            break;
     }
 }
