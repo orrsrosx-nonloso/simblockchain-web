@@ -1769,6 +1769,10 @@ let summaryMesUpdata = reactive([
     tabName: "Transaction fee:  ",
     data: "0%",
   },
+  {
+    tabName: "默认产快时间单位:  ",
+    data: "10",
+  },
   // {
   //   tabName: "Account quantity:  ",
   //   data: "0",
@@ -3564,6 +3568,10 @@ export default {
       {
         tabName: "Transaction fee:  ",
         data: "0%",
+      },
+      {
+        tabName: "默认产块时间单位:  ",
+        data: "10",
       },
       // {
       //   tabName: "Account quantity:  ",
