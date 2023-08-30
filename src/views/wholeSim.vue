@@ -878,10 +878,10 @@
         >
       </el-dialog>
       <div class="reStarteSim">
-        <el-button type="primary" @click="reStartSim" plain>再次仿真</el-button>
+        <el-button type="primary" size="small" @click="reStartSim" plain>再次仿真</el-button>
       </div>
       <div class="simDataGet">
-        <el-button @click="simDataGetlist5" plain>仿真记录</el-button>
+        <el-button size="small" @click="simDataGetlist5" plain>仿真记录</el-button>
       </div>
       <div class="wholeSimTeamstamp" style="color: #916b0a">
         <!-- <el-button
@@ -4483,19 +4483,19 @@ export default {
   margin-top: 1%;
   position: absolute;
   background-color: #fff;
-  right: 2%;
-  width: 8%;
+  right: 1%;
+  width: 5%;
   height: auto;
   z-index: 999;
   padding: 0 1%;
   opacity: 0.8;
 }
 .simDataGet {
-  margin-top: 43%;
+  margin-top: 1%;
   position: absolute;
   background-color: #fff;
-  right: 2%;
-  width: 8%;
+  right: 10%;
+  width: 5%;
   height: auto;
   z-index: 999;
   padding: 0 1%;

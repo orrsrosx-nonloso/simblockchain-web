@@ -4930,19 +4930,19 @@ export default {
   margin-top: 1%;
   position: absolute;
   background-color: #fff;
-  right: 2%;
-  width: 8%;
+  right: 1%;
+  width: 5%;
   height: auto;
   z-index: 1000;
   padding: 0 1%;
   opacity: 0.8;
 }
 .simDataGet {
-  margin-top: 53%;
+  margin-top: 1%;
   position: absolute;
   background-color: #fff;
-  right: 2%;
-  width: 8%;
+  right: 10%;
+  width: 5%;
   height: auto;
   z-index: 999;
   padding: 0 1%;
