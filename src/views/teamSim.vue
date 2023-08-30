@@ -1082,6 +1082,9 @@
                   <div class="dataImport">
                     <el-button type="primary" @click="findUserSimList" size="large">查看仿真记录</el-button>
                   </div>
+                   <div class="dataImport">
+                    <el-button type="primary" @click="findaddUserSimList" size="large">在线加入仿真</el-button>
+                  </div>
                 </div>
               </div>
               <div class="mesBox" v-show="activeIndex == 4">
@@ -1704,7 +1707,8 @@ import {
   configWholeSettingEndDataTeam,
   configWholeBlockMesTeam,
   getConfigSimDataTeam,
-  getUserisOnSimState
+  getUserisOnSimState,
+  getUserTeamSimAgain
 } from "../api/apis";
 // import * as  bitcoin from 'bitcoinjs-lib';
 import { nodeCreated } from "../wholesim/wholeNode";
@@ -4728,6 +4732,17 @@ export default {
     },
     //继续仿真
     teamSimAgain(id,userName){
+      let param = {
+        userList:null,
+        teamSimDataOutput:null,
+        mes:"",
+        username:userName,
+        wholeSimId:id,
+        status:1
+      }
+      getUserTeamSimAgain(param).then((resnode) => {
+        console.log(resnode);
+      });
       console.log("again success!")
     },
     //查看仿真记录
@@ -4751,6 +4766,9 @@ export default {
         this.simDataUserListVisible = true;
       });
       console.log("查看仿真记录")
+    },
+    findaddUserSimList(){
+      
     }
   },
 };

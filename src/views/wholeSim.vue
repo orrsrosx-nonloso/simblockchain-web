@@ -413,7 +413,7 @@
       </div>
 
       <!-- 当前用户仿真数据获取 -->
-      <el-dialog v-model="simDataeVisible" title="仿真记录" width="40%">
+      <el-dialog v-model="simDataeVisible" title="仿真记录" width="36%">
         <el-table :data="blockDataTableData" style="width: 100%">
           <el-table-column prop="id" label="Id" width="60" />
           <el-table-column prop="numOfNodes" label="NumOfNode" width="130" />
@@ -611,6 +611,13 @@
               align="left"
               min-width="100px"
               >{{ createMesData.mes }}</el-descriptions-item
+            >
+            <el-descriptions-item
+              label="区块挖掘难度"
+              label-align="left"
+              align="left"
+              min-width="100px"
+              >{{ createMesData.blockDif }}</el-descriptions-item
             >
 
             <el-descriptions-item
@@ -886,7 +893,8 @@
           >虚拟时间进度:{{ simFlowTime.timeString }}</el-button
         > -->
         <span>虚拟时间进度:</span
-        ><el-date-picker
+        >
+        <el-date-picker
           v-model="simFlowTime.timeData"
           size="large"
           type="datetime"
@@ -1633,6 +1641,10 @@ export default {
         tabName: "账户数量:  ",
         data: "0",
       },
+      {
+        tabName: "默认产块时间单位:  ",
+        data: "10"
+      },
     ]);
     //
     let nodeMesVisList = reactive([
@@ -1952,6 +1964,7 @@ export default {
     //直接获取仿真结果
     const nextEnd = () => {
       dialogWholeSimVisible.value = false;
+      let loading = openFullScreen("加载中...");
       reSetSimEndTimeStr(getTargetDataStr(WholeSimData.simEndTime));
       let data = {
         wholeSimDataInput: JSON.parse(JSON.stringify(WholeSimData)),
@@ -1963,6 +1976,7 @@ export default {
         if (res.status == 1) {
           simDataId = res.wholeSimId;
           simState.value = true;
+          loading.close();
           startWholeSim(res.wholeSimId, 1); // 1表示不实时显示仿真流程
         } else {
           ElMessageBox.alert("一些错误：" + res.mes, "ALERT", {
@@ -1978,6 +1992,7 @@ export default {
       if (activeIndex.value == 4) {
         let j = WholeSimData;
         dialogWholeSimVisible.value = false;
+        let loading = openFullScreen("加载中...");
         reSetSimEndTimeStr(getTargetDataStr(WholeSimData.simEndTime));
         let data = {
           wholeSimDataInput: JSON.parse(JSON.stringify(WholeSimData)),
@@ -1989,6 +2004,7 @@ export default {
           if (res.status == 1) {
             simDataId = res.wholeSimId;
             simState.value = true;
+            loading.close();
             startWholeSim(res.wholeSimId, 0); //0表示实时显示仿真流程
           } else {
             ElMessageBox.alert("一些错误：" + res.mes, "ALERT", {
@@ -2096,6 +2112,7 @@ export default {
       isOrphan: "false",
       minerReward: "",
       timestamp: "",
+      blockDif:0
     });
     let nodeMesData = reactive({
       type: "0",
@@ -2482,6 +2499,8 @@ export default {
         mes.contentMessage.type == "blockCreated" ||
         mes.contentMessage.type == "normalMes"
       ) {
+        this.createMesData.type = mes.contentMessage.type;
+        this.createMesData.blockDif = parseInt(mes.contentMessage.blockDif);
         this.createMesData.mes = mes.mes;
         this.createMesData.isOrphan = mes.contentMessage.isOrphan;
         this.createMesData.timestamp = new Date(mes.contentMessage.timestamp);
@@ -2525,6 +2544,8 @@ export default {
         mes.contentMessage.type == "blockCreated" ||
         mes.contentMessage.type == "normalMes"
       ) {
+        this.createMesData.type = mes.contentMessage.type;
+        this.createMesData.blockDif = parseInt(mes.contentMessage.blockDif);
         this.createMesData.mes = mes.mes;
         this.createMesData.isOrphan = mes.contentMessage.isOrphan;
         this.createMesData.timestamp = new Date(mes.contentMessage.timestamp);
@@ -2840,7 +2861,7 @@ export default {
           map: "world",
           type: "map",
           mapType: "world",
-          roam: true,
+          roam: false,//是否可以移动
           zoom: 1.2,
           label: {
             normal: {
@@ -3237,10 +3258,12 @@ export default {
           confirmId: confirmedId,
           timestamp: timestampMes,
           isOrphan: "false",
+          blockDif: mes.targetBlock.difficulty,
         };
         titleMesBlock.push({ id: titleMesBlock.length, content: "区块创建" });
         contentMesBlock.unshift({
           id: contentMesBlock.length,
+          type: mes.type,
           contentMessage: blockEndMes,
           mes:
             "区块" +
@@ -3319,10 +3342,12 @@ export default {
           confirmId: "",
           timestamp: timestampMes,
           isOrphan: "true",
+          blockDif: mes.targetBlock.difficulty
         };
         titleMesBlock.push({ id: titleMesBlock.length, content: "区块创建" });
         contentMesBlock.unshift({
           id: contentMesBlock.length,
+          type: mes.type,
           contentMessage: blockEndMes,
           mes:
             "区块" +
@@ -4369,6 +4394,7 @@ export default {
           ) {
             let targetminer = mesList2[i].contentMessage.miner;
             if (targetminer.toLowerCase().indexOf(content) != -1) {
+              
               this.searchMesList.push(mesList2[i]);
             }
           } else {
