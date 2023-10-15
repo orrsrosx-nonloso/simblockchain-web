@@ -6040,9 +6040,11 @@ export default {
   background-color: #878787;
 }
 .transLeftContent {
+  position: relative;
   width: 40%;
 }
 .transRightContent {
+  position: relative;
   width: 40%;
 }
 .baifenhao{
